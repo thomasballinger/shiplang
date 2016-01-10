@@ -97,7 +97,19 @@
   function entityMove(e, dt){
     e.x += e.dx * dt;
     e.y += e.dy * dt;
-    if (e.dh !== undefined){
+    if (e.hTarget !== undefined){
+      var diff = (e.h - e.hTarget + 3600) % 360;
+      var delta = diff <= 180 ? diff : 360 - diff;
+      diff = e.hTarget - e.h;
+      if (diff > 0 ? diff > 180 : diff >= -180){
+        e.h = (e.h - Math.min(e.maxDH*dt, delta)) % 360;
+      } else {
+        e.h = (e.h + Math.min(e.maxDH*dt, delta)) % 360;
+      }
+      if (delta < 0.01){
+        e.hTarget = undefined;
+      }
+    } else if (e.dh !== undefined){
       e.h += e.dh * dt;
     }
     if (e.thrust !== undefined){

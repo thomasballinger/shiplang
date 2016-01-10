@@ -35,15 +35,20 @@
   }
 
   function turnLeft(entity, x){
-    console.log('turnLeft called on', entity, x);
     var target_h = (entity.h - x) % 360;
-    entity.dh = entity.maxDH;
+    return turnTo(entity, target_h);
+  }
+
+  function turnRight(entity, x){
+    var target_h = (entity.h + x) % 360;
+    return turnTo(entity, target_h);
+  }
+
+  function turnTo(entity, x){
+    entity.hTarget = x;
+    console.log('turnTo called on', entity, x);
     function doneWaiting(){
-      if (Math.abs(((entity.h - target_h) % 360) - 360) < 5){
-        entity.dh = 0;
-        return true;
-      }
-      return false;
+      return (entity.hTarget === undefined);
     }
     return doneWaiting;
   }
