@@ -1,0 +1,57 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>missiles</title>
+<style type="text/css" media="screen">
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-color: #777777;
+    body {
+      background-color: #111111
+    }
+</style>
+</head>
+<body>
+<canvas id="canvas" width="1" height="1"></canvas>
+<div id="errorbar"></div>
+<script>
+  var canvas = document.getElementById('canvas');
+  canvas.width = window.innerWidth - 630;
+  canvas.height = window.innerHeight;
+</script>
+<script src="ai.js"></script>
+<script src="Space.js"></script>
+
+<script>
+function* pilotScript(e){
+  yield ai.thrustFor(e, .3);
+  yield ai.turnLeft(e, 180);
+  yield ai.thrustFor(e, .3);
+  yield ai.turnLeft(e, 180);
+  yield ai.thrustFor(e, .3);
+  yield ai.turnLeft(e, 180);
+  yield ai.thrustFor(e, .3);
+  ai.detonate(e);
+}
+</script>
+
+<script>
+  var display = new Space.SpaceDisplay('canvas');
+  var world = new Space.SpaceWorld();
+
+  var ship = Space.makeShip(10, 200, .1, .1, -90, pilotScript);
+  world.addEntity(Space.makeBoid(10, 20, .1, .2));
+  world.addEntity(Space.makeBoid(100, 200, .1, .2));
+  world.addEntity(ship);
+  setInterval(function(){
+    world.tick()
+    display.render(world.entities, 0, 0, 1000, 1000);
+  }, 10);
+
+</script>
+</body>
+</html>
