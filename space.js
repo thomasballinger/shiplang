@@ -82,6 +82,8 @@
     var ship = makeEntity('ship', x, y, dx, dy, 10);
     ship.h = h;
     ship.thrust = 0;
+    ship.maxThrust = 1000;
+    ship.maxDH = 360;
     ship.script = script;
     return ship;
   }
@@ -182,9 +184,9 @@
     }
     this.entities = this.entities.filter(function(x){return x !== null;});
   };
-  SpaceWorld.prototype.tick = function(){
+  SpaceWorld.prototype.tick = function(dt){
     for (var i=0; i<this.entities.length; i++){
-      entityMove(this.entities[i], 1);
+      entityMove(this.entities[i], dt);
     }
     this.checkCollisions();
     for (var i=0; i<this.entities.length; i++){

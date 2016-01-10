@@ -3,7 +3,7 @@
 
   function thrustFor(entity, x){
     console.log('thrustFor called on', entity, x);
-    entity.thrust = 0.1;
+    entity.thrust = entity.maxThrust;
 
     var t0 = new Date().getTime();
     function doneWaiting(){
@@ -32,7 +32,7 @@
   function turnLeft(entity, x){
     console.log('turnLeft called on', entity, x);
     var target_h = (entity.h - x) % 360;
-    entity.dh = 2;
+    entity.dh = entity.maxDH;
     function doneWaiting(){
       if (Math.abs(((entity.h - target_h) % 360) - 360) < 5){
         entity.dh = 0;

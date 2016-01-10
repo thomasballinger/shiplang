@@ -61,11 +61,16 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   world.addEntity(Space.makeBoid(10, 20, .1, .2));
   world.addEntity(Space.makeBoid(100, 200, .1, .2));
   world.addEntity(ship);
-  setInterval(function(){
-    world.tick()
+  var last_tick = new Date().getTime()
+  function tick(){
+    var now = new Date().getTime();
+    var dt = now - last_tick;
+    last_tick = now;
+    world.tick(dt / 1000);
     display.render(world.entities, 0, 0, 1000, 1000);
-  }, 10);
-
+    setTimeout(tick, 10);
+  }
+  tick();
 </script>
 </body>
 </html>
