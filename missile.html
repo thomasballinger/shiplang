@@ -47,6 +47,10 @@ function* pilotScript(e){
   }
   ai.detonate(e);
 }
+function* boidScript(e){
+  ai.setThrust(e, e.maxThrust * .5)
+  yield ai.turnLeft(e, 180);
+}
 </script>
 <script>
 var pilotScriptSource = document.getElementById('pilot-script').innerHTML;
@@ -58,8 +62,8 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   var world = new Space.SpaceWorld();
 
   var ship = Space.makeShip(10, 200, .1, .1, -90, pilotScript);
-  world.addEntity(Space.makeBoid(10, 20, .1, .2));
-  world.addEntity(Space.makeBoid(100, 200, .1, .2));
+  world.addEntity(Space.makeBoid(10, 20, .1, .2, boidScript));
+  world.addEntity(Space.makeBoid(100, 200, .1, .2, boidScript));
   world.addEntity(ship);
   var last_tick = new Date().getTime()
   function tick(){

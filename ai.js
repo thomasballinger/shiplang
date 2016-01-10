@@ -16,6 +16,11 @@
     return doneWaiting;
   }
 
+  function setThrust(entity, x){
+    console.log('set thrust ran:', entity, x);
+    entity.thrust = Math.max(0, Math.min(x, entity.maxThrust));
+  }
+
   function waitFor(entity, x){
     console.log('waitFor called by', entity, x);
 
@@ -50,6 +55,7 @@
 
   function runEntityScript(e){
     if (e.readyCallback === 'done'){
+      console.log('already done', e);
       return;
     }
     if (e.scriptInProgress === undefined){
@@ -86,6 +92,7 @@
   ai.thrustFor = thrustFor;
   ai.turnLeft = turnLeft;
   ai.waitFor = waitFor;
+  ai.setThrust = setThrust;
   ai.detonate = detonate;
 
   if (typeof exports !== 'undefined') {
