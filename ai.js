@@ -16,6 +16,19 @@
     return doneWaiting;
   }
 
+  function waitFor(entity, x){
+    console.log('waitFor called by', entity, x);
+
+    var t0 = new Date().getTime();
+    function doneWaiting(){
+      if (new Date().getTime() > t0 + (x * 1000)){
+        return true;
+      }
+      return false;
+    }
+    return doneWaiting;
+  }
+
   function turnLeft(entity, x){
     console.log('turnLeft called on', entity, x);
     var target_h = (entity.h - x) % 360;
@@ -55,7 +68,6 @@
       }
       e.readyCallback = request.value;
     }
-    console.log(e.readyCallback);
     while (e.readyCallback()){
       request = e.scriptInProgress.next();
       if (request.done){
@@ -73,6 +85,7 @@
   ai.runEntityScript = runEntityScript;
   ai.thrustFor = thrustFor;
   ai.turnLeft = turnLeft;
+  ai.waitFor = waitFor;
   ai.detonate = detonate;
 
   if (typeof exports !== 'undefined') {

@@ -6,10 +6,7 @@
     require = module.require;
   } else {
     require = function(name){
-      console.log(name);
       var realname = name.match(/(\w+)[.]?j?s?$/)[1];
-      console.log(realname);
-      console.log(window[realname]);
       return window[realname];
     };
   }
@@ -115,7 +112,7 @@
     },
     'ship': function(e, ctx, dx, dy, scale_factor){
       ctx.fillStyle="#eeaa22";
-      if (e.thrusting){
+      if (e.thrust > 0){
       drawPoly(ctx,
                e.x + dx - e.r/2 * scale_factor,
                e.y + dy - e.r/2 * scale_factor,
@@ -139,10 +136,10 @@
       drawPoly(ctx,
                e.x + dx - e.r/2 * scale_factor,
                e.y + dy - e.r/2 * scale_factor,
-               [[-103*scale_factor, -100*scale_factor],
-                [-90*scale_factor, 100*scale_factor],
-                [90*scale_factor, 110*scale_factor],
-                [130*scale_factor, -100*scale_factor]],
+               [[-13*scale_factor, -10*scale_factor],
+                [-9*scale_factor, 10*scale_factor],
+                [9*scale_factor, 10*scale_factor],
+                [13*scale_factor, -10*scale_factor]],
                e.h);
     }
   };
@@ -175,6 +172,7 @@
         e2 = this.entities[j];
         if (dist(e1.x, e1.y, e2.x, e2.y) < e1.r + e2.r){
           collisions.push([i, j]);
+          console.log('collision!');
         }
       }
     }

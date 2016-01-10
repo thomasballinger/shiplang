@@ -3,19 +3,29 @@
 <meta charset="UTF-8">
 <title>missiles</title>
 <style type="text/css" media="screen">
+    body {
+      background-color: #111111
+    }
+    #editor {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 630px;
+        color: #eeeeee;
+    }
     #canvas {
       position: absolute;
       top: 0;
-      left: 0;
+      left: 630px;
       bottom: 0;
       right: 0;
       background-color: #777777;
-    body {
-      background-color: #111111
     }
 </style>
 </head>
 <body>
+  <div id="editor"><code><pre>hello</pre><code></div>
 <canvas id="canvas" width="1" height="1"></canvas>
 <div id="errorbar"></div>
 <script>
@@ -26,17 +36,21 @@
 <script src="ai.js"></script>
 <script src="Space.js"></script>
 
-<script>
+<script id="pilot-script">
 function* pilotScript(e){
-  yield ai.thrustFor(e, .3);
+  yield ai.waitFor(e, .5);
+  yield ai.thrustFor(e, .15);
   yield ai.turnLeft(e, 180);
-  yield ai.thrustFor(e, .3);
-  yield ai.turnLeft(e, 180);
-  yield ai.thrustFor(e, .3);
-  yield ai.turnLeft(e, 180);
-  yield ai.thrustFor(e, .3);
+  while(true){
+    yield ai.thrustFor(e, .3);
+    yield ai.turnLeft(e, 180);
+  }
   ai.detonate(e);
 }
+</script>
+<script>
+var pilotScriptSource = document.getElementById('pilot-script').innerHTML;
+document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'</pre></code>';
 </script>
 
 <script>
