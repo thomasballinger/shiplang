@@ -80,7 +80,9 @@
       boid.script = script;
     }
     boid.h = Math.random() * 360;
-    boid.maxThrust = 100;
+    boid.dh = Math.random() * 100 - 50;
+    boid.maxThrust = 1;
+    boid.maxDH = Math.abs(boid.dh);
     return boid;
   }
 
@@ -89,7 +91,7 @@
     ship.h = h;
     ship.thrust = 0;
     ship.maxThrust = 1000;
-    ship.maxDH = 360;
+    ship.maxDH = 300;
     ship.script = script;
     return ship;
   }
@@ -108,6 +110,7 @@
       }
       if (delta < 0.01){
         e.hTarget = undefined;
+        e.dh = 0;
       }
     } else if (e.dh !== undefined){
       e.h += e.dh * dt;
@@ -119,36 +122,42 @@
   }
 
   function entityDraw(e, ctx, x_offset, y_offset, scale_factor){
-    return entityDraws[e.type](e, ctx, x_offset, y_offset, scale_factor);
+    //TODO x and y offsets for panning
+    //TODO scale_factor for zooming
+    return entityDraws[e.type](e, ctx);
   }
 
   var entityDraws = {
-    'boid': function(e, ctx, dx, dy, scale_factor){
+    'boid': function(e, ctx){
       ctx.fillStyle="#ffeebb";
-      ctx.fillRect((e.x + dx - e.r/2) * scale_factor,
-                    e.y + dy - e.r/2 * scale_factor,
-                    e.r * scale_factor,
-                    e.r * scale_factor);
+      drawPoly(ctx,
+               e.x,
+               e.y,
+               [[-e.r, -e.r],
+                [-e.r, e.r],
+                [e.r, e.r],
+                [e.r, -e.r]],
+               e.h);
     },
     'ship': function(e, ctx, dx, dy, scale_factor){
       ctx.fillStyle="#eeaa22";
       if (e.thrust > 0){
       drawPoly(ctx,
-               e.x + dx - e.r/2 * scale_factor,
-               e.y + dy - e.r/2 * scale_factor,
-               [[-13*scale_factor, -10*scale_factor],
-                [-9*scale_factor, -10*scale_factor],
-                [-9*scale_factor, 10*scale_factor],
-                [-13*scale_factor, 10*scale_factor]],
+               e.x,
+               e.y,
+               [[-13, -10],
+                [-9, -10],
+                [-9, 10],
+                [-13, 10]],
                e.h);
       }
       ctx.fillStyle="#aaeebb";
       drawPoly(ctx,
-               e.x + dx - e.r/2 * scale_factor,
-               e.y + dy - e.r/2 * scale_factor,
-               [[15*scale_factor, 0*scale_factor],
-                [-10*scale_factor, -12*scale_factor],
-                [-10*scale_factor, 12*scale_factor]],
+               e.x,
+               e.y,
+               [[15, 0],
+                [-10, -12],
+                [-10, 12]],
                e.h);
     },
     'explosion': function(e, ctx, dx, dy, scale_factor){

@@ -39,11 +39,16 @@
 <script id="pilot-script">
 function* pilotScript(e){
   yield ai.waitFor(e, .5);
-  yield ai.thrustFor(e, .15);
-  yield ai.turnLeft(e, 180);
-  while(true){
-    yield ai.thrustFor(e, .3);
-    yield ai.turnLeft(e, 180);
+  yield ai.thrustFor(e, .1);
+  while (true){
+    if (e.y > 500 && e.dy > 0){
+      yield ai.turnTo(e, 270);
+      yield ai.thrustFor(e, .2);
+    } else if (e.y < 100 && e.dy < 0){
+      yield ai.turnTo(e, 90);
+      yield ai.thrustFor(e, .2);
+    }
+    yield ai.waitFor(e, .3);
   }
   ai.detonate(e);
 }
@@ -61,9 +66,9 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   var display = new Space.SpaceDisplay('canvas');
   var world = new Space.SpaceWorld();
 
-  var ship = Space.makeShip(10, 200, .1, .1, -90, pilotScript);
-  world.addEntity(Space.makeBoid(10, 20, .1, .2, boidScript));
-  world.addEntity(Space.makeBoid(100, 200, .1, .2, boidScript));
+  var ship = Space.makeShip(100, 200, .1, .1, 90, pilotScript);
+  world.addEntity(Space.makeBoid(180, 90, .1, .2, boidScript));
+  world.addEntity(Space.makeBoid(200, 200, .1, .2, boidScript));
   world.addEntity(ship);
   var last_tick = new Date().getTime()
   function tick(){

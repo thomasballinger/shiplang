@@ -60,7 +60,6 @@
 
   function runEntityScript(e){
     if (e.readyCallback === 'done'){
-      console.log('already done', e);
       return;
     }
     if (e.scriptInProgress === undefined){
@@ -96,6 +95,8 @@
   ai.runEntityScript = runEntityScript;
   ai.thrustFor = thrustFor;
   ai.turnLeft = turnLeft;
+  ai.turnRight = turnRight;
+  ai.turnTo = turnTo;
   ai.waitFor = waitFor;
   ai.setThrust = setThrust;
   ai.detonate = detonate;
