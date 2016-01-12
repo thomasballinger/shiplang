@@ -161,6 +161,13 @@
                 [-13, 10]],
                e.h);
       }
+      if (e.scanning){
+        ctx.fillStyle="#222222";
+        ctx.lineStyle="#550099";
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r*10, 0, 2*Math.PI);
+        ctx.stroke();
+      }
       ctx.fillStyle="#aaeebb";
       drawPoly(ctx,
                e.x,
@@ -175,10 +182,10 @@
       drawPoly(ctx,
                e.x,
                e.y,
-               [[-13, -10],
-                [-9, 10],
-                [9, 10],
-                [13, -10]],
+               [[-130, -100],
+                [-90, 100],
+                [90, 100],
+                [130, -100]],
                e.h);
     },
     'missile': function(e, ctx, dx, dy){
