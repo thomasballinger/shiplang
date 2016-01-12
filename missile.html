@@ -73,13 +73,14 @@ function* fireMissile(e){
     yield ai.waitFor(e, .1);
 }
 function* missileScript(e){
-  yield ai.thrustFor(e, .7);
+  yield ai.thrustFor(e, .4);
   if (world.distToClosest(e) < 4){
     return ai.detonate(e);
   }
+  yield ai.thrustFor(e, .2);
   while (true){
     yield* missilePursuit(e);
-    if (world.distToClosest(e) < 20) {
+    if (world.distToClosest(e) < 25) {
       break
     }
   }
