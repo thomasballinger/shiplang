@@ -74,10 +74,10 @@
   }
 
   function detonate(entity){
-    entity.type = 'explosion';
     entity.r = 100;
-    entity.dx = 1;// Math.pow(entity.dx, 0.2);
-    entity.dy = 2;// Math.pow(entity.dy, 0.2);
+    entity.type = 'explosion';
+    entity.dx = entity.dx/Math.abs(entity.dx)*Math.pow(Math.abs(entity.dx), .2) || 0;
+    entity.dy = entity.dy/Math.abs(entity.dy)*Math.pow(Math.abs(entity.dy), .2) || 0;
   }
 
   function runEntityScript(e){
