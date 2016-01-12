@@ -38,52 +38,10 @@
 <script src="manual.js"></script>
 
 <script id="pilot-script">
-function* pilotScript(e){
-  yield ai.thrustFor(e, .1);
+function* faceShip(e){
   while (true){
-    if (e.y > 400 && e.dy > 0){
-      yield ai.turnTo(e, 270);
-      yield ai.thrustFor(e, .2);
-    } else if (e.y < 200 && e.dy < 0){
-      yield ai.turnTo(e, 90);
-      yield ai.thrustFor(e, .2);
-    }
-    var spot = yield* scanForEnemy(e);
-    yield* fireMissile(e);
+    yield ai.turnTo(e, ai.towards(e, ship));
   }
-}
-function* boidScript(e){
-  ai.setThrust(e, e.maxThrust * .5)
-  yield ai.turnLeft(e, 180);
-}
-function* missilePursuit(e){
-  var closest = world.findClosest(e);
-  yield ai.turnTo(e, ai.towards(e, closest));
-  yield ai.thrustFor(e, 0.1);
-}
-function* scanForEnemy(e){
-  e.scanning = true;
-  yield ai.waitFor(e, 1)
-  e.scanning = false;
-  return [300, 200];
-}
-function* fireMissile(e){
-    yield ai.waitFor(e, .1);
-    world.addEntity(Space.fireMissile(e, missileScript))
-    yield ai.waitFor(e, .1);
-}
-function* missileScript(e){
-  yield ai.thrustFor(e, .7);
-  if (world.distToClosest(e) < 4){
-    return ai.detonate(e);
-  }
-  while (true){
-    yield* missilePursuit(e);
-    if (world.distToClosest(e) < 20) {
-      break
-    }
-  }
-  ai.detonate(e);
 }
 function* manualDrive(e){
   while (true){
@@ -106,11 +64,18 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   var display = new Space.SpaceDisplay('canvas');
   var world = new Space.SpaceWorld();
 
-  var ship = Space.makeShip(400, 190, 17, .1, 270, manualDrive);
+  var ship = Space.makeShip(200, 200, 0, 0, 0, manualDrive);
   world.addEntity(ship);
-  world.addEntity(Space.makeShip(70, 190, 17, .1, 270, pilotScript));
-  world.addEntity(Space.makeBoid(180, 90, .1, .2, boidScript));
-  world.addEntity(Space.makeBoid(180, 150, .1, .2, boidScript));
+  world.addEntity(Space.makeShip(50, 350, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(80, 330, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(120, 310,0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(150, 310, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(200, 30, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(250, 310, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(280, 310, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(320, 310, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(350, 350, 0, .1, 0, faceShip));
+  world.addEntity(Space.makeShip(400, 350, 0, .1, 0, faceShip));
   var last_tick = new Date().getTime()
   function tick(){
     var now = new Date().getTime();

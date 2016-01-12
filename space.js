@@ -109,9 +109,9 @@
       var delta = diff <= 180 ? diff : 360 - diff;
       diff = e.hTarget - e.h;
       if (diff > 0 ? diff > 180 : diff >= -180){
-        e.h = (e.h - Math.min(e.maxDH*dt, delta)) % 360;
+        e.h = (e.h - Math.min(e.maxDH*dt, delta) + 3600) % 360;
       } else {
-        e.h = (e.h + Math.min(e.maxDH*dt, delta)) % 360;
+        e.h = (e.h + Math.min(e.maxDH*dt, delta) + 3600) % 360;
       }
       if (delta < 0.01){
         e.hTarget = undefined;
@@ -119,13 +119,14 @@
       }
     } else if (e.dh !== undefined){
       if (e.h === undefined){
-        throw Error("e.h is not a number: "+e)
+        throw Error("e.h is not a number: "+e);
       }
       e.h += e.dh * dt;
+      e.h = (e.h + 3600) % 360;
     }
     if (e.thrust !== undefined){
       if (e.h === undefined){
-        throw Error("e.h is not a number: "+e)
+        throw Error("e.h is not a number: "+e);
       }
       e.dx += x_comp(e.h) * e.thrust * dt;
       e.dy += y_comp(e.h) * e.thrust * dt;

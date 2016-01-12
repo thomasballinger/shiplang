@@ -22,7 +22,7 @@
     }
     var dx = x2 - x1;
     var dy = y2 - y1;
-    return ((Math.atan2(dx, -dy) * 180 / Math.PI) + 270 + 360) % 360;
+    return (((Math.atan2(dx, -dy) * 180 / Math.PI) + 270 + 360) + 3600) % 360;
   }
 
   function thrustFor(entity, x){
@@ -56,12 +56,12 @@
   }
 
   function turnLeft(entity, x){
-    var target_h = (entity.h - x) % 360;
+    var target_h = ((entity.h - x) + 3600) % 360;
     return turnTo(entity, target_h);
   }
 
   function turnRight(entity, x){
-    var target_h = (entity.h + x) % 360;
+    var target_h = ((entity.h + x) + 3600) % 360;
     return turnTo(entity, target_h);
   }
 
