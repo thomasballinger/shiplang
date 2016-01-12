@@ -2,6 +2,9 @@
   'use strict';
 
   function towards(e1, e2){
+    if (e2 === undefined){
+      return 0;
+    }
     return towardsPoint(e1.x, e1.y, e2.x, e2.y);
   }
 

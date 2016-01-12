@@ -91,10 +91,17 @@
   }
 
   function fireMissile(e, script){
-    return makeMissile(e.x, e.y, e.dx, e.dy, e.h, script);
+    return makeMissile(e.x + x_comp(e.h)*e.r,
+                       e.y + y_comp(e.h)*e.r,
+                       e.dx + x_comp(e.h) * 10,
+                       e.dy + y_comp(e.h) * 10,
+                       e.h, script);
   }
 
   function entityMove(e, dt){
+    if (e.type === 'explosion'){
+      e.r = Math.max(e.r - 100*dt, 1);
+    }
     e.x += e.dx * dt;
     e.y += e.dy * dt;
     if (e.hTarget !== undefined){
@@ -131,7 +138,7 @@
     //
     entityDraws[e.type](e, ctx);
     ctx.fillStyle="#222222";
-    ctx.lineStyle="#222222";
+    ctx.strokeStyle="#222222";
     ctx.beginPath();
     ctx.arc(e.x,e.y,e.r,0,2*Math.PI);
     ctx.stroke();
@@ -162,8 +169,7 @@
                e.h);
       }
       if (e.scanning){
-        ctx.fillStyle="#222222";
-        ctx.lineStyle="#550099";
+        ctx.strokeStyle="#ffeeff";
         ctx.beginPath();
         ctx.arc(e.x, e.y, e.r*10, 0, 2*Math.PI);
         ctx.stroke();
@@ -182,10 +188,10 @@
       drawPoly(ctx,
                e.x,
                e.y,
-               [[-130, -100],
-                [-90, 100],
-                [90, 100],
-                [130, -100]],
+               [[-1.3*e.r, -1*e.r],
+                [-.9*e.r, 1*e.r],
+                [.9*e.r, 1*e.r],
+                [1.3*e.r, -1*e.r]],
                e.h);
     },
     'missile': function(e, ctx, dx, dy){
@@ -194,10 +200,21 @@
                e.x,
                e.y,
                [[10, -1],
-                [-10, -2],
-                [-10, 2],
+                [-10, -3],
+                [-10, 3],
                 [10, 1]],
                e.h);
+      if (e.thrust > 0){
+        ctx.fillStyle="#eeaa22";
+        drawPoly(ctx,
+                 e.x,
+                 e.y,
+                 [[-13, -4],
+                  [-9, -3],
+                  [-9, 3],
+                  [-13, 4]],
+                 e.h);
+      }
     }
   };
 
@@ -234,14 +251,30 @@
       }
     }
     for (var k=0; k<collisions.length; k++){
-      this.entities[collisions[k][0]] = null;
-      this.entities[collisions[k][1]] = null;
+      var e1 = this.entities[collisions[k][0]];
+      if (e1 !== null && e1.type !== 'explosion'){
+        console.log('killing', e1, 'of type', e1 && e2.type);
+        this.entities[collisions[k][0]] = null;
+      }
+      var e2 = this.entities[collisions[k][1]];
+      if (e2 !== null && e2.type !== 'explosion'){
+        console.log('killing', e2, 'of type', e2 && e2.type);
+        this.entities[collisions[k][1]] = null;
+      }
+    }
+
+    // cull explosions (should be moved out of collisions)
+    for (var i=0; i<this.entities.length; i++){
+      var e = this.entities[i];
+      if (e !== null && e.type == 'explosion' && e.r < 10){
+        this.entities[i] = null;
+      }
     }
     this.entities = this.entities.filter(function(x){return x !== null;});
   };
   SpaceWorld.prototype.findClosest = function(e1){
     var minDist = Number.MAX_VALUE;
-    var other;
+    var other = undefined;
     for (var i=0; i<this.entities.length; i++){
       var e2 = this.entities[i];
       if (e1 === e2){ continue; }
@@ -255,11 +288,18 @@
   };
   SpaceWorld.prototype.distToClosest = function(e){
     var closest = this.findClosest(e);
+    if (closest === undefined){
+      return Number.MAX_VALUE;
+    }
     return dist(closest.x, closest.y, e.x, e.y);
   };
   SpaceWorld.prototype.tick = function(dt){
     for (var i=0; i<this.entities.length; i++){
-      entityMove(this.entities[i], dt);
+      var entity = this.entities[i];
+      if (entity === undefined){
+        throw Error('entity does not exist: ', this.entities);
+      }
+      entityMove(entity, dt);
     }
     this.checkCollisions();
     for (var i=0; i<this.entities.length; i++){

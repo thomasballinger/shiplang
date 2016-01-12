@@ -38,21 +38,18 @@
 
 <script id="pilot-script">
 function* pilotScript(e){
-  yield ai.waitFor(e, .5);
   yield ai.thrustFor(e, .1);
   while (true){
-    if (e.y > 300 && e.dy > 0){
+    if (e.y > 400 && e.dy > 0){
       yield ai.turnTo(e, 270);
       yield ai.thrustFor(e, .2);
-    } else if (e.y < 100 && e.dy < 0){
+    } else if (e.y < 200 && e.dy < 0){
       yield ai.turnTo(e, 90);
       yield ai.thrustFor(e, .2);
     }
     var spot = yield* scanForEnemy(e);
-    yield ai.waitFor(e, 3);
-    world.addEntity(Space.fireMissile(e, missileScript))
+    yield* fireMissile(e);
   }
-  ai.detonate(e);
 }
 function* boidScript(e){
   ai.setThrust(e, e.maxThrust * .5)
@@ -63,15 +60,22 @@ function* missilePursuit(e){
     yield ai.thrustFor(e, 0.1);
 }
 function* scanForEnemy(e){
-  console.log('scanning for enemy...');
   e.scanning = true;
   yield ai.waitFor(e, 1)
+  console.log('done waiting, turning off scanner');
   e.scanning = false;
   return [300, 200];
 }
+function* fireMissile(e){
+    yield ai.waitFor(e, .1);
+    world.addEntity(Space.fireMissile(e, missileScript))
+    yield ai.waitFor(e, .1);
+}
 function* missileScript(e){
-  yield ai.turnTo(e, 0);
-  yield ai.thrustFor(e, .5);
+  yield ai.thrustFor(e, .7);
+  if (world.distToClosest(e) < 10){
+    return ai.detonate();
+  }
   while (true){
     yield* missilePursuit(e);
     if (world.distToClosest(e) < 100) {
@@ -90,9 +94,9 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   var display = new Space.SpaceDisplay('canvas');
   var world = new Space.SpaceWorld();
 
-  var ship = Space.makeShip(100, 200, .1, .1, 90, pilotScript);
+  var ship = Space.makeShip(70, 190, 17, .1, 270, pilotScript);
   world.addEntity(Space.makeBoid(180, 90, .1, .2, boidScript));
-  world.addEntity(Space.makeBoid(200, 200, .1, .2, boidScript));
+  world.addEntity(Space.makeBoid(180, 150, .1, .2, boidScript));
   world.addEntity(ship);
   var last_tick = new Date().getTime()
   function tick(){
