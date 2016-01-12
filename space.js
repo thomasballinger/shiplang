@@ -84,7 +84,7 @@
     var missile = makeEntity('missile', x, y, dx, dy, undefined);
     missile.h = h;
     missile.thrust = 0;
-    missile.maxThrust = 200;
+    missile.maxThrust = 400;
     missile.maxDH = 360;
     missile.script = script;
     return missile;

@@ -77,7 +77,7 @@ function* missileScript(e){
   yield ai.thrustFor(e, .6);
   while (true){
     yield* missilePursuit(e);
-    yield* ai.detonateIfCloserThanFor(e, world, 10, .01);
+    yield* ai.detonateIfCloserThanFor(e, world, 30, .001);
   }
 }
 function* manualDrive(e){
@@ -113,7 +113,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
     last_tick = now;
     world.tick(dt / 1000);
     display.render(world.entities, 0, 0, 1000, 1000);
-    setTimeout(tick, 50);
+    setTimeout(tick, 5);
   }
   tick();
 </script>
