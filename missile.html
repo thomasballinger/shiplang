@@ -57,9 +57,10 @@ function* boidScript(e){
   yield ai.turnLeft(e, 180);
 }
 function* missilePursuit(e){
+  e.thrust = e.maxThrust;
   var closest = world.findClosest(e);
-  yield ai.turnTo(e, ai.towards(e, closest));
-  yield ai.thrustFor(e, 0.1);
+  yield ai.turnTowardFor(e, ai.towards(e, closest), .2);
+  e.thrust = 0;
 }
 function* scanForEnemy(e){
   e.scanning = true;
@@ -73,18 +74,11 @@ function* fireMissile(e){
     yield ai.waitFor(e, .1);
 }
 function* missileScript(e){
-  yield ai.thrustFor(e, .4);
-  if (world.distToClosest(e) < 4){
-    return ai.detonate(e);
-  }
-  yield ai.thrustFor(e, .2);
+  yield ai.thrustFor(e, .6);
   while (true){
     yield* missilePursuit(e);
-    if (world.distToClosest(e) < 25) {
-      break
-    }
+    yield* ai.detonateIfCloserThanFor(e, world, 10, .01);
   }
-  ai.detonate(e);
 }
 function* manualDrive(e){
   while (true){

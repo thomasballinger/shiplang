@@ -85,7 +85,7 @@
     missile.h = h;
     missile.thrust = 0;
     missile.maxThrust = 200;
-    missile.maxDH = 300;
+    missile.maxDH = 360;
     missile.script = script;
     return missile;
   }
@@ -196,7 +196,11 @@
                e.h);
     },
     'missile': function(e, ctx, dx, dy){
-      ctx.fillStyle="#4411AA";
+      if (e.armed){
+        ctx.fillStyle="#AA1144";
+      } else {
+        ctx.fillStyle="#4411AA";
+      }
       drawPoly(ctx,
                e.x,
                e.y,

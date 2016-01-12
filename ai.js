@@ -73,11 +73,49 @@
     return doneWaiting;
   }
 
-  function detonate(entity){
+  function turnTowardFor(e, h, x){
+    e.hTarget = h;
+    var t0 = new Date().getTime();
+    function doneWaiting(){
+      if (new Date().getTime() > t0 + (x * 1000)){
+        e.hTarget = undefined;
+        return true;
+      } else if (e.hTarget === undefined){
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return doneWaiting;
+  }
+
+  function* detonate(entity){
     entity.r = 30;
     entity.type = 'explosion';
     entity.dx = entity.dx/Math.abs(entity.dx)*Math.pow(Math.abs(entity.dx), .2) || 0;
     entity.dy = entity.dy/Math.abs(entity.dy)*Math.pow(Math.abs(entity.dy), .2) || 0;
+    yield 'done';
+  }
+
+  function* detonateIfCloserThanFor(e, world, d, x){
+    yield waitFor(e, 0.1);
+    var t0 = new Date().getTime();
+    function doneWaiting(){
+      if (new Date().getTime() > t0 + (x * 1000)){
+        return true;
+      } else if (world.distToClosest(e) < d){
+        return true;
+      } else {
+        return false;
+      }
+    }
+    e.armed = true;
+    yield doneWaiting;
+    e.armed = false;
+
+    if (world.distToClosest(e) < d || new Date().getTime() < t0 + (x * 1000)){
+      yield* detonate(e);
+    }
   }
 
   function runEntityScript(e){
@@ -108,6 +146,9 @@
         break;
       } else {
         e.readyCallback = request.value;
+        if (e.readyCallback === 'done'){
+          break;
+        }
       }
     }
   }
@@ -122,7 +163,9 @@
   ai.waitFor = waitFor;
   ai.setThrust = setThrust;
   ai.detonate = detonate;
+  ai.detonateIfCloserThanFor = detonateIfCloserThanFor;
   ai.towards = towards;
+  ai.turnTowardFor = turnTowardFor;
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
