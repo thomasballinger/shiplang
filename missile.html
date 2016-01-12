@@ -35,6 +35,7 @@
 </script>
 <script src="ai.js"></script>
 <script src="space.js"></script>
+<script src="manual.js"></script>
 
 <script id="pilot-script">
 function* pilotScript(e){
@@ -72,16 +73,24 @@ function* fireMissile(e){
 }
 function* missileScript(e){
   yield ai.thrustFor(e, .7);
-  if (world.distToClosest(e) < 10){
+  if (world.distToClosest(e) < 4){
     return ai.detonate(e);
   }
   while (true){
     yield* missilePursuit(e);
-    if (world.distToClosest(e) < 100) {
+    if (world.distToClosest(e) < 20) {
       break
     }
   }
   ai.detonate(e);
+}
+function* manualDrive(e){
+  while (true){
+    key = yield* Manual.actOnKey(e, controls);
+    if (key === 'space'){
+      yield* fireMissile(e);
+    }
+  }
 }
 </script>
 <script>
@@ -90,13 +99,17 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
 </script>
 
 <script>
+  var controls = new Manual.Controls()
+
+
   var display = new Space.SpaceDisplay('canvas');
   var world = new Space.SpaceWorld();
 
-  var ship = Space.makeShip(70, 190, 17, .1, 270, pilotScript);
+  var ship = Space.makeShip(400, 190, 17, .1, 270, manualDrive);
+  world.addEntity(ship);
+  world.addEntity(Space.makeShip(70, 190, 17, .1, 270, pilotScript));
   world.addEntity(Space.makeBoid(180, 90, .1, .2, boidScript));
   world.addEntity(Space.makeBoid(180, 150, .1, .2, boidScript));
-  world.addEntity(ship);
   var last_tick = new Date().getTime()
   function tick(){
     var now = new Date().getTime();
@@ -104,7 +117,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
     last_tick = now;
     world.tick(dt / 1000);
     display.render(world.entities, 0, 0, 1000, 1000);
-    setTimeout(tick, 5);
+    setTimeout(tick, 50);
   }
   tick();
 </script>

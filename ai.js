@@ -74,7 +74,7 @@
   }
 
   function detonate(entity){
-    entity.r = 100;
+    entity.r = 30;
     entity.type = 'explosion';
     entity.dx = entity.dx/Math.abs(entity.dx)*Math.pow(Math.abs(entity.dx), .2) || 0;
     entity.dy = entity.dy/Math.abs(entity.dy)*Math.pow(Math.abs(entity.dy), .2) || 0;
