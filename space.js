@@ -28,22 +28,6 @@
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
   }
 
-  function towards(p1, p2, x2, y2){
-    // works with 2 or 4 arguments
-    var x1, y1;
-    if (x2 === undefined && y2 === undefined) {
-      x1 = p1[0];
-      y1 = p1[1];
-      x2 = p2[0];
-      y2 = p2[1];
-    } else {
-      x1 = p1;
-      y1 = p2;
-    }
-    var dx = x2 - x1;
-    var dy = y2 - y1;
-    return ((Math.atan2(dx, -dy) * 180 / Math.PI) + 270 + 360) % 360;
-  }
   function x_comp(h){
     return Math.cos(h * Math.PI / 180);
   }
@@ -96,6 +80,20 @@
     return ship;
   }
 
+  function makeMissile(x, y, dx, dy, h, script){
+    var missile = makeEntity('missile', x, y, dx, dy, undefined);
+    missile.h = h;
+    missile.thrust = 0;
+    missile.maxThrust = 300;
+    missile.maxDH = 300;
+    missile.script = script;
+    return missile;
+  }
+
+  function fireMissile(e, script){
+    return makeMissile(e.x, e.y, e.dx, e.dy, e.h, script);
+  }
+
   function entityMove(e, dt){
     e.x += e.dx * dt;
     e.y += e.dy * dt;
@@ -113,9 +111,15 @@
         e.dh = 0;
       }
     } else if (e.dh !== undefined){
+      if (e.h === undefined){
+        throw Error("e.h is not a number: "+e)
+      }
       e.h += e.dh * dt;
     }
     if (e.thrust !== undefined){
+      if (e.h === undefined){
+        throw Error("e.h is not a number: "+e)
+      }
       e.dx += x_comp(e.h) * e.thrust * dt;
       e.dy += y_comp(e.h) * e.thrust * dt;
     }
@@ -124,7 +128,13 @@
   function entityDraw(e, ctx, x_offset, y_offset, scale_factor){
     //TODO x and y offsets for panning
     //TODO scale_factor for zooming
-    return entityDraws[e.type](e, ctx);
+    //
+    entityDraws[e.type](e, ctx);
+    ctx.fillStyle="#222222";
+    ctx.lineStyle="#222222";
+    ctx.beginPath();
+    ctx.arc(e.x,e.y,e.r,0,2*Math.PI);
+    ctx.stroke();
   }
 
   var entityDraws = {
@@ -139,7 +149,7 @@
                 [e.r, -e.r]],
                e.h);
     },
-    'ship': function(e, ctx, dx, dy, scale_factor){
+    'ship': function(e, ctx, dx, dy){
       ctx.fillStyle="#eeaa22";
       if (e.thrust > 0){
       drawPoly(ctx,
@@ -160,15 +170,26 @@
                 [-10, 12]],
                e.h);
     },
-    'explosion': function(e, ctx, dx, dy, scale_factor){
+    'explosion': function(e, ctx, dx, dy){
       ctx.fillStyle="#FFA500";
       drawPoly(ctx,
-               e.x + dx - e.r/2 * scale_factor,
-               e.y + dy - e.r/2 * scale_factor,
-               [[-13*scale_factor, -10*scale_factor],
-                [-9*scale_factor, 10*scale_factor],
-                [9*scale_factor, 10*scale_factor],
-                [13*scale_factor, -10*scale_factor]],
+               e.x,
+               e.y,
+               [[-13, -10],
+                [-9, 10],
+                [9, 10],
+                [13, -10]],
+               e.h);
+    },
+    'missile': function(e, ctx, dx, dy){
+      ctx.fillStyle="#4411AA";
+      drawPoly(ctx,
+               e.x,
+               e.y,
+               [[10, -1],
+                [-10, -2],
+                [-10, 2],
+                [10, 1]],
                e.h);
     }
   };
@@ -195,21 +216,39 @@
   };
   SpaceWorld.prototype.checkCollisions = function(){
     var collisions = [];
-    for (var i=0; i++; i<this.entities.length){
-      e1 = this.entities[i];
-      for (var j=i; j++; j<this.entities.length){
-        e2 = this.entities[j];
-        if (dist(e1.x, e1.y, e2.x, e2.y) < e1.r + e2.r){
+    for (var i=0; i<this.entities.length; i++){
+      var e1 = this.entities[i];
+      for (var j=i+1; j<this.entities.length; j++){
+        var e2 = this.entities[j];
+        if (e1.r !== undefined && e2 !== undefined &&
+            dist(e1.x, e1.y, e2.x, e2.y) < e1.r + e2.r){
           collisions.push([i, j]);
-          console.log('collision!');
         }
       }
     }
-    for (var k=0; k++; k<collisions){
+    for (var k=0; k<collisions.length; k++){
       this.entities[collisions[k][0]] = null;
       this.entities[collisions[k][1]] = null;
     }
     this.entities = this.entities.filter(function(x){return x !== null;});
+  };
+  SpaceWorld.prototype.findClosest = function(e1){
+    var minDist = Number.MAX_VALUE;
+    var other;
+    for (var i=0; i<this.entities.length; i++){
+      var e2 = this.entities[i];
+      if (e1 === e2){ continue; }
+      var d = dist(e1.x, e1.y, e2.x, e2.y);
+      if (d < minDist){
+        minDist = d;
+        other = e2;
+      }
+    }
+    return other;
+  };
+  SpaceWorld.prototype.distToClosest = function(e){
+    var closest = this.findClosest(e);
+    return dist(closest.x, closest.y, e.x, e.y);
   };
   SpaceWorld.prototype.tick = function(dt){
     for (var i=0; i<this.entities.length; i++){
@@ -237,6 +276,7 @@
   Space.makeBoid = makeBoid;
   Space.SpaceDisplay = SpaceDisplay;
   Space.SpaceWorld = SpaceWorld;
+  Space.fireMissile = fireMissile;
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
