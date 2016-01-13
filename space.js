@@ -94,6 +94,7 @@
     missile.maxDH = 360;
     missile.script = script;
     missile.isMunition = true;
+    missile.explodes = true;
     return missile;
   }
 
@@ -278,10 +279,14 @@
         if (e1.r !== undefined && e2 !== undefined &&
             dist(e1.x, e1.y, e2.x, e2.y) < e1.r + e2.r){
           if (e1.firedBy === e2 && t < e1.firedAt + IMMUNITY_TIME_MS){
-            continue;
+            if (e1.type !== 'explosion'){
+              continue;
+            }
           }
           if (e2.firedBy === e1 && t < e2.firedAt + IMMUNITY_TIME_MS){
-            continue;
+            if (e2.type !== 'explosion'){
+              continue;
+            }
           }
           if (e1.isMunition || e2.isMunition){
             collisions.push([i, j]);
@@ -290,15 +295,18 @@
       }
     }
     for (var k=0; k<collisions.length; k++){
-      var e1 = this.entities[collisions[k][0]];
-      if (e1 !== null && e1.type !== 'explosion'){
-        console.log('killing', e1, 'of type', e1 && e2.type);
-        this.entities[collisions[k][0]] = null;
-      }
-      var e2 = this.entities[collisions[k][1]];
-      if (e2 !== null && e2.type !== 'explosion'){
-        console.log('killing', e2, 'of type', e2 && e2.type);
-        this.entities[collisions[k][1]] = null;
+      for (var index of collisions[k]){
+        var e = this.entities[index];
+        if (e === null){continue;}
+        if (e.explodes && e.type !== 'explosion'){
+          e.r = 30;
+          e.type = 'explosion';
+          e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
+          e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
+        } else if (e.type !== 'explosion'){
+          console.log('killing', e, 'of type', e && e.type);
+          this.entities[collisions[k][0]] = null;
+        }
       }
     }
 
