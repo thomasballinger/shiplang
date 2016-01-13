@@ -8,6 +8,29 @@
     return towardsPoint(e1.x, e1.y, e2.x, e2.y);
   }
 
+  function vHeading(e){
+    return towardsPoint(0, 0, e.dx, e.dy);
+  }
+
+  function speed(e){
+    return Math.sqrt(Math.pow(e.dx, 2) + Math.pow(e.dy, 2));
+  }
+
+  //TODO test this
+  function headingWithin(h1, h2, dh){
+    return (Math.abs(h1 - h2) < dh || Math.abs(h1 + 360 - h2) < dh ||
+            Math.abs(h1 - (h2 + 360)) < dh);
+  }
+
+  function* slowDownIfWrongWay(e1, e2){
+    var towardsE2 = towardsPoint(e1.x, e1.y, e2.x, e2.y);
+    if (!headingWithin(vHeading(e1), e1.h, 60)){
+      console.log('reverse thrust until stopped...')
+      yield* thrustUntilStopped(e1);
+      console.log('should be stopped...')
+    }
+  }
+
   function towardsPoint(p1, p2, x2, y2){
     // works with 2 or 4 arguments
     var x1, y1;
@@ -71,6 +94,24 @@
       return (entity.hTarget === undefined);
     }
     return doneWaiting;
+  }
+
+  function* thrustUntilStopped(e){
+    yield turnTo(e, (vHeading(e) + 180) % 360);
+    e.thrust = e.maxThrust;
+    var lastSpeed = Number.MAX_VALUE;
+    function doneWaiting(){
+      var speed = Math.sqrt(Math.pow(e.dx, 2) + Math.pow(e.dy, 2));
+      console.log('current speed:', speed);
+      if (speed > lastSpeed){
+        e.thrust = 0;
+        return true;
+      } else {
+        lastSpeed = speed;
+        return false;
+      }
+    }
+    yield doneWaiting;
   }
 
   function turnTowardFor(e, h, x){
@@ -166,6 +207,9 @@
   ai.detonateIfCloserThanFor = detonateIfCloserThanFor;
   ai.towards = towards;
   ai.turnTowardFor = turnTowardFor;
+  ai.slowDownIfWrongWay = slowDownIfWrongWay;
+  ai.thrustUntilStopped = thrustUntilStopped;
+  ai.speed = speed;
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {

@@ -40,6 +40,7 @@
 <script id="pilot-script">
 function* pilotScript(e){
   yield ai.thrustFor(e, .1);
+  yield* ai.thrustUntilStopped(e);
   while (true){
     if (e.y > 400 && e.dy > 0){
       yield ai.turnTo(e, 270);
@@ -57,10 +58,12 @@ function* boidScript(e){
   yield ai.turnLeft(e, 180);
 }
 function* missilePursuit(e){
-  e.thrust = e.maxThrust;
   var closest = world.findClosest(e);
+  yield* ai.slowDownIfWrongWay(e, closest);
   yield ai.turnTowardFor(e, ai.towards(e, closest), .2);
-  e.thrust = 0;
+  if (ai.speed(e) < 300){
+    yield ai.thrustFor(e, .1);
+  }
 }
 function* scanForEnemy(e){
   e.scanning = true;
@@ -113,7 +116,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
     last_tick = now;
     world.tick(dt / 1000);
     display.render(world.entities, 0, 0, 1000, 1000);
-    setTimeout(tick, 5);
+    setTimeout(tick, 100);
   }
   tick();
 </script>
