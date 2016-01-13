@@ -141,7 +141,7 @@
     function doneWaiting(){
       if (new Date().getTime() > t0 + (x * 1000)){
         return true;
-      } else if (world.distToClosest(e) < d){
+      } else if (world.distToClosestShip(e) < d){
         return true;
       } else {
         return false;
@@ -151,7 +151,7 @@
     yield doneWaiting;
     e.armed = false;
 
-    if (world.distToClosest(e) < d || new Date().getTime() < t0 + (x * 1000)){
+    if (world.distToClosestShip(e) < d || new Date().getTime() < t0 + (x * 1000)){
       yield* detonate(e);
     }
   }

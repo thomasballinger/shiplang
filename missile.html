@@ -58,7 +58,7 @@ function* boidScript(e){
   yield ai.turnLeft(e, 180);
 }
 function* missilePursuit(e){
-  var closest = world.findClosest(e);
+  var closest = world.findClosestShip(e);
   yield* ai.slowDownIfWrongWay(e, closest);
   yield ai.turnTowardFor(e, ai.towards(e, closest), .2);
   if (ai.speed(e) < 300){

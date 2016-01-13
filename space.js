@@ -249,6 +249,12 @@
   SpaceWorld.prototype.addEntity = function(entity){
     this.entities.push(entity);
   };
+  SpaceWorld.prototype.ships = function(){
+    return this.entities.filter(function(x){return !x.isMunition;});
+  };
+  SpaceWorld.prototype.munitions = function(){
+    return this.entities.filter(function(x){return x.isMunition;});
+  };
   SpaceWorld.prototype.checkCollisions = function(){
     var t = new Date().getTime();
     var collisions = [];
@@ -292,11 +298,17 @@
     }
     this.entities = this.entities.filter(function(x){return x !== null;});
   };
-  SpaceWorld.prototype.findClosest = function(e1){
+  SpaceWorld.prototype.findClosestShip = function(e1){
+    return this.findClosest(e1, this.ships());
+  };
+  SpaceWorld.prototype.findClosest = function(e1, candidates){
+    if (candidates === undefined){
+      candidates = this.entities;
+    }
     var minDist = Number.MAX_VALUE;
     var other = undefined;
-    for (var i=0; i<this.entities.length; i++){
-      var e2 = this.entities[i];
+    for (var i=0; i<candidates.length; i++){
+      var e2 = candidates[i];
       if (e1 === e2){ continue; }
       var d = dist(e1.x, e1.y, e2.x, e2.y);
       if (d < minDist){
@@ -308,6 +320,13 @@
   };
   SpaceWorld.prototype.distToClosest = function(e){
     var closest = this.findClosest(e);
+    if (closest === undefined){
+      return Number.MAX_VALUE;
+    }
+    return dist(closest.x, closest.y, e.x, e.y);
+  };
+  SpaceWorld.prototype.distToClosestShip = function(e){
+    var closest = this.findClosestShip(e);
     if (closest === undefined){
       return Number.MAX_VALUE;
     }
