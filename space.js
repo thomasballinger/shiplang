@@ -1,6 +1,8 @@
 ;(function() {
   'use strict';
 
+  var IMMUNITY_TIME_MS = 1000;
+
   var require;
   if (typeof window === 'undefined') {
     require = module.require;
@@ -81,7 +83,7 @@
   }
 
   function makeMissile(x, y, dx, dy, h, script){
-    var missile = makeEntity('missile', x, y, dx, dy, undefined);
+    var missile = makeEntity('missile', x, y, dx, dy, 3);
     missile.h = h;
     missile.thrust = 0;
     missile.maxThrust = 400;
@@ -91,11 +93,14 @@
   }
 
   function fireMissile(e, script){
-    return makeMissile(e.x + x_comp(e.h)*e.r,
-                       e.y + y_comp(e.h)*e.r,
-                       e.dx + x_comp(e.h) * 10,
-                       e.dy + y_comp(e.h) * 10,
-                       e.h, script);
+    var missile = makeMissile(e.x + x_comp(e.h)*e.r,
+                          e.y + y_comp(e.h)*e.r,
+                          e.dx + x_comp(e.h) * 10,
+                          e.dy + y_comp(e.h) * 10,
+                          e.h, script);
+    missile.firedBy = e;
+    missile.firedAt = new Date().getTime();
+    return missile;
   }
 
   function entityMove(e, dt){
@@ -244,6 +249,7 @@
     this.entities.push(entity);
   };
   SpaceWorld.prototype.checkCollisions = function(){
+    var t = new Date().getTime();
     var collisions = [];
     for (var i=0; i<this.entities.length; i++){
       var e1 = this.entities[i];
@@ -251,6 +257,12 @@
         var e2 = this.entities[j];
         if (e1.r !== undefined && e2 !== undefined &&
             dist(e1.x, e1.y, e2.x, e2.y) < e1.r + e2.r){
+          if (e1.firedBy === e2 && t < e1.firedAt + IMMUNITY_TIME_MS){
+            continue;
+          }
+          if (e2.firedBy === e1 && t < e2.firedAt + IMMUNITY_TIME_MS){
+            continue;
+          }
           collisions.push([i, j]);
         }
       }

@@ -25,9 +25,7 @@
   function* slowDownIfWrongWay(e1, e2){
     var towardsE2 = towardsPoint(e1.x, e1.y, e2.x, e2.y);
     if (!headingWithin(vHeading(e1), e1.h, 60)){
-      console.log('reverse thrust until stopped...')
       yield* thrustUntilStopped(e1);
-      console.log('should be stopped...')
     }
   }
 
@@ -102,7 +100,6 @@
     var lastSpeed = Number.MAX_VALUE;
     function doneWaiting(){
       var speed = Math.sqrt(Math.pow(e.dx, 2) + Math.pow(e.dy, 2));
-      console.log('current speed:', speed);
       if (speed > lastSpeed){
         e.thrust = 0;
         return true;
