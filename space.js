@@ -143,20 +143,20 @@
     //TODO x and y offsets for panning
     //TODO scale_factor for zooming
     //
-    entityDraws[e.type](e, ctx);
+    entityDraws[e.type](e, ctx, x_offset, y_offset);
     ctx.fillStyle="#222222";
     ctx.strokeStyle="#222222";
     ctx.beginPath();
-    ctx.arc(e.x,e.y,e.r,0,2*Math.PI);
+    ctx.arc(e.x-x_offset, e.y-y_offset, e.r, 0, 2*Math.PI);
     ctx.stroke();
   }
 
   var entityDraws = {
-    'boid': function(e, ctx){
+    'boid': function(e, ctx, dx, dy){
       ctx.fillStyle="#ffeebb";
       drawPoly(ctx,
-               e.x,
-               e.y,
+               e.x - dx,
+               e.y - dy,
                [[-e.r, -e.r],
                 [-e.r, e.r],
                 [e.r, e.r],
@@ -167,8 +167,8 @@
       ctx.fillStyle="#eeaa22";
       if (e.thrust > 0){
       drawPoly(ctx,
-               e.x,
-               e.y,
+               e.x - dx,
+               e.y - dy,
                [[-13, -10],
                 [-9, -10],
                 [-9, 10],
@@ -178,13 +178,13 @@
       if (e.scanning){
         ctx.strokeStyle="#ffeeff";
         ctx.beginPath();
-        ctx.arc(e.x, e.y, e.r*10, 0, 2*Math.PI);
+        ctx.arc(e.x-dx, e.y-dy, e.r*10, 0, 2*Math.PI);
         ctx.stroke();
       }
       ctx.fillStyle="#aaeebb";
       drawPoly(ctx,
-               e.x,
-               e.y,
+               e.x - dx,
+               e.y - dy,
                [[15, 0],
                 [-10, -12],
                 [-10, 12]],
@@ -193,8 +193,8 @@
     'explosion': function(e, ctx, dx, dy){
       ctx.fillStyle="#FFA500";
       drawPoly(ctx,
-               e.x,
-               e.y,
+               e.x - dx,
+               e.y - dy,
                [[-1.3*e.r, -1*e.r],
                 [-.9*e.r, 1*e.r],
                 [.9*e.r, 1*e.r],
@@ -208,8 +208,8 @@
         ctx.fillStyle="#4411AA";
       }
       drawPoly(ctx,
-               e.x,
-               e.y,
+               e.x - dx,
+               e.y - dy,
                [[10, -1],
                 [-10, -3],
                 [-10, 3],
@@ -218,8 +218,8 @@
       if (e.thrust > 0){
         ctx.fillStyle="#eeaa22";
         drawPoly(ctx,
-                 e.x,
-                 e.y,
+                 e.x - dx,
+                 e.y - dy,
                  [[-13, -4],
                   [-9, -3],
                   [-9, 3],
@@ -233,13 +233,13 @@
     this.canvas = document.getElementById('canvas');
     this.ctx = this.canvas.getContext('2d');
   }
-  SpaceDisplay.prototype.render = function(entities, left, top, right, bottom){
-    var onscreen = entities.slice();  // select elements in range
+  SpaceDisplay.prototype.render = function(entities, left, top, right, bottom, scale){
+    var onscreen = entities.slice();  // TODO select just elements currently visible
     this.ctx.fillStyle="#112233";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     for (var i=0; i<onscreen.length; i++){
       var entity = onscreen[i];
-      entityDraw(entity, this.ctx, 0, 0, 1);
+      entityDraw(entity, this.ctx, left, top, 1);
     }
   };
 

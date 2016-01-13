@@ -115,7 +115,12 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
     var dt = now - last_tick;
     last_tick = now;
     world.tick(dt / 1000);
-    display.render(world.entities, 0, 0, 1000, 1000);
+    display.render(world.entities,
+                   ship.x-canvas.width/2,
+                   ship.y-canvas.height/2,
+                   ship.x+canvas.width/2,
+                   ship.y+canvas.height/2,
+                   1);
     setTimeout(tick, 15);
   }
   tick();
