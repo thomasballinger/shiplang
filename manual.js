@@ -33,7 +33,8 @@
     window.addEventListener('keydown', function(e){
       events.push(e);
       if ([37, 38, 29, 40, // arrows
-          32 // spacebar
+          32, // spacebar
+          70 // f
           ].indexOf(e.keyCode) != -1){
         e.preventDefault();
         return false;
@@ -72,6 +73,11 @@
       case 32:
         if (event.type == 'keydown'){
           return 'space';
+        }
+        break;
+      case 70:
+        if (event.type == 'keydown'){
+          return 'f';
         }
         break;
     }

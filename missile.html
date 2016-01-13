@@ -88,6 +88,10 @@ function* fireMissile(e){
     world.addEntity(Space.fireMissile(e, missileScript))
     yield ai.waitFor(e, .1);
 }
+function* fireLaser(e){
+    world.addEntity(Space.fireLaser(e));
+    yield ai.waitFor(e, .05);
+}
 function* missileScript(e){
   yield ai.thrustFor(e, .6);
   while (true){
@@ -100,6 +104,8 @@ function* manualDrive(e){
     key = yield* Manual.actOnKey(e, controls);
     if (key === 'space'){
       yield* fireMissile(e);
+    } else if (key == 'f'){
+      yield* fireLaser(e);
     }
   }
 }
@@ -124,6 +130,8 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
     world.addEntity(Space.makeBoid(Math.random()*1000, Math.random()*1000, Math.random()*2-1, Math.random()*2-1, boidScript));
   }
   var last_tick = new Date().getTime()
+  var startTime = last_tick;
+  var finishTime = undefined;
   function tick(){
     var now = new Date().getTime();
     var dt = now - last_tick;
@@ -136,7 +144,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
                    ship.y+canvas.height/2,
                    1,
                    1);
-    var positionScaleFactor = .04;
+    var positionScaleFactor = .1;
     var entityScaleFactor = .5;
     minimapDisplay.render(world.entities,
                           ship.x-minimap.width/2/positionScaleFactor,
@@ -145,6 +153,20 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
                           ship.y+minimap.height/2/positionScaleFactor,
                           positionScaleFactor,
                           entityScaleFactor);
+
+    var ctx = canvas.getContext('2d');
+    ctx.font = "30px Arial";
+    if (world.ships().length === 0){
+      if (finishTime === undefined){
+        finishTime = new Date().getTime() - startTime;
+      }
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillText("Your time was " + Math.round(finishTime / 1000, 5) + " seconds.", 10, 50);
+    } else {
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillText("Destroy everything. " + (world.ships().length).toString() + " things left. Arrow keys, space and f.", 0, 28);
+    }
+
     setTimeout(tick, 5);
   }
   tick();

@@ -108,6 +108,19 @@
     missile.firedAt = new Date().getTime();
     return missile;
   }
+  function fireLaser(e){
+    var laser = makeEntity('laser',
+                          e.x + x_comp(e.h)*e.r,
+                          e.y + y_comp(e.h)*e.r,
+                          e.dx + x_comp(e.h) * 200,
+                          e.dy + y_comp(e.h) * 200,
+                          2);
+    laser.firedBy = e;
+    laser.firedAt = Number.MAX_VALUE;  // never damages owner
+    laser.timeToDie = new Date().getTime() + 1500;
+    laser.isMunition = true;
+    return laser;
+  }
 
   function entityMove(e, dt){
     if (e.type === 'explosion'){
@@ -237,6 +250,12 @@
                  e.h,
                  esf);
       }
+    },
+    'laser': function(e, ctx, dx, dy, psf, esf){
+      ctx.fillStyle="#ffff00";
+      ctx.beginPath();
+      ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*1*psf, 0, 2*Math.PI);
+      ctx.fill();
     }
   };
 
@@ -305,7 +324,7 @@
           e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
         } else if (e.type !== 'explosion'){
           console.log('killing', e, 'of type', e && e.type);
-          this.entities[collisions[k][0]] = null;
+          this.entities[index] = null;
         }
       }
     }
@@ -314,6 +333,8 @@
     for (var i=0; i<this.entities.length; i++){
       var e = this.entities[i];
       if (e !== null && e.type == 'explosion' && e.r < 10){
+        this.entities[i] = null;
+      } else if (e !== null && e.type == 'laser' && e.timeToDie < t){
         this.entities[i] = null;
       }
     }
@@ -384,6 +405,7 @@
   Space.SpaceDisplay = SpaceDisplay;
   Space.SpaceWorld = SpaceWorld;
   Space.fireMissile = fireMissile;
+  Space.fireLaser = fireLaser;
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
