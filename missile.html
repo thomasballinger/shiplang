@@ -104,11 +104,12 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   var display = new Space.SpaceDisplay('canvas');
   var world = new Space.SpaceWorld();
 
-  var ship = Space.makeShip(400, 190, 17, .1, 270, manualDrive);
+  var ship = Space.makeShip(400, 190, 0, 0, 270, manualDrive);
   world.addEntity(ship);
   world.addEntity(Space.makeShip(70, 190, 17, .1, 270, pilotScript));
-  world.addEntity(Space.makeBoid(180, 90, .1, .2, boidScript));
-  world.addEntity(Space.makeBoid(180, 150, .1, .2, boidScript));
+  for (var i=0; i<20; i++){
+    world.addEntity(Space.makeBoid(Math.random()*1000, Math.random()*1000, Math.random()*2-1, Math.random()*2-1, boidScript));
+  }
   var last_tick = new Date().getTime()
   function tick(){
     var now = new Date().getTime();
