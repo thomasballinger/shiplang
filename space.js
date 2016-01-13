@@ -89,6 +89,7 @@
     missile.maxThrust = 400;
     missile.maxDH = 360;
     missile.script = script;
+    missile.isMunition = true;
     return missile;
   }
 
@@ -263,7 +264,9 @@
           if (e2.firedBy === e1 && t < e2.firedAt + IMMUNITY_TIME_MS){
             continue;
           }
-          collisions.push([i, j]);
+          if (e1.isMunition || e2.isMunition){
+            collisions.push([i, j]);
+          }
         }
       }
     }
