@@ -11,13 +11,13 @@
         top: 0;
         bottom: 0;
         left: 0;
-        width: 400px;
+        width: 450px;
         color: #eeeeee;
     }
     #canvas {
       position: absolute;
       top: 0;
-      left: 400px;
+      left: 450px;
       bottom: 0;
       right: 0;
       background-color: #777777;
@@ -39,7 +39,7 @@
 <div id="errorbar"></div>
 <script>
   var canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth - 400;
+  canvas.width = window.innerWidth - 450;
   canvas.height = window.innerHeight;
   var minimap = document.getElementById('minimap');
   minimap.width = 200;
@@ -50,6 +50,7 @@
 <script src="manual.js"></script>
 
 <script id="pilot-script">
+// example ai script
 function* pilotScript(e){
   yield ai.thrustFor(e, .1);
   yield* ai.thrustUntilStopped(e);
@@ -65,9 +66,15 @@ function* pilotScript(e){
     yield* fireMissile(e);
   }
 }
-function* boidScript(e){
-  ai.setThrust(e, e.maxThrust * .5)
-  yield ai.turnLeft(e, 180);
+
+// players would get to write their own ai for missiles
+// in a syncronous style, which would desugar to yields
+function* missileScript(e){
+  yield ai.thrustFor(e, .6);
+  while (true){
+    yield* missilePursuit(e);
+    yield* ai.detonateIfCloserThanFor(e, world, 30, .001);
+  }
 }
 function* missilePursuit(e){
   var closest = world.findClosestShip(e);
@@ -77,28 +84,7 @@ function* missilePursuit(e){
     yield ai.thrustFor(e, .1);
   }
 }
-function* scanForEnemy(e){
-  e.scanning = true;
-  yield ai.waitFor(e, 1)
-  e.scanning = false;
-  return [300, 200];
-}
-function* fireMissile(e){
-    yield ai.waitFor(e, .1);
-    world.addEntity(Space.fireMissile(e, missileScript))
-    yield ai.waitFor(e, .1);
-}
-function* fireLaser(e){
-    world.addEntity(Space.fireLaser(e));
-    yield ai.waitFor(e, .05);
-}
-function* missileScript(e){
-  yield ai.thrustFor(e, .6);
-  while (true){
-    yield* missilePursuit(e);
-    yield* ai.detonateIfCloserThanFor(e, world, 30, .001);
-  }
-}
+// maybe users would write their own controls
 function* manualDrive(e){
   while (true){
     key = yield* Manual.actOnKey(e, controls);
@@ -108,6 +94,28 @@ function* manualDrive(e){
       yield* fireLaser(e);
     }
   }
+}
+function* boidScript(e){
+  ai.setThrust(e, e.maxThrust * .5)
+  yield ai.turnLeft(e, 180);
+}
+
+// this is an example of a scanner that returns data
+function* scanForEnemy(e){
+  e.scanning = true;
+  yield ai.waitFor(e, 1)
+  e.scanning = false;
+  return [300, 200];
+}
+// builtins the user might have access to
+function* fireMissile(e){
+    yield ai.waitFor(e, .1);
+    world.addEntity(Space.fireMissile(e, missileScript))
+    yield ai.waitFor(e, .1);
+}
+function* fireLaser(e){
+    world.addEntity(Space.fireLaser(e));
+    yield ai.waitFor(e, .05);
 }
 </script>
 <script>
