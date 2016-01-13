@@ -22,16 +22,28 @@
       right: 0;
       background-color: #777777;
     }
+    #minimap {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200;
+      height: 200;
+      border: 5px solid black;
+    }
 </style>
 </head>
 <body>
   <div id="editor"><code><pre>hello</pre><code></div>
 <canvas id="canvas" width="1" height="1"></canvas>
+<canvas id="minimap" width="1" height="1"></canvas>
 <div id="errorbar"></div>
 <script>
   var canvas = document.getElementById('canvas');
   canvas.width = window.innerWidth - 400;
   canvas.height = window.innerHeight;
+  var minimap = document.getElementById('minimap');
+  minimap.width = 200;
+  minimap.height = 200;
 </script>
 <script src="ai.js"></script>
 <script src="space.js"></script>
@@ -102,6 +114,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
 
 
   var display = new Space.SpaceDisplay('canvas');
+  var minimapDisplay = new Space.SpaceDisplay('minimap');
   var world = new Space.SpaceWorld();
 
   var ship = Space.makeShip(400, 190, 0, 0, 270, manualDrive);
@@ -121,7 +134,17 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
                    ship.y-canvas.height/2,
                    ship.x+canvas.width/2,
                    ship.y+canvas.height/2,
+                   1,
                    1);
+    var psf = .04;
+    var esf = .5;
+    minimapDisplay.render(world.entities,
+                          ship.x-minimap.width/2/psf,
+                          ship.y-minimap.height/2/psf,
+                          ship.x+minimap.width/2/psf,
+                          ship.y+minimap.height/2/psf,
+                          psf,
+                          esf);
     setTimeout(tick, 15);
   }
   tick();

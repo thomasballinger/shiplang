@@ -37,9 +37,13 @@
     return Math.sin(h * Math.PI / 180);
   }
 
-  function drawPoly(ctx, x, y, points, h){
+  // x and y are in display space
+  function drawPoly(ctx, x, y, points, h, esf){
+    if (esf === undefined){
+      esf = 1;
+    }
     points = points.map(function(arr){
-      var dx = arr[0], dy = arr[1];
+      var dx = arr[0] * esf, dy = arr[1] * esf;
       return [x + dx * Math.cos(h * Math.PI / 180) - dy * Math.sin(h * Math.PI / 180),
               y + dx * Math.sin(h * Math.PI / 180) + dy * Math.cos(h * Math.PI / 180)];
     });
@@ -139,107 +143,116 @@
     }
   }
 
-  function entityDraw(e, ctx, x_offset, y_offset, scale_factor){
-    //TODO x and y offsets for panning
-    //TODO scale_factor for zooming
-    //
-    entityDraws[e.type](e, ctx, x_offset, y_offset);
+  function entityDraw(e, ctx, dx, dy, psf, esf){
+    //dx and dy are offsets in world space for panning
+    // psf is position scale factor, used to place ships
+    // esf is entity scale factor, used to scale ship dimensions
+    entityDraws[e.type](e, ctx, dx, dy, psf, esf);
     ctx.fillStyle="#222222";
     ctx.strokeStyle="#222222";
     ctx.beginPath();
-    ctx.arc(e.x-x_offset, e.y-y_offset, e.r, 0, 2*Math.PI);
+    ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
     ctx.stroke();
   }
 
   var entityDraws = {
-    'boid': function(e, ctx, dx, dy){
+    'boid': function(e, ctx, dx, dy, psf, esf){
       ctx.fillStyle="#ffeebb";
       drawPoly(ctx,
-               e.x - dx,
-               e.y - dy,
+               (e.x-dx)*psf,
+               (e.y-dy)*psf,
                [[-e.r, -e.r],
                 [-e.r, e.r],
                 [e.r, e.r],
                 [e.r, -e.r]],
-               e.h);
+               e.h,
+               esf);
     },
-    'ship': function(e, ctx, dx, dy){
+    'ship': function(e, ctx, dx, dy, psf, esf){
       ctx.fillStyle="#eeaa22";
       if (e.thrust > 0){
       drawPoly(ctx,
-               e.x - dx,
-               e.y - dy,
+               (e.x-dx)*psf,
+               (e.y-dy)*psf,
                [[-13, -10],
                 [-9, -10],
                 [-9, 10],
                 [-13, 10]],
-               e.h);
+               e.h,
+               esf);
       }
       if (e.scanning){
         ctx.strokeStyle="#ffeeff";
         ctx.beginPath();
-        ctx.arc(e.x-dx, e.y-dy, e.r*10, 0, 2*Math.PI);
+        ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*10*psf, 0, 2*Math.PI);
         ctx.stroke();
       }
       ctx.fillStyle="#aaeebb";
       drawPoly(ctx,
-               e.x - dx,
-               e.y - dy,
+               (e.x-dx)*psf,
+               (e.y-dy)*psf,
                [[15, 0],
                 [-10, -12],
                 [-10, 12]],
-               e.h);
+               e.h,
+               esf);
     },
-    'explosion': function(e, ctx, dx, dy){
+    'explosion': function(e, ctx, dx, dy, psf, esf){
       ctx.fillStyle="#FFA500";
       drawPoly(ctx,
-               e.x - dx,
-               e.y - dy,
+               (e.x-dx)*psf,
+               (e.y-dy)*psf,
                [[-1.3*e.r, -1*e.r],
                 [-.9*e.r, 1*e.r],
                 [.9*e.r, 1*e.r],
                 [1.3*e.r, -1*e.r]],
-               e.h);
+               e.h,
+               esf);
     },
-    'missile': function(e, ctx, dx, dy){
+    'missile': function(e, ctx, dx, dy, psf, esf){
       if (e.armed){
         ctx.fillStyle="#AA1144";
       } else {
         ctx.fillStyle="#4411AA";
       }
       drawPoly(ctx,
-               e.x - dx,
-               e.y - dy,
+               (e.x-dx)*psf,
+               (e.y-dy)*psf,
                [[10, -1],
                 [-10, -3],
                 [-10, 3],
                 [10, 1]],
-               e.h);
+               e.h,
+               esf);
       if (e.thrust > 0){
         ctx.fillStyle="#eeaa22";
         drawPoly(ctx,
-                 e.x - dx,
-                 e.y - dy,
+                 (e.x-dx)*psf,
+                 (e.y-dy)*psf,
                  [[-13, -4],
                   [-9, -3],
                   [-9, 3],
                   [-13, 4]],
-                 e.h);
+                 e.h,
+                 esf);
       }
     }
   };
 
   function SpaceDisplay(id){
-    this.canvas = document.getElementById('canvas');
+    this.canvas = document.getElementById(id);
     this.ctx = this.canvas.getContext('2d');
   }
-  SpaceDisplay.prototype.render = function(entities, left, top, right, bottom, scale){
+  // left/top/right/bottom are in world space, scale factor relates these to display
+  SpaceDisplay.prototype.render = function(entities, left, top, right, bottom,
+                                           position_scale_factor, entity_scale_factor){
     var onscreen = entities.slice();  // TODO select just elements currently visible
     this.ctx.fillStyle="#112233";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     for (var i=0; i<onscreen.length; i++){
       var entity = onscreen[i];
-      entityDraw(entity, this.ctx, left, top, 1);
+      entityDraw(entity, this.ctx, left, top, position_scale_factor, entity_scale_factor);
+      // Given the world-space
     }
   };
 
