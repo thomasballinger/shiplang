@@ -127,7 +127,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
   world.addEntity(ship);
   world.addEntity(Space.makeShip(70, 190, 17, .1, 270, pilotScript));
   for (var i=0; i<20; i++){
-    world.addEntity(Space.makeBoid(Math.random()*1000, Math.random()*1000, Math.random()*2-1, Math.random()*2-1, boidScript));
+    world.addEntity(Space.makeBoid(Math.random()*2000-1000, Math.random()*2000-1000, Math.random()*10-5, Math.random()*10-5, boidScript));
   }
   var last_tick = new Date().getTime()
   var startTime = last_tick;
@@ -145,7 +145,7 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
                    1,
                    1);
     var positionScaleFactor = .1;
-    var entityScaleFactor = .5;
+    var entityScaleFactor = .2;
     minimapDisplay.render(world.entities,
                           ship.x-minimap.width/2/positionScaleFactor,
                           ship.y-minimap.height/2/positionScaleFactor,
