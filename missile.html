@@ -136,16 +136,16 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
                    ship.y+canvas.height/2,
                    1,
                    1);
-    var psf = .04;
-    var esf = .5;
+    var positionScaleFactor = .04;
+    var entityScaleFactor = .5;
     minimapDisplay.render(world.entities,
-                          ship.x-minimap.width/2/psf,
-                          ship.y-minimap.height/2/psf,
-                          ship.x+minimap.width/2/psf,
-                          ship.y+minimap.height/2/psf,
-                          psf,
-                          esf);
-    setTimeout(tick, 15);
+                          ship.x-minimap.width/2/positionScaleFactor,
+                          ship.y-minimap.height/2/positionScaleFactor,
+                          ship.x+minimap.width/2/positionScaleFactor,
+                          ship.y+minimap.height/2/positionScaleFactor,
+                          positionScaleFactor,
+                          entityScaleFactor);
+    setTimeout(tick, 5);
   }
   tick();
 </script>
