@@ -268,7 +268,7 @@
                                            position_scale_factor, entity_scale_factor){
     var onscreen = entities.slice();  // TODO select just elements currently visible
     this.ctx.fillStyle="#112233";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     for (var i=0; i<onscreen.length; i++){
       var entity = onscreen[i];
       entityDraw(entity, this.ctx, left, top, position_scale_factor, entity_scale_factor);

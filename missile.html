@@ -12,15 +12,18 @@
         bottom: 0;
         left: 0;
         width: 450px;
-        color: #eeeeee;
+        color: white;
     }
     #canvas {
       position: absolute;
       top: 0;
-      left: 450px;
+      left: 0px;
       bottom: 0;
       right: 0;
-      background-color: #777777;
+      /*background-image: url('http://a1star.com/images/space.gif');*/
+      background-image: url('images/2.jpg');
+      background-color: #010101;
+      background-size: 1000px;
     }
     #minimap {
       position: absolute;
@@ -29,17 +32,18 @@
       width: 200;
       height: 200;
       border: 5px solid black;
+      background-color: #333333;
     }
 </style>
 </head>
 <body>
-  <div id="editor"><code><pre>hello</pre><code></div>
 <canvas id="canvas" width="1" height="1"></canvas>
+<div id="editor"><code><pre>hello</pre><code></div>
 <canvas id="minimap" width="1" height="1"></canvas>
 <div id="errorbar"></div>
 <script>
   var canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth - 450;
+  canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   var minimap = document.getElementById('minimap');
   minimap.width = 200;
@@ -145,22 +149,24 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
     var dt = now - last_tick;
     last_tick = now;
     world.tick(dt / 1000);
+    var positionScaleFactor = 1;
+    var entityScaleFactor = 1;
     display.render(world.entities,
-                   ship.x-canvas.width/2,
-                   ship.y-canvas.height/2,
-                   ship.x+canvas.width/2,
-                   ship.y+canvas.height/2,
-                   1,
-                   1);
-    var positionScaleFactor = .1;
-    var entityScaleFactor = .2;
+                   ship.x-canvas.width/2/positionScaleFactor,
+                   ship.y-canvas.height/2/positionScaleFactor,
+                   ship.x+canvas.width/2/positionScaleFactor,
+                   ship.y+canvas.height/2/positionScaleFactor,
+                   positionScaleFactor,
+                   entityScaleFactor);
+    var minimapPSF = .07;
+    var minimapESF = .2;
     minimapDisplay.render(world.entities,
-                          ship.x-minimap.width/2/positionScaleFactor,
-                          ship.y-minimap.height/2/positionScaleFactor,
-                          ship.x+minimap.width/2/positionScaleFactor,
-                          ship.y+minimap.height/2/positionScaleFactor,
-                          positionScaleFactor,
-                          entityScaleFactor);
+                          ship.x-minimap.width/2/minimapPSF,
+                          ship.y-minimap.height/2/minimapPSF,
+                          ship.x+minimap.width/2/minimapPSF,
+                          ship.y+minimap.height/2/minimapPSF,
+                          minimapPSF,
+                          minimapESF);
 
     var ctx = canvas.getContext('2d');
     ctx.font = "30px Arial";
@@ -169,11 +175,13 @@ document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'<
         finishTime = new Date().getTime() - startTime;
       }
       ctx.fillStyle = '#eeeeee';
-      ctx.fillText("Your time was " + Math.round(finishTime / 1000, 5) + " seconds.", 10, 50);
+      ctx.fillText("Your time was " + Math.round(finishTime / 1000, 5) + " seconds.", 300, 50);
     } else {
       ctx.fillStyle = '#eeeeee';
-      ctx.fillText("Destroy everything. " + (world.ships().length).toString() + " things left. Arrow keys, space and f.", 0, 28);
+      ctx.fillText("Destroy everything. " + (world.ships().length).toString() + " things left. Arrow keys, space and f.", 300, 28);
     }
+    var backgroundParallax = .1;
+    canvas.style.backgroundPosition=''+(0-ship.x*backgroundParallax)+' '+(0-ship.y*backgroundParallax);
 
     setTimeout(tick, 5);
   }

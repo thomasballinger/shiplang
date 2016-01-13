@@ -208,6 +208,7 @@
   ai.slowDownIfWrongWay = slowDownIfWrongWay;
   ai.thrustUntilStopped = thrustUntilStopped;
   ai.speed = speed;
+  ai.vHeading = vHeading;
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {

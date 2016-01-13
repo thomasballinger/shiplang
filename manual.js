@@ -11,6 +11,8 @@
     };
   }
 
+  var vHeading = require('./ai.js').vHeading;
+
   function Controls(){
     this.events = [];
     this.initialize();
@@ -68,6 +70,13 @@
           e.dh = e.maxDH;
         } else if (event.type == 'keyup'){
           e.dh = 0;
+        }
+        break;
+      case 40:
+        if (event.type == 'keydown'){
+          e.hTarget = (vHeading(e) + 180) % 360;
+        } else if (event.type == 'keyup'){
+          e.hTarget = undefined;
         }
         break;
       case 32:
