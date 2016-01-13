@@ -23,6 +23,7 @@
   }
 
   function* slowDownIfWrongWay(e1, e2){
+    if (e2 === undefined){ return }
     var towardsE2 = towardsPoint(e1.x, e1.y, e2.x, e2.y);
     if (!headingWithin(vHeading(e1), e1.h, 60)){
       yield* thrustUntilStopped(e1);
