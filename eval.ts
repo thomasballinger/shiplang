@@ -1,3 +1,25 @@
+enum BC {
+    LoadConstant,
+    FunctionLookup,
+    FunctionCall,
+}
+
+type ByteCode = [BC, any];
+
+function enumLookup(enumObj, value){
+    for (var name in enumObj){
+        if (enumObj[name] == value){
+            return name;
+        }
+    }
+}
+
+function dis(bytecode: ByteCode[]){
+    bytecode.map(function(x){
+        console.log(enumLookup(BC, x[0]), x[1]);
+    })
+}
+
 function indent(content: string, n=2): string{
     var lines = content.split('\n');
     return lines.map(function(line){return Array(n).join(' ') + line}).join('\n');
@@ -8,6 +30,7 @@ class ASTNode {
     content: any;
     eval() { throw Error('abstract method')}; // TODO there's probably some nice way to do abstract methods
     tree(): string { throw Error('abstract method'); return '';}; // TODO there's probably some nice way to do abstract methods
+    compile(): Array<ByteCode> { throw Error('abstract method'); return [[BC.LoadConstant, 'should be abstract']];};
 }
 
 export class LiteralNumberNode extends ASTNode {
@@ -18,6 +41,7 @@ export class LiteralNumberNode extends ASTNode {
     content: number;
     eval() { return this.content; }
     tree() { return 'NumberLiteral: ' + this.content; }
+    compile(): Array<ByteCode> { return [[BC.LoadConstant, this.content]]; }
 }
 
 export class NameNode extends ASTNode {
@@ -28,17 +52,19 @@ export class NameNode extends ASTNode {
     content: string;
     eval() { throw Error('Name lookup not implemented')};
     tree() { return 'Name: ' + this.content; }
+    compile() { throw Error('TODO'); return []; } //TODO
 }
 
 export class FunctionNameNode extends NameNode{
     content: string;
     tree() { return 'Function Name: ' + this.content; }
+    compile() { return [[BC.FunctionLookup, this.content]]; }
 }
 
 export class StringLiteral extends ASTNode {
     eval() { return this.content; }
     tree() { return 'StringLiteral: ' + this.content; }
-}
+    compile(): Array<ByteCode> { return [[BC.LoadConstant, this.eval()]]; } }
 
 // This time around you can't use expressions in the front position
 export class FunctionCallNode extends ASTNode {
@@ -59,6 +85,12 @@ export class FunctionCallNode extends ASTNode {
                 '\n'+this.args.map(function(x: ASTNode){
                     return indent(x.tree())
                 }).join('\n'));
+    }
+    compile() {
+        var loadfunc = this.head.compile();
+        var loadargs = [].concat.apply([], this.args.map(function(x: ASTNode){ return x.compile()}));
+        console.log('loadargs', loadargs);
+        return [].concat(loadfunc, loadargs, [[BC.FunctionCall, loadargs.length]]);
     }
 }
 
@@ -119,6 +151,8 @@ function main(){
     var plus = new FunctionNameNode(1, 2, '+');
     var funccall = new FunctionCallNode(1, 1, plus, [one, two]);
     console.log(funccall.tree())
+    console.log(funccall.compile())
+    dis(funccall.compile())
     return funccall.eval()
 }
 console.log(main());
