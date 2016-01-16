@@ -1,37 +1,47 @@
+function indent(content: string, n=2): string{
+    var lines = content.split('\n');
+    return lines.map(function(line){return Array(n).join(' ') + line}).join('\n');
+}
+
 class ASTNode {
     constructor(public line: number, public col: number){}
     content: any;
     eval() { throw Error('abstract method')}; // TODO there's probably some nice way to do abstract methods
+    tree(): string { throw Error('abstract method'); return '';}; // TODO there's probably some nice way to do abstract methods
 }
 
-class LiteralNumberNode extends ASTNode {
+export class LiteralNumberNode extends ASTNode {
     constructor(line, col, content: string){
         super(line, col);
         this.content = Number(content);
     }
     content: number;
     eval() { return this.content; }
+    tree() { return 'NumberLiteral: ' + this.content; }
 }
 
-class NameNode extends ASTNode {
+export class NameNode extends ASTNode {
     constructor(line, col, content: string){
         super(line, col);
         this.content = content;
     }
     content: string;
     eval() { throw Error('Name lookup not implemented')};
+    tree() { return 'Name: ' + this.content; }
 }
 
-class FunctionNameNode extends NameNode{
+export class FunctionNameNode extends NameNode{
     content: string;
+    tree() { return 'Function Name: ' + this.content; }
 }
 
-class StringLiteral extends ASTNode {
+export class StringLiteral extends ASTNode {
     eval() { return this.content; }
+    tree() { return 'StringLiteral: ' + this.content; }
 }
 
 // This time around you can't use expressions in the front position
-class FunctionCallNode extends ASTNode {
+export class FunctionCallNode extends ASTNode {
     constructor(public line: number, public col: number,
                 public head: FunctionNameNode, public args: ASTNode[]){
         super(line, col);
@@ -43,6 +53,36 @@ class FunctionCallNode extends ASTNode {
         var func = funcs[this.head.content];
         var argValues = this.args.map(function(node){return node.eval()});
         return func.apply(null, argValues);
+    }
+    tree() {
+        return ('Func call with '+this.head.tree() +
+                '\n'+this.args.map(function(x: ASTNode){
+                    return indent(x.tree())
+                }).join('\n'));
+    }
+}
+
+export class IfNode extends ASTNode {
+    constructor(public line: number, public col: number,
+                public condition: ASTNode, public ifTrue: ASTNode, public ifFalse?: ASTNode){
+        super(line, col);
+    }
+    get content(): ASTNode[]{
+        if (this.ifFalse === undefined){
+            return [].concat(this.condition, this.ifTrue);
+        } else {
+            return [].concat(this.condition, this.ifTrue, this.ifFalse);
+        }
+    }
+    eval() {
+        var cond = this.condition.eval();
+        if (cond){
+            return this.ifTrue.eval();
+        } else if (this.ifFalse !== undefined){
+            return this.ifFalse.eval();
+        } else {
+            return null;
+        }
     }
 }
 
@@ -61,6 +101,7 @@ function main(){
     var two = new LiteralNumberNode(1, 6, '2');
     var plus = new FunctionNameNode(1, 2, '+');
     var funccall = new FunctionCallNode(1, 1, plus, [one, two]);
+    console.log(funccall.tree())
     return funccall.eval()
 }
 console.log(main());
