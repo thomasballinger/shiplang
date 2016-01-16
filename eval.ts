@@ -25,6 +25,10 @@ function indent(content: string, n=2): string{
     return lines.map(function(line){return Array(n).join(' ') + line}).join('\n');
 }
 
+function range(n){
+    return Array.apply(null, Array(n)).map(function (_, i) {return i;});
+}
+
 class ASTNode {
     constructor(public line: number, public col: number){}
     content: any;
@@ -135,6 +139,31 @@ export class Do extends ASTNode {
 
 }
 
+function runBytecode(bytecode: ByteCode[]){
+    var toRun = bytecode.slice();
+    var stack = [];
+    while (toRun.length > 0){
+        var [bc, arg] = toRun.shift();
+        switch (bc){
+            case BC.LoadConstant:
+                stack.push(arg)
+                break;
+            case BC.FunctionLookup:
+                stack.push(funcs[arg])
+                break;
+            case BC.FunctionCall:
+                var args = range(arg).map(function(){return stack.pop();});
+                var func = stack.pop()
+                // TODO allow lambdas here instead
+                stack.push(func.apply(null, args));
+                break;
+            default:
+                throw Error('unrecognized bytecode: '+bc);
+        }
+    }
+    console.log('runBytecode finished with stack of:', stack);
+}
+
 var funcs = {
     '+': function(){
       return Array.prototype.slice.call(arguments).reduce(function(a, b){
@@ -153,6 +182,7 @@ function main(){
     console.log(funccall.tree())
     console.log(funccall.compile())
     dis(funccall.compile())
+    console.log(runBytecode(funccall.compile()));
     return funccall.eval()
 }
 console.log(main());
