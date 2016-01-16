@@ -81,9 +81,26 @@ export class IfNode extends ASTNode {
         } else if (this.ifFalse !== undefined){
             return this.ifFalse.eval();
         } else {
-            return null;
+            return undefined;
         }
     }
+    tree() {
+        return ('if\n' + indent(this.condition.tree()) + '\nthen\n' + indent(this.ifTrue.tree()) +
+                (this.ifFalse === undefined ? '' : 'else\n'+indent(this.ifFalse.tree())));
+    }
+}
+
+export class Do extends ASTNode {
+    constructor(public line: number, public col: number,
+                public content: ASTNode[]){
+                    super(line, col);
+                }
+    eval() {
+        var result = undefined;
+        this.content.map(function(x){ result = x.eval();});
+        return result;
+    }
+
 }
 
 var funcs = {
