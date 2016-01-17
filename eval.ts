@@ -3,6 +3,7 @@ enum BC {
     LoadConstant,
     FunctionLookup,
     FunctionCall,
+    NameLookup,
 }
 type ByteCode = [BC, any];
 
@@ -11,11 +12,18 @@ import PEG = require('pegjs')
 var grammar = `
 {
     function ein(s){ // empty string if null
-        return '' ? s === null : s;
+        return s === null ? '' : s;
     }
     function makeFunctionCallNode(funcName, spacesAndAtoms){
         var nodes = spacesAndAtoms.map(function(x){return x[1];});
         return new parser.nodes.FunctionCallNode(location(), funcName, nodes);
+    }
+    function doIfMultipleStatements(location, sexps){
+        if (sexps.length === 1){
+            return sexps[0];
+        } else {
+            return parser.nodes.DoNode(location, sexps);
+        }
     }
 }
 
@@ -23,7 +31,7 @@ start
   = module
 
 module
-  = _* head:sexp wsNoNewline* rest:('\\n' _* sexp)* _* { return [head].concat(rest.map(function(x){return x[2];})); }
+  = _* head:sexp wsNoNewline* rest:('\\n' _* sexp)* _* { return doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[2];}))); }
 
 sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }
@@ -34,18 +42,21 @@ ifSexp
   = "(" _? "if" _+ cond:sexp _+ ifTrue:sexp _* ")" { return parser.nodes.IfNode(location(), cond, ifTrue); }
   / "(" _? "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
 
+doSexp
+  = "(" _* "do" sexps:(_+ sexp)* _* ")" { return parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]}))}
+
 functionCallSexp =
   "(" _* funcName:functionName atoms:(_* atom)* _* ")" { return makeFunctionCallNode(funcName, atoms); }
 
 functionName
-  = name:([a-zA-Z0-9_-]+) {return new parser.nodes.FunctionNameNode(location(), name.join('')); }
+  = name:identifier {return new parser.nodes.FunctionNameNode(location(), name.content); }
 
 atom
-  = identifier
-  / literal
+  = literal
+  / identifier
 
 identifier
-  = name:([a-zA-Z0-9_-]+) { return new parser.nodes.NameNode(location(), name.join('')); }
+  = name:([a-zA-Z0-9-+*/!$%&*+-/:<=>?@^_~]+) { return new parser.nodes.NameNode(location(), name.join('')); }
 
 literal
   = number
@@ -56,8 +67,8 @@ string
   / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(value.join('')); }
 
 number
- = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return Number(eif(unary)+ein(before)+ein(decimal)+after); }
- / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return Number(eif(unary)+before+ein(decimal)+ein(after)); }
+ = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+after); }
+ / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+before+ein(decimal)+ein(after)); }
 
 _
   = [ \\t\\r\\n]
@@ -72,12 +83,6 @@ function enumLookup(enumObj, value){
             return name;
         }
     }
-}
-
-function dis(bytecode: ByteCode[]){
-    bytecode.map(function(x){
-        console.log(enumLookup(BC, x[0]), x[1]);
-    })
 }
 
 function indent(content: string, n=2): string{
@@ -101,55 +106,56 @@ var noLocation = {
 class ASTNode {
     constructor(public location: Location){}
     content: any;
-    eval() { throw Error('abstract method')}; // TODO there's probably some nice way to do abstract methods
+    eval(env: Environment) { throw Error('abstract method')}; // TODO there's probably some nice way to do abstract methods
     tree(): string { throw Error('abstract method'); return '';}; // TODO there's probably some nice way to do abstract methods
     compile(): Array<ByteCode> { throw Error('abstract method'); return [[BC.LoadConstant, 'should be abstract']];};
 }
 
-export class NullNode extends ASTNode {
+class NullNode extends ASTNode {
     constructor(location){
         this.content = null;
         super(location)
     }
-    eval() { return null; }
+    eval(env: Environment) { return null; }
     compile(): Array<ByteCode> { return [[BC.LoadConstant, null]];};
 }
 
-export class NumberLiteralNode extends ASTNode {
+class NumberLiteralNode extends ASTNode {
     constructor(location, content: string){
         super(location);
         this.content = Number(content);
     }
     content: number;
-    eval() { return this.content; }
+    eval(env) { return this.content; }
     tree() { return 'NumberLiteral: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.LoadConstant, this.content]]; }
 }
 
-export class NameNode extends ASTNode {
+class NameNode extends ASTNode {
     constructor(location, content: string){
         super(location);
         this.content = content;
     }
     content: string;
-    eval() { throw Error('Name lookup not implemented')};
+    eval(env) { return env.lookup(this.content) };
     tree() { return 'Name: ' + this.content; }
-    compile() { throw Error('TODO'); return []; } //TODO
+    compile(): Array<ByteCode> { return [[BC.NameLookup, 0]]; }
 }
 
-export class FunctionNameNode extends NameNode{
+class FunctionNameNode extends NameNode{
     content: string;
+    eval(env) { return env.lookup(this.content); }
     tree() { return 'Function Name: ' + this.content; }
-    compile() { return [[BC.FunctionLookup, this.content]]; }
+    compile(): Array<ByteCode> { return [[BC.FunctionLookup, this.content]]; }
 }
 
-export class StringLiteralNode extends NameNode {
-    eval() { return this.content; }
+class StringLiteralNode extends NameNode {
+    eval(env) { return this.content; }
     tree() { return 'StringLiteral: ' + this.content; }
-    compile(): Array<ByteCode> { return [[BC.LoadConstant, this.eval()]]; } }
+    compile(): Array<ByteCode> { return [[BC.LoadConstant, this.content]]; } }
 
 // This time around you can't use expressions in the front position
-export class FunctionCallNode extends ASTNode {
+class FunctionCallNode extends ASTNode {
     constructor(location,
                 public head: FunctionNameNode, public args: ASTNode[]){
         super(location);
@@ -157,9 +163,10 @@ export class FunctionCallNode extends ASTNode {
     get content(): ASTNode[]{
         return (<ASTNode[]>[this.head]).concat(this.args);
     }
-    eval() {
-        var func = funcs[this.head.content];
-        var argValues = this.args.map(function(node){return node.eval()});
+    eval(env) {
+        var func = this.head.eval(env);
+        var argValues = this.args.map(function(node){return node.eval(env)});
+        console
         return func.apply(null, argValues);
     }
     tree() {
@@ -171,12 +178,11 @@ export class FunctionCallNode extends ASTNode {
     compile() {
         var loadfunc = this.head.compile();
         var loadargs = [].concat.apply([], this.args.map(function(x: ASTNode){ return x.compile()}));
-        console.log('loadargs', loadargs);
         return [].concat(loadfunc, loadargs, [[BC.FunctionCall, loadargs.length]]);
     }
 }
 
-export class IfNode extends ASTNode {
+class IfNode extends ASTNode {
     constructor(location: Location,
                 public condition: ASTNode, public ifTrue: ASTNode, public ifFalse?: ASTNode){
         super(location);
@@ -188,12 +194,12 @@ export class IfNode extends ASTNode {
             return [].concat(this.condition, this.ifTrue, this.ifFalse);
         }
     }
-    eval() {
-        var cond = this.condition.eval();
+    eval(env) {
+        var cond = this.condition.eval(env);
         if (cond){
-            return this.ifTrue.eval();
+            return this.ifTrue.eval(env);
         } else if (this.ifFalse !== undefined){
-            return this.ifFalse.eval();
+            return this.ifFalse.eval(env);
         } else {
             return undefined;
         }
@@ -204,17 +210,34 @@ export class IfNode extends ASTNode {
     }
 }
 
-export class DoNode extends ASTNode {
+class DoNode extends ASTNode {
     constructor(location: Location,
                 public content: ASTNode[]){
                     super(location);
                 }
-    eval() {
+    eval(env) {
         var result = undefined;
-        this.content.map(function(x){ result = x.eval();});
+        this.content.map(function(x){ result = x.eval(env);});
         return result;
     }
 }
+
+class Environment {
+    constructor(public scopes: Array<any>){ }
+    lookup(name: string){
+        for (var scope of this.scopes){
+            if (scope.hasOwnProperty(name)){
+                return scope[name];
+            }
+        }
+        var scopeReprs = this.scopes.map(function(scope){
+            return ''+Object.keys(scope);
+        }).join('\n');
+        throw Error("Name '"+name+"' not found in scopes:\n"+scopeReprs);
+    }
+}
+var emptyEnv = new Environment([]);
+
 
 var parser = PEG.buildParser(grammar);
 parser.nodes = {}
@@ -226,7 +249,7 @@ parser.nodes.FunctionCallNode = FunctionCallNode;
 parser.nodes.IfNode = IfNode;
 parser.nodes.DoNode = DoNode;
 
-function runBytecode(bytecode: ByteCode[]){
+function runBytecode(bytecode: ByteCode[], env: Environment){
     var toRun = bytecode.slice();
     var stack = [];
     while (toRun.length > 0){
@@ -236,7 +259,10 @@ function runBytecode(bytecode: ByteCode[]){
                 stack.push(arg)
                 break;
             case BC.FunctionLookup:
-                stack.push(funcs[arg])
+                stack.push(env.lookup(arg));
+                break;
+            case BC.NameLookup:
+                stack.push(env.lookup(arg));
                 break;
             case BC.FunctionCall:
                 var args = range(arg).map(function(){return stack.pop();});
@@ -249,6 +275,7 @@ function runBytecode(bytecode: ByteCode[]){
         }
     }
     console.log('runBytecode finished with stack of:', stack);
+    return stack.pop();
 }
 
 var funcs = {
@@ -260,6 +287,38 @@ var funcs = {
     '*': function(a, b){ return a * b; },
 }
 
+export function dis(bytecode: ByteCode[], indent=0){
+    bytecode.map(function(x){
+        console.log(Array(indent).join(' ') + enumLookup(BC, x[0]), x[1]);
+    })
+}
+
+export function run(code: string){
+    var ast = parser.parse(code);
+    var bytecode = ast.compile();
+    var env = new Environment([Object.assign({}, funcs), {}])
+    var interpResult = ast.eval(env);
+    var env = new Environment([Object.assign({}, funcs), {}])
+    var compiledResult = runBytecode(bytecode, env);
+    if (interpResult !== compiledResult){
+        throw Error('interpreted result '+interpResult+' differs from compiled result '+compiledResult);
+    }
+    return compiledResult;
+}
+
+export function trace(code: string){
+    var ast = parser.parse(code);
+    console.log('AST:');
+    console.log(indent(ast.tree()));
+    var bytecode = ast.compile();
+    console.log('bytecode:');
+    dis(bytecode, 2);
+    var env = new Environment([Object.assign({}, funcs), {}])
+    console.log('interpreted result:', ast.eval(env));
+    var env = new Environment([Object.assign({}, funcs), {}])
+    console.log('compiled result:', runBytecode(bytecode, env));
+}
+
 function main(){
     '(+ 1 2)'
     var one = new NumberLiteralNode(noLocation, '1');
@@ -269,11 +328,13 @@ function main(){
     console.log(funccall.tree())
     console.log(funccall.compile())
     dis(funccall.compile())
-    console.log(runBytecode(funccall.compile()));
+    var env = new Environment([Object.assign({}, funcs), {}])
+    console.log(runBytecode(funccall.compile(), env));
     console.log(parser.parse('(1 2 3)'));
     console.log(parser.parse(`(1 2 3)
 
                               (2 3 4)`));
-    return funccall.eval()
+    var env = new Environment([Object.assign({}, funcs), {}])
+    return funccall.eval(env)
 }
-console.log(main());
+trace('(+ 1 2)');
