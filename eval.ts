@@ -20,14 +20,17 @@ var grammar = `
 }
 
 start
-  = functionCallSexp
+  = module
+
+module
+  = _* head:sexp wsNoNewline* rest:('\\n' _* sexp)* _* { return [head].concat(rest.map(function(x){return x[2];})); }
 
 sexp
-  = "(" " "* ")" { return new parser.node.NullNode(location()) }
+  = "(" _+ ")" { return new parser.node.NullNode(location()) }
   / functionCallSexp
 
 functionCallSexp =
-  "(" " "* funcName:functionName atoms:(" "* atom)* " "* ")" { return makeFunctionCallNode(funcName, atoms); }
+  "(" _* funcName:functionName atoms:(_* atom)* _* ")" { return makeFunctionCallNode(funcName, atoms); }
 
 functionName
   = name:([a-zA-Z0-9_-]+) {return new parser.nodes.FunctionNameNode(location(), name.join('')); }
@@ -44,12 +47,18 @@ literal
   / string
 
 string
-  = '"' value:[^"]+ '"' { return new parser.nodes.StringLiteralNode(value.join('')); }
+  = '"' value:([^"])+ '"' { return new parser.nodes.StringLiteralNode(value.join('')); }
   / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(value.join('')); }
 
 number
  = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return Number(eif(unary)+ein(before)+ein(decimal)+after); }
  / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return Number(eif(unary)+before+ein(decimal)+ein(after)); }
+
+_
+  = [ \\t\\r\\n]
+
+wsNoNewline
+  = [ \\t]
 `
 
 function enumLookup(enumObj, value){
@@ -256,7 +265,10 @@ function main(){
     console.log(funccall.compile())
     dis(funccall.compile())
     console.log(runBytecode(funccall.compile()));
-    console.log('!',parser.parse('(1 2 3)'));
+    console.log(parser.parse('(1 2 3)'));
+    console.log(parser.parse(`(1 2 3)
+
+                              (2 3 4)`));
     return funccall.eval()
 }
 console.log(main());
