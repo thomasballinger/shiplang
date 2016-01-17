@@ -4,6 +4,8 @@ enum BC {
     FunctionLookup,
     FunctionCall,
     NameLookup,
+    JumpIfNot,
+    Jump,
 }
 type ByteCode = [BC, any];
 
@@ -35,12 +37,13 @@ module
 
 sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }
+  / atom
   / ifSexp
   / functionCallSexp
 
 ifSexp
-  = "(" _? "if" _+ cond:sexp _+ ifTrue:sexp _* ")" { return parser.nodes.IfNode(location(), cond, ifTrue); }
-  / "(" _? "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
+  = "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _*")" { return new parser.nodes.IfNode(location(), cond, ifTrue); }
+  / "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return new parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
 
 doSexp
   = "(" _* "do" sexps:(_+ sexp)* _* ")" { return parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]}))}
@@ -103,12 +106,12 @@ var noLocation = {
   end:   { offset: 0, line: 1, column: 1 }
 }
 
-class ASTNode {
+abstract class ASTNode {
     constructor(public location: Location){}
     content: any;
-    eval(env: Environment) { throw Error('abstract method')}; // TODO there's probably some nice way to do abstract methods
-    tree(): string { throw Error('abstract method'); return '';}; // TODO there's probably some nice way to do abstract methods
-    compile(): Array<ByteCode> { throw Error('abstract method'); return [[BC.LoadConstant, 'should be abstract']];};
+    abstract eval(env: Environment): any;
+    abstract tree(): string;
+    abstract compile(): Array<ByteCode>;
 }
 
 class NullNode extends ASTNode {
@@ -117,6 +120,7 @@ class NullNode extends ASTNode {
         super(location)
     }
     eval(env: Environment) { return null; }
+    tree() { return 'NullLiteral: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.LoadConstant, null]];};
 }
 
@@ -206,10 +210,19 @@ class IfNode extends ASTNode {
     }
     tree() {
         return ('if\n' + indent(this.condition.tree()) + '\nthen\n' + indent(this.ifTrue.tree()) +
-                (this.ifFalse === undefined ? '' : 'else\n'+indent(this.ifFalse.tree())));
+                (this.ifFalse === undefined ? '' : '\nelse\n'+indent(this.ifFalse.tree())));
+    }
+    compile(): Array<ByteCode> {
+        var condition = this.condition.compile();
+        var ifTrue = this.ifTrue.compile();
+        var ifFalse = this.ifFalse === undefined ? [] : this.ifFalse.compile();
+        var skipFalse = this.ifFalse === undefined ? [] : [[BC.Jump, ifFalse.length]];
+        return [].concat(condition, [[BC.JumpIfNot, ifTrue.length]],
+                         ifTrue, skipFalse, ifFalse);
     }
 }
 
+/*
 class DoNode extends ASTNode {
     constructor(location: Location,
                 public content: ASTNode[]){
@@ -220,7 +233,9 @@ class DoNode extends ASTNode {
         this.content.map(function(x){ result = x.eval(env);});
         return result;
     }
+    compile { return [[BC.JumpIf, 1]]; throw Error('not implemented');}
 }
+*/
 
 class Environment {
     constructor(public scopes: Array<any>){ }
@@ -247,13 +262,15 @@ parser.nodes.FunctionNameNode = FunctionNameNode;
 parser.nodes.NameNode = NameNode;
 parser.nodes.FunctionCallNode = FunctionCallNode;
 parser.nodes.IfNode = IfNode;
-parser.nodes.DoNode = DoNode;
+//parser.nodes.DoNode = DoNode;
 
 function runBytecode(bytecode: ByteCode[], env: Environment){
-    var toRun = bytecode.slice();
+    var toRun = bytecode;
     var stack = [];
-    while (toRun.length > 0){
-        var [bc, arg] = toRun.shift();
+    var counter = 0;
+    while (true){
+        if (counter >= toRun.length){ break; }
+        var [bc, arg] = toRun[counter];
         switch (bc){
             case BC.LoadConstant:
                 stack.push(arg)
@@ -267,12 +284,21 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
             case BC.FunctionCall:
                 var args = range(arg).map(function(){return stack.pop();});
                 var func = stack.pop()
-                // TODO allow lambdas here instead
                 stack.push(func.apply(null, args));
+                break;
+            case BC.JumpIfNot:
+                var cond = stack.pop();
+                if (!cond) {
+                    counter += arg;
+                }
+                break;
+            case BC.Jump:
+                counter += arg;
                 break;
             default:
                 throw Error('unrecognized bytecode: '+bc);
         }
+        counter++;
     }
     console.log('runBytecode finished with stack of:', stack);
     return stack.pop();
@@ -337,4 +363,5 @@ function main(){
     var env = new Environment([Object.assign({}, funcs), {}])
     return funccall.eval(env)
 }
-trace('(+ 1 2)');
+//trace('(+ 1 2)');
+trace('(if 1 2 3)');
