@@ -6,6 +6,7 @@ enum BC {
     NameLookup,
     JumpIfNot,
     Jump,
+    Pop,
 }
 type ByteCode = [BC, any];
 
@@ -14,6 +15,9 @@ import PEG = require('pegjs')
 var grammar = `
 {
     function ein(s){ // empty string if null
+        if (Array.isArray(s)){
+            s = s.join('');
+        }
         return s === null ? '' : s;
     }
     function makeFunctionCallNode(funcName, spacesAndAtoms){
@@ -37,19 +41,20 @@ module
 
 sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }
-  / atom
   / ifSexp
+  / doSexp
   / functionCallSexp
+  / atom
 
 ifSexp
   = "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _*")" { return new parser.nodes.IfNode(location(), cond, ifTrue); }
   / "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return new parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
 
 doSexp
-  = "(" _* "do" sexps:(_+ sexp)* _* ")" { return parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]}))}
+  = "(" _* "do" sexps:(_+ sexp)* _* ")" { return new parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]})); }
 
 functionCallSexp =
-  "(" _* funcName:functionName atoms:(_* atom)* _* ")" { return makeFunctionCallNode(funcName, atoms); }
+  "(" _* funcName:functionName sexps:(_* sexp)* _* ")" { return makeFunctionCallNode(funcName, sexps); }
 
 functionName
   = name:identifier {return new parser.nodes.FunctionNameNode(location(), name.content); }
@@ -70,8 +75,8 @@ string
   / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(value.join('')); }
 
 number
- = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+after); }
- / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+before+ein(decimal)+ein(after)); }
+ = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
+ / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
 
 _
   = [ \\t\\r\\n]
@@ -182,7 +187,7 @@ class FunctionCallNode extends ASTNode {
     compile() {
         var loadfunc = this.head.compile();
         var loadargs = [].concat.apply([], this.args.map(function(x: ASTNode){ return x.compile()}));
-        return [].concat(loadfunc, loadargs, [[BC.FunctionCall, loadargs.length]]);
+        return [].concat(loadfunc, loadargs, [[BC.FunctionCall, this.args.length]]);
     }
 }
 
@@ -217,12 +222,11 @@ class IfNode extends ASTNode {
         var ifTrue = this.ifTrue.compile();
         var ifFalse = this.ifFalse === undefined ? [] : this.ifFalse.compile();
         var skipFalse = this.ifFalse === undefined ? [] : [[BC.Jump, ifFalse.length]];
-        return [].concat(condition, [[BC.JumpIfNot, ifTrue.length]],
+        return [].concat(condition, [[BC.JumpIfNot, ifTrue.length+skipFalse.length]],
                          ifTrue, skipFalse, ifFalse);
     }
 }
 
-/*
 class DoNode extends ASTNode {
     constructor(location: Location,
                 public content: ASTNode[]){
@@ -233,9 +237,21 @@ class DoNode extends ASTNode {
         this.content.map(function(x){ result = x.eval(env);});
         return result;
     }
-    compile { return [[BC.JumpIf, 1]]; throw Error('not implemented');}
+    tree() { return ('Do\n' +
+                '\n'+this.content.map(function(x: ASTNode){
+                    return indent(x.tree())
+                }).join('\n'));
+    }
+    compile() {
+        var code = <Array<ByteCode>>[];
+        for (var node of this.content){
+            code = code.concat(node.compile())
+            code.push([BC.Pop, null]);
+        }
+        code.pop(); // last value shouldn't be cleared
+        return code;
+    }
 }
-*/
 
 class Environment {
     constructor(public scopes: Array<any>){ }
@@ -262,7 +278,7 @@ parser.nodes.FunctionNameNode = FunctionNameNode;
 parser.nodes.NameNode = NameNode;
 parser.nodes.FunctionCallNode = FunctionCallNode;
 parser.nodes.IfNode = IfNode;
-//parser.nodes.DoNode = DoNode;
+parser.nodes.DoNode = DoNode;
 
 function runBytecode(bytecode: ByteCode[], env: Environment){
     var toRun = bytecode;
@@ -283,7 +299,7 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
                 break;
             case BC.FunctionCall:
                 var args = range(arg).map(function(){return stack.pop();});
-                var func = stack.pop()
+                var func = stack.pop();
                 stack.push(func.apply(null, args));
                 break;
             case BC.JumpIfNot:
@@ -295,6 +311,9 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
             case BC.Jump:
                 counter += arg;
                 break;
+            case BC.Pop:
+                stack.pop();
+                break
             default:
                 throw Error('unrecognized bytecode: '+bc);
         }
@@ -333,11 +352,18 @@ export function run(code: string){
 }
 
 export function trace(code: string){
-    var ast = parser.parse(code);
+    console.log(code);
+    try {
+        var ast = parser.parse(code);
+    } catch (e) {
+        console.log(e)
+        return
+    }
     console.log('AST:');
     console.log(indent(ast.tree()));
     var bytecode = ast.compile();
     console.log('bytecode:');
+    console.log(bytecode);
     dis(bytecode, 2);
     var env = new Environment([Object.assign({}, funcs), {}])
     console.log('interpreted result:', ast.eval(env));
@@ -364,4 +390,10 @@ function main(){
     return funccall.eval(env)
 }
 //trace('(+ 1 2)');
-trace('(if 1 2 3)');
+//trace('(if 1 2 3)');
+//trace(`(if 1 (do 3 4) (do 1 2))`);
+
+//trace('50.0');
+//trace(`(+ 1 (if 3 4 50))`);
+//trace(`(do (+ 1 (if 3 4 50)))`);
+trace(`(do (+ 1 (if 3 4 50)))`);
