@@ -27,7 +27,12 @@ module
 
 sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }
+  / ifSexp
   / functionCallSexp
+
+ifSexp
+  = "(" _? "if" _+ cond:sexp _+ ifTrue:sexp _* ")" { return parser.nodes.IfNode(location(), cond, ifTrue); }
+  / "(" _? "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
 
 functionCallSexp =
   "(" _* funcName:functionName atoms:(_* atom)* _* ")" { return makeFunctionCallNode(funcName, atoms); }
