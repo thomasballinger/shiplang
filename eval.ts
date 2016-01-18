@@ -13,6 +13,9 @@ enum BC {
     Store,         // arg is variable name, saves TOS
 }
 type ByteCode = [BC, any];
+interface Scope {
+  [key: string]: any;
+}
 
 import PEG = require('pegjs')
 
@@ -100,7 +103,7 @@ wsNoNewline
   = [ \\t]
 `
 
-function enumLookup(enumObj, value){
+function enumLookup(enumObj: any, value: number){
     for (var name in enumObj){
         if (enumObj[name] == value){
             return name;
@@ -113,8 +116,8 @@ function indent(content: string, n=2): string{
     return lines.map(function(line){return Array(n).join(' ') + line}).join('\n');
 }
 
-function range(n){
-    return Array.apply(null, Array(n)).map(function (_, i) {return i;});
+function range(n: number){
+    return Array.apply(null, Array(n)).map(function (_:any, i:number) {return i;});
 }
 
 interface Location {
@@ -135,59 +138,59 @@ abstract class ASTNode {
 }
 
 class NullNode extends ASTNode {
-    constructor(location){
+    constructor(location: Location){
         this.content = null;
         super(location)
     }
-    eval(env: Environment) { return null; }
+    eval(env: Environment):any { return null; }
     tree() { return 'NullLiteral: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.LoadConstant, null]];};
 }
 
 class NumberLiteralNode extends ASTNode {
-    constructor(location, content: string){
+    constructor(location: Location, content: string){
         super(location);
         this.content = Number(content);
     }
     content: number;
-    eval(env) { return this.content; }
+    eval(env: Environment):any { return this.content; }
     tree() { return 'NumberLiteral: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.LoadConstant, this.content]]; }
 }
 
 class NameNode extends ASTNode {
-    constructor(location, content: string){
+    constructor(location: Location, content: string){
         super(location);
         this.content = content;
     }
     content: string;
-    eval(env) { return env.lookup(this.content) };
+    eval(env: Environment):any { return env.lookup(this.content) };
     tree() { return 'Name: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.NameLookup, this.content]]; }
 }
 
 class FunctionNameNode extends NameNode{
     content: string;
-    eval(env) { return env.lookup(this.content); }
+    eval(env: Environment):any { return env.lookup(this.content); }
     tree() { return 'Function Name: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.FunctionLookup, this.content]]; }
 }
 
 class StringLiteralNode extends NameNode {
-    eval(env) { return this.content; }
+    eval(env: Environment):any { return this.content; }
     tree() { return 'StringLiteral: ' + this.content; }
     compile(): Array<ByteCode> { return [[BC.LoadConstant, this.content]]; } }
 
 // This time around you can't use expressions in the front position
 class FunctionCallNode extends ASTNode {
-    constructor(location,
+    constructor(location: Location,
                 public head: FunctionNameNode, public args: ASTNode[]){
         super(location);
     }
     get content(): ASTNode[]{
         return (<ASTNode[]>[this.head]).concat(this.args);
     }
-    eval(env) {
+    eval(env: Environment):any {
         var func = this.head.eval(env);
         var argValues = this.args.map(function(node){return node.eval(env)});
         if (typeof func === 'function'){
@@ -214,7 +217,7 @@ class DefineNode extends ASTNode {
                 public name: string, public value: ASTNode){
         super(location);
     }
-    eval(env){
+    eval(env: Environment):any{
         var v = this.value.eval(env);
         env.define(this.name, v);
         return v;
@@ -239,7 +242,7 @@ class IfNode extends ASTNode {
             return [].concat(this.condition, this.ifTrue, this.ifFalse);
         }
     }
-    eval(env) {
+    eval(env: Environment):any {
         var cond = this.condition.eval(env);
         if (cond){
             return this.ifTrue.eval(env);
@@ -268,8 +271,8 @@ class DoNode extends ASTNode {
                 public content: ASTNode[]){
                     super(location);
                 }
-    eval(env) {
-        var result = undefined;
+    eval(env: Environment):any {
+        var result = <any>undefined;
         this.content.map(function(x){ result = x.eval(env);});
         return result;
     }
@@ -294,13 +297,13 @@ class CompiledFunctionObject {
 }
 
 class FunctionObject {
-    constructor(public params, public body, public env){
+    constructor(public params: string[], public body: ASTNode, public env: Environment){
         this.params = params;
         this.body = body;
         this.env = env.copy();
     }
     run(args: any[]){
-        var scope = {};
+        var scope = <Scope>{};
         if (args.length !== this.params.length){
             throw Error('Function called with wrong arity! Takes ' +
                          this.params.length + ' args, given ' + args.length);
@@ -325,7 +328,7 @@ class LambdaNode extends ASTNode {
     get content(): any[]{
         return [this.params, this.body];
     }
-    eval(env) {
+    eval(env: Environment):any {
         return new FunctionObject(this.params, this.body, env);
     }
     tree() { return ("lambda with params (" + this.params + ")" +
@@ -378,7 +381,7 @@ parser.nodes.DefineNode = DefineNode;
 
 function runBytecode(bytecode: ByteCode[], env: Environment){
     var toRun = bytecode;
-    var stack = [];
+    var stack = <any[]>[];
     var counter = 0;
     while (true){
         if (counter >= toRun.length){ break; }
@@ -399,8 +402,8 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
                 if (typeof func === 'function'){
                     stack.push(func.apply(null, args));
                 } else {
-                    var scope = {};
-                    args.map(function(x, i){
+                    var scope = <Scope>{};
+                    args.map(function(x:any, i:number){ //TODO why is this necessary?
                         scope[params[i]] = x;
                     }); // TODO factor out creating a new environment
                     var newEnv = env.copy();
@@ -450,11 +453,11 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
 
 var funcs = {
     '+': function(){
-      return Array.prototype.slice.call(arguments).reduce(function(a, b){
+      return Array.prototype.slice.call(arguments).reduce(function(a:number, b:number){
         return a + b;
       }, 0);
     },
-    '*': function(a, b){ return a * b; },
+    '*': function(a:number, b:number){ return a * b; },
 }
 
 export function dis(bytecode: ByteCode[], indent=0){
