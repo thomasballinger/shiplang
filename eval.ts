@@ -190,8 +190,11 @@ class FunctionCallNode extends ASTNode {
     eval(env) {
         var func = this.head.eval(env);
         var argValues = this.args.map(function(node){return node.eval(env)});
-        console
-        return func.apply(null, argValues);
+        if (typeof func === 'function'){
+            return func.apply(null, argValues);
+        } else {
+            return func.run(argValues);
+        }
     }
     tree() {
         return ('Func call with '+this.head.tree() +
@@ -287,7 +290,7 @@ class DoNode extends ASTNode {
 }
 
 class CompiledFunctionObject {
-    constructor(public params: string[], public body: ASTNode, public env: Environment){}
+    constructor(public params: string[], public code: ByteCode[], public env: Environment){}
 }
 
 class FunctionObject {
@@ -296,10 +299,15 @@ class FunctionObject {
         this.body = body;
         this.env = env.copy();
     }
-    apply(args: any[]){
+    run(args: any[]){
         var scope = {};
+        if (args.length !== this.params.length){
+            throw Error('Function called with wrong arity! Takes ' +
+                         this.params.length + ' args, given ' + args.length);
+        }
+        var params = this.params;
         args.map(function(x, i){
-            scope[this.params[i]] = x;
+            scope[params[i]] = x;
         });
         var env = this.env.copy();
         env.scopes.push(scope);
@@ -349,7 +357,7 @@ class Environment {
 
     // create a new environment with same scopes as this one, plus
     // an additional provided scope
-    copy(s: any): Environment{
+    copy(): Environment{
         return new Environment(this.scopes.slice(0));
     }
 }
@@ -388,7 +396,17 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
             case BC.FunctionCall:
                 var args = range(arg).map(function(){return stack.pop();});
                 var func = stack.pop();
-                stack.push(func.apply(null, args));
+                if (typeof func === 'function'){
+                    stack.push(func.apply(null, args));
+                } else {
+                    var scope = {};
+                    args.map(function(x, i){
+                        scope[params[i]] = x;
+                    }); // TODO factor out creating a new environment
+                    var newEnv = env.copy();
+                    newEnv.scopes.push(scope);
+                    stack.push(runBytecode(func.code, newEnv))
+                }
                 break;
             case BC.JumpIfNot:
                 var cond = stack.pop();
@@ -426,6 +444,7 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
         }
         counter++;
     }
+    //console.log('finished with stack of:', stack)
     return stack.pop();
 }
 
@@ -504,5 +523,9 @@ function main(){
 //trace(`(do (+ 1 (if 3 4 50)))`);
 //trace(`(do (+ 1 (if 3 4 50)))`);
 //trace(`((lambda (x y) (+ 1 2) (+ 3 4))`)
-trace(`(define a 1)
-       a`)
+//trace(`(define a 1)
+//       a`)
+//trace(`(define a (lambda (x y) (+ x y)))
+//       (a 1 2)`)
+trace(`(define a (lambda (x y) 1 2 (+ x y)))
+      (a 2 3)`);
