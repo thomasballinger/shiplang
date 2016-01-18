@@ -9,6 +9,8 @@ enum BC {
     Pop,            // arg always null
     BuildFunction, // arg is null for lambda, name otherwise
     Push,
+    StoreNew,      // arg is variable name, saves TOS
+    Store,         // arg is variable name, saves TOS
 }
 type ByteCode = [BC, any];
 
@@ -46,6 +48,7 @@ sexp
   / ifSexp
   / doSexp
   / lambdaSexp
+  / defineSexp
   / functionCallSexp
   / atom
 
@@ -61,6 +64,9 @@ lambdaSexp
 
 functionParams
   = "(" params:(_* atom)* _* ")" { return params.map(function(x){return x[1].content}); }
+
+defineSexp
+  = "(" _* "define" _+ name:identifier _+ value:sexp _* ")" { return new parser.nodes.DefineNode(location(), name.content, value); }
 
 functionCallSexp =
   "(" _* funcName:functionName sexps:(_* sexp)* _* ")" { return makeFunctionCallNode(funcName, sexps); }
@@ -157,7 +163,7 @@ class NameNode extends ASTNode {
     content: string;
     eval(env) { return env.lookup(this.content) };
     tree() { return 'Name: ' + this.content; }
-    compile(): Array<ByteCode> { return [[BC.NameLookup, 0]]; }
+    compile(): Array<ByteCode> { return [[BC.NameLookup, this.content]]; }
 }
 
 class FunctionNameNode extends NameNode{
@@ -197,6 +203,24 @@ class FunctionCallNode extends ASTNode {
         var loadfunc = this.head.compile();
         var loadargs = [].concat.apply([], this.args.map(function(x: ASTNode){ return x.compile()}));
         return [].concat(loadfunc, loadargs, [[BC.FunctionCall, this.args.length]]);
+    }
+}
+
+class DefineNode extends ASTNode {
+    constructor(location: Location,
+                public name: string, public value: ASTNode){
+        super(location);
+    }
+    eval(env){
+        var v = this.value.eval(env);
+        env.define(this.name, v);
+        return v;
+    }
+    tree(){
+        return 'define\n '+this.value+' to be\n'+indent(this.value.tree(), 1);
+    }
+    compile(){
+        return [].concat(this.value.compile(), [[BC.StoreNew, this.name]]);
     }
 }
 
@@ -319,6 +343,10 @@ class Environment {
         }).join('\n');
         throw Error("Name '"+name+"' not found in scopes:\n"+scopeReprs);
     }
+    define(name: string, value: any){
+        this.scopes[this.scopes.length-1][name] = value;
+    }
+
     // create a new environment with same scopes as this one, plus
     // an additional provided scope
     copy(s: any): Environment{
@@ -338,6 +366,7 @@ parser.nodes.FunctionCallNode = FunctionCallNode;
 parser.nodes.IfNode = IfNode;
 parser.nodes.DoNode = DoNode;
 parser.nodes.LambdaNode = LambdaNode;
+parser.nodes.DefineNode = DefineNode;
 
 function runBytecode(bytecode: ByteCode[], env: Environment){
     var toRun = bytecode;
@@ -388,6 +417,9 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
                 break;
             case BC.Push:
                 stack.push(arg);
+                break;
+            case BC.StoreNew:
+                env.define(arg, stack.pop());
                 break;
             default:
                 throw Error('unrecognized bytecode: '+bc+' enumLookup:'+enumLookup(BC, bc));
@@ -471,4 +503,6 @@ function main(){
 //trace(`(+ 1 (if 3 4 50))`);
 //trace(`(do (+ 1 (if 3 4 50)))`);
 //trace(`(do (+ 1 (if 3 4 50)))`);
-trace(`((lambda (x y) (+ 1 2) (+ 3 4))`)
+//trace(`((lambda (x y) (+ 1 2) (+ 3 4))`)
+trace(`(define a 1)
+       a`)
