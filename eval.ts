@@ -6,7 +6,9 @@ enum BC {
     NameLookup,
     JumpIfNot,
     Jump,
-    Pop,
+    Pop,            // arg always null
+    BuildFunction, // arg is null for lambda, name otherwise
+    Push,
 }
 type ByteCode = [BC, any];
 
@@ -28,7 +30,7 @@ var grammar = `
         if (sexps.length === 1){
             return sexps[0];
         } else {
-            return parser.nodes.DoNode(location, sexps);
+            return new parser.nodes.DoNode(location, sexps);
         }
     }
 }
@@ -43,6 +45,7 @@ sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }
   / ifSexp
   / doSexp
+  / lambdaSexp
   / functionCallSexp
   / atom
 
@@ -52,6 +55,12 @@ ifSexp
 
 doSexp
   = "(" _* "do" sexps:(_+ sexp)* _* ")" { return new parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]})); }
+
+lambdaSexp
+  = "(" _* "lambda" _* params:functionParams _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.LambdaNode(location(), params, doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }
+
+functionParams
+  = "(" params:(_* atom)* _* ")" { return params.map(function(x){return x[1].content}); }
 
 functionCallSexp =
   "(" _* funcName:functionName sexps:(_* sexp)* _* ")" { return makeFunctionCallNode(funcName, sexps); }
@@ -238,9 +247,9 @@ class DoNode extends ASTNode {
         return result;
     }
     tree() { return ('Do\n' +
-                '\n'+this.content.map(function(x: ASTNode){
-                    return indent(x.tree())
-                }).join('\n'));
+                     this.content.map(function(x: ASTNode){
+                        return indent(x.tree())
+                     }).join('\n'));
     }
     compile() {
         var code = <Array<ByteCode>>[];
@@ -250,6 +259,50 @@ class DoNode extends ASTNode {
         }
         code.pop(); // last value shouldn't be cleared
         return code;
+    }
+}
+
+class CompiledFunctionObject {
+    constructor(public params: string[], public body: ASTNode, public env: Environment){}
+}
+
+class FunctionObject {
+    constructor(public params, public body, public env){
+        this.params = params;
+        this.body = body;
+        this.env = env.copy();
+    }
+    apply(args: any[]){
+        var scope = {};
+        args.map(function(x, i){
+            scope[this.params[i]] = x;
+        });
+        var env = this.env.copy();
+        env.scopes.push(scope);
+        return this.body.eval(env);
+    }
+}
+
+
+class LambdaNode extends ASTNode {
+    constructor(location: Location,
+                public params: string[],
+                public body: ASTNode){
+                    super(location);
+                }
+    get content(): any[]{
+        return [this.params, this.body];
+    }
+    eval(env) {
+        return new FunctionObject(this.params, this.body, env);
+    }
+    tree() { return ("lambda with params (" + this.params + ")" +
+                     "\n" + indent(this.body.tree())); }
+    compile() {
+        return <Array<ByteCode>>[
+            [BC.Push, this.body.compile()],
+            [BC.Push, this.params],
+            [BC.BuildFunction, null]];
     }
 }
 
@@ -266,6 +319,11 @@ class Environment {
         }).join('\n');
         throw Error("Name '"+name+"' not found in scopes:\n"+scopeReprs);
     }
+    // create a new environment with same scopes as this one, plus
+    // an additional provided scope
+    copy(s: any): Environment{
+        return new Environment(this.scopes.slice(0));
+    }
 }
 var emptyEnv = new Environment([]);
 
@@ -279,6 +337,7 @@ parser.nodes.NameNode = NameNode;
 parser.nodes.FunctionCallNode = FunctionCallNode;
 parser.nodes.IfNode = IfNode;
 parser.nodes.DoNode = DoNode;
+parser.nodes.LambdaNode = LambdaNode;
 
 function runBytecode(bytecode: ByteCode[], env: Environment){
     var toRun = bytecode;
@@ -312,14 +371,29 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
                 counter += arg;
                 break;
             case BC.Pop:
+                if (arg !== null){
+                    throw Error('argument to pop should always be null, was '+arg);
+                }
                 stack.pop();
                 break
+            case BC.BuildFunction:
+                var name = arg;
+                var params = stack.pop();
+                var code = stack.pop();
+                stack.push(new CompiledFunctionObject(params, code, env));
+                if (arg === null){ // lambda function
+                } else {
+                    throw Error('named functions not implemented yet');
+                }
+                break;
+            case BC.Push:
+                stack.push(arg);
+                break;
             default:
-                throw Error('unrecognized bytecode: '+bc);
+                throw Error('unrecognized bytecode: '+bc+' enumLookup:'+enumLookup(BC, bc));
         }
         counter++;
     }
-    console.log('runBytecode finished with stack of:', stack);
     return stack.pop();
 }
 
@@ -363,7 +437,7 @@ export function trace(code: string){
     console.log(indent(ast.tree()));
     var bytecode = ast.compile();
     console.log('bytecode:');
-    console.log(bytecode);
+    //console.log(bytecode);
     dis(bytecode, 2);
     var env = new Environment([Object.assign({}, funcs), {}])
     console.log('interpreted result:', ast.eval(env));
@@ -396,4 +470,5 @@ function main(){
 //trace('50.0');
 //trace(`(+ 1 (if 3 4 50))`);
 //trace(`(do (+ 1 (if 3 4 50)))`);
-trace(`(do (+ 1 (if 3 4 50)))`);
+//trace(`(do (+ 1 (if 3 4 50)))`);
+trace(`((lambda (x y) (+ 1 2) (+ 3 4))`)
