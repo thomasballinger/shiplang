@@ -1,0 +1,191 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>missiles</title>
+<style type="text/css" media="screen">
+    body {
+      background-color: #111111
+    }
+    #editor {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 450px;
+        color: white;
+    }
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0px;
+      bottom: 0;
+      right: 0;
+      /*background-image: url('http://a1star.com/images/space.gif');*/
+      background-image: url('images/2.jpg');
+      background-color: #010101;
+      background-size: 1000px;
+    }
+    #minimap {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200;
+      height: 200;
+      border: 5px solid black;
+      background-color: #333333;
+    }
+</style>
+</head>
+<body>
+<canvas id="canvas" width="1" height="1"></canvas>
+<div id="editor"><code><pre>hello</pre><code></div>
+<canvas id="minimap" width="1" height="1"></canvas>
+<div id="errorbar"></div>
+<script>
+  var canvas = document.getElementById('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  var minimap = document.getElementById('minimap');
+  minimap.width = 200;
+  minimap.height = 200;
+</script>
+<script src="ai.js"></script>
+<script src="space.js"></script>
+<script src="manual.js"></script>
+
+<script id="pilot-script">
+// example ai script
+function* pilotScript(e){
+  yield ai.thrustFor(e, .1);
+  yield* ai.thrustUntilStopped(e);
+  while (true){
+    if (e.y > 400 && e.dy > 0){
+      yield ai.turnTo(e, 270);
+      yield ai.thrustFor(e, .2);
+    } else if (e.y < 200 && e.dy < 0){
+      yield ai.turnTo(e, 90);
+      yield ai.thrustFor(e, .2);
+    }
+    var spot = yield* scanForEnemy(e);
+    yield* fireMissile(e);
+  }
+}
+
+// players would get to write their own ai for missiles
+// in a syncronous style, which would desugar to yields
+function* missileScript(e){
+  yield ai.thrustFor(e, .6);
+  while (true){
+    yield* missilePursuit(e);
+    yield* ai.detonateIfCloserThanFor(e, world, 30, .001);
+  }
+}
+function* missilePursuit(e){
+  var closest = world.findClosestShip(e);
+  yield* ai.slowDownIfWrongWay(e, closest);
+  yield ai.turnTowardFor(e, ai.towards(e, closest), .2);
+  if (ai.speed(e) < 300){
+    yield ai.thrustFor(e, .1);
+  }
+}
+// maybe users would write their own controls
+function* manualDrive(e){
+  while (true){
+    key = yield* Manual.actOnKey(e, controls);
+    if (key === 'space'){
+      yield* fireMissile(e);
+    } else if (key == 'f'){
+      yield* fireLaser(e);
+    }
+  }
+}
+function* boidScript(e){
+  ai.setThrust(e, e.maxThrust * .5)
+  yield ai.turnLeft(e, 180);
+}
+
+// this is an example of a scanner that returns data
+function* scanForEnemy(e){
+  e.scanning = true;
+  yield ai.waitFor(e, 1)
+  e.scanning = false;
+  return [300, 200];
+}
+// builtins the user might have access to
+function* fireMissile(e){
+    yield ai.waitFor(e, .1);
+    world.addEntity(Space.fireMissile(e, missileScript))
+    yield ai.waitFor(e, .1);
+}
+function* fireLaser(e){
+    world.addEntity(Space.fireLaser(e));
+    yield ai.waitFor(e, .05);
+}
+</script>
+<script>
+var pilotScriptSource = document.getElementById('pilot-script').innerHTML;
+document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'</pre></code>';
+</script>
+
+<script>
+  var controls = new Manual.Controls()
+
+
+  var display = new Space.SpaceDisplay('canvas');
+  var minimapDisplay = new Space.SpaceDisplay('minimap');
+  var world = new Space.SpaceWorld();
+
+  var ship = Space.makeShip(400, 190, 0, 0, 270, manualDrive);
+  world.addEntity(ship);
+  world.addEntity(Space.makeShip(70, 190, 17, .1, 270, pilotScript));
+  for (var i=0; i<20; i++){
+    world.addEntity(Space.makeBoid(Math.random()*2000-1000, Math.random()*2000-1000, Math.random()*10-5, Math.random()*10-5, boidScript));
+  }
+  var last_tick = new Date().getTime()
+  var startTime = last_tick;
+  var finishTime = undefined;
+  function tick(){
+    var now = new Date().getTime();
+    var dt = now - last_tick;
+    last_tick = now;
+    world.tick(dt / 1000);
+    var positionScaleFactor = 1;
+    var entityScaleFactor = 1;
+    display.render(world.entities,
+                   ship.x-canvas.width/2/positionScaleFactor,
+                   ship.y-canvas.height/2/positionScaleFactor,
+                   ship.x+canvas.width/2/positionScaleFactor,
+                   ship.y+canvas.height/2/positionScaleFactor,
+                   positionScaleFactor,
+                   entityScaleFactor);
+    var minimapPSF = .07;
+    var minimapESF = .2;
+    minimapDisplay.render(world.entities,
+                          ship.x-minimap.width/2/minimapPSF,
+                          ship.y-minimap.height/2/minimapPSF,
+                          ship.x+minimap.width/2/minimapPSF,
+                          ship.y+minimap.height/2/minimapPSF,
+                          minimapPSF,
+                          minimapESF);
+
+    var ctx = canvas.getContext('2d');
+    ctx.font = "30px Arial";
+    if (world.ships().length === 0){
+      if (finishTime === undefined){
+        finishTime = new Date().getTime() - startTime;
+      }
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillText("Your time was " + Math.round(finishTime / 1000, 5) + " seconds.", 300, 50);
+    } else {
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillText("Destroy everything. " + (world.ships().length).toString() + " things left. Arrow keys, space and f.", 300, 28);
+    }
+    var backgroundParallax = .1;
+    canvas.style.backgroundPosition=''+(0-ship.x*backgroundParallax)+' '+(0-ship.y*backgroundParallax);
+
+    setTimeout(tick, 5);
+  }
+  tick();
+</script>
+</body>
+</html>
