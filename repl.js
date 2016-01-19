@@ -1,7 +1,10 @@
 // Simple REPL for shiplang
+require('ts-node').register();
+
 var readline = require('readline');
-var evaluation = require('./bundle');
 var process = require('process');
+
+var evaluation = require('./eval');
 
 if (process.argv[2] === 'runner'){
   process.exit();
