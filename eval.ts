@@ -402,9 +402,13 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
                 if (typeof func === 'function'){
                     stack.push(func.apply(null, args));
                 } else {
+                    if (func.params.length !== arg){
+                        throw Error('Function called with wrong arity! Takes ' +
+                                    func.params.length + ' args, given ' + args.length);
+                    }
                     var scope = <Scope>{};
                     args.map(function(x:any, i:number){ //TODO why is this necessary?
-                        scope[params[i]] = x;
+                        scope[func.params[i]] = x;
                     }); // TODO factor out creating a new environment
                     var newEnv = env.copy();
                     newEnv.scopes.push(scope);
@@ -479,19 +483,40 @@ export function run(code: string){
     return compiledResult;
 }
 
-export function trace(code: string){
-    console.log(code);
+abstract class Session{
+    constructor(){ this.env = new Environment([Object.assign({}, funcs), {}]); }
+    abstract run(s: string):any
+    env: Environment;
+}
+
+export class InterpreterSession extends Session{
+    run(s: string){
+        var ast = parseOrShowError(s)
+        if (ast === undefined) { return }
+        return ast.eval(this.env);
+    }
+}
+export class CompilerSession extends Session{
+    run(s: string){
+        var ast = parseOrShowError(s)
+        if (ast === undefined){ return }
+        return runBytecode(ast.compile(), this.env);}
+}
+
+function parseOrShowError(s: string){
     try {
-        var ast = parser.parse(code);
+        return parser.parse(s);
     } catch (e) {
         console.log(e)
-        return
     }
+}
+
+export function trace(code: string){
+    var ast = parseOrShowError(code);
     console.log('AST:');
     console.log(indent(ast.tree()));
     var bytecode = ast.compile();
     console.log('bytecode:');
-    //console.log(bytecode);
     dis(bytecode, 2);
     var env = new Environment([Object.assign({}, funcs), {}])
     console.log('interpreted result:', ast.eval(env));
@@ -530,5 +555,5 @@ function main(){
 //       a`)
 //trace(`(define a (lambda (x y) (+ x y)))
 //       (a 1 2)`)
-trace(`(define a (lambda (x y) 1 2 (+ x y)))
-      (a 2 3)`);
+//trace(`(define a (lambda (x y) 1 2 (+ x y)))
+//      (a 2 3)`);
