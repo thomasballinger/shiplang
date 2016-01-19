@@ -6,102 +6,20 @@ enum BC {
     NameLookup,
     JumpIfNot,
     Jump,
-    Pop,            // arg always null
+    Pop,           // arg always null
     BuildFunction, // arg is null for lambda, name otherwise
     Push,
     StoreNew,      // arg is variable name, saves TOS
     Store,         // arg is variable name, saves TOS
+    Return,        // done with this bytecode
 }
 type ByteCode = [BC, any];
 interface Scope {
   [key: string]: any;
 }
 
-import PEG = require('pegjs')
-
-var grammar = `
-{
-    function ein(s){ // empty string if null
-        if (Array.isArray(s)){
-            s = s.join('');
-        }
-        return s === null ? '' : s;
-    }
-    function makeFunctionCallNode(funcName, spacesAndAtoms){
-        var nodes = spacesAndAtoms.map(function(x){return x[1];});
-        return new parser.nodes.FunctionCallNode(location(), funcName, nodes);
-    }
-    function doIfMultipleStatements(location, sexps){
-        if (sexps.length === 1){
-            return sexps[0];
-        } else {
-            return new parser.nodes.DoNode(location, sexps);
-        }
-    }
-}
-
-start
-  = module
-
-module
-  = _* head:sexp wsNoNewline* rest:('\\n' _* sexp)* _* { return doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[2];}))); }
-
-sexp
-  = "(" _+ ")" { return new parser.node.NullNode(location()) }
-  / ifSexp
-  / doSexp
-  / lambdaSexp
-  / defineSexp
-  / functionCallSexp
-  / atom
-
-ifSexp
-  = "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _*")" { return new parser.nodes.IfNode(location(), cond, ifTrue); }
-  / "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return new parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
-
-doSexp
-  = "(" _* "do" sexps:(_+ sexp)* _* ")" { return new parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]})); }
-
-lambdaSexp
-  = "(" _* "lambda" _* params:functionParams _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.LambdaNode(location(), params, doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }
-
-functionParams
-  = "(" params:(_* atom)* _* ")" { return params.map(function(x){return x[1].content}); }
-
-defineSexp
-  = "(" _* "define" _+ name:identifier _+ value:sexp _* ")" { return new parser.nodes.DefineNode(location(), name.content, value); }
-
-functionCallSexp =
-  "(" _* funcName:functionName sexps:(_* sexp)* _* ")" { return makeFunctionCallNode(funcName, sexps); }
-
-functionName
-  = name:identifier {return new parser.nodes.FunctionNameNode(location(), name.content); }
-
-atom
-  = literal
-  / identifier
-
-identifier
-  = name:([a-zA-Z0-9-+*/!$%&*+-/:<=>?@^_~]+) { return new parser.nodes.NameNode(location(), name.join('')); }
-
-literal
-  = number
-  / string
-
-string
-  = '"' value:([^"])+ '"' { return new parser.nodes.StringLiteralNode(value.join('')); }
-  / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(value.join('')); }
-
-number
- = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
- / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
-
-_
-  = [ \\t\\r\\n]
-
-wsNoNewline
-  = [ \\t]
-`
+import PEG = require('pegjs');
+var grammar = require('./shiplang.grammar');
 
 function enumLookup(enumObj: any, value: number){
     for (var name in enumObj){
@@ -334,8 +252,10 @@ class LambdaNode extends ASTNode {
     tree() { return ("lambda with params (" + this.params + ")" +
                      "\n" + indent(this.body.tree())); }
     compile() {
+        var code = this.body.compile()
+        code.push([BC.Return, null]);
         return <Array<ByteCode>>[
-            [BC.Push, this.body.compile()],
+            [BC.Push, code],
             [BC.Push, this.params],
             [BC.BuildFunction, null]];
     }
@@ -379,79 +299,116 @@ parser.nodes.DoNode = DoNode;
 parser.nodes.LambdaNode = LambdaNode;
 parser.nodes.DefineNode = DefineNode;
 
-function runBytecode(bytecode: ByteCode[], env: Environment){
-    var toRun = bytecode;
-    var stack = <any[]>[];
-    var counter = 0;
-    while (true){
-        if (counter >= toRun.length){ break; }
-        var [bc, arg] = toRun[counter];
-        switch (bc){
-            case BC.LoadConstant:
-                stack.push(arg)
-                break;
-            case BC.FunctionLookup:
-                stack.push(env.lookup(arg));
-                break;
-            case BC.NameLookup:
-                stack.push(env.lookup(arg));
-                break;
-            case BC.FunctionCall:
-                var args = range(arg).map(function(){return stack.pop();});
-                var func = stack.pop();
-                if (typeof func === 'function'){
-                    stack.push(func.apply(null, args));
-                } else {
-                    if (func.params.length !== arg){
-                        throw Error('Function called with wrong arity! Takes ' +
-                                    func.params.length + ' args, given ' + args.length);
-                    }
-                    var scope = <Scope>{};
-                    args.map(function(x:any, i:number){ //TODO why is this necessary?
-                        scope[func.params[i]] = x;
-                    }); // TODO factor out creating a new environment
-                    var newEnv = env.copy();
-                    newEnv.scopes.push(scope);
-                    stack.push(runBytecode(func.code, newEnv))
-                }
-                break;
-            case BC.JumpIfNot:
-                var cond = stack.pop();
-                if (!cond) {
-                    counter += arg;
-                }
-                break;
-            case BC.Jump:
-                counter += arg;
-                break;
-            case BC.Pop:
-                if (arg !== null){
-                    throw Error('argument to pop should always be null, was '+arg);
-                }
-                stack.pop();
-                break
-            case BC.BuildFunction:
-                var name = arg;
-                var params = stack.pop();
-                var code = stack.pop();
-                stack.push(new CompiledFunctionObject(params, code, env));
-                if (arg === null){ // lambda function
-                } else {
-                    throw Error('named functions not implemented yet');
-                }
-                break;
-            case BC.Push:
-                stack.push(arg);
-                break;
-            case BC.StoreNew:
-                env.define(arg, stack.pop());
-                break;
-            default:
-                throw Error('unrecognized bytecode: '+bc+' enumLookup:'+enumLookup(BC, bc));
-        }
-        counter++;
+function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
+                            stack: any[], envStack: Environment[]){
+    //console.log('bytecodeStack:', bytecodeStack);
+    //console.log('counterStack:', counterStack);
+    //console.log('stack:', stack);
+    if (bytecodeStack.length === 0){ throw Error('No bytecode to run!'); }
+    if (counterStack.length === 0){ throw Error('No indexes!'); }
+    if (counterStack.length !== bytecodeStack.length){
+        throw Error('bytecodeStack and counterStack must be same length!');
     }
-    //console.log('finished with stack of:', stack)
+    if (bytecodeStack.length !== envStack.length){
+        throw Error('bytecodeStack and envStack must be same length!');
+    }
+    var bytecode = bytecodeStack[bytecodeStack.length-1];
+    var env = envStack[envStack.length-1];
+    if (bytecode.length <= counterStack[counterStack.length-1]){
+        throw Error('counter went off the end of bytecode: missing return?')
+    }
+    var [bc, arg] = bytecode[counterStack[counterStack.length-1]];
+    switch (bc){
+        case BC.LoadConstant:
+            stack.push(arg)
+            break;
+        case BC.FunctionLookup:
+            stack.push(env.lookup(arg));
+            break;
+        case BC.NameLookup:
+            stack.push(env.lookup(arg));
+            break;
+        case BC.FunctionCall:
+            var args = range(arg).map(function(){return stack.pop();});
+            var func = stack.pop();
+            if (typeof func === 'function'){
+                stack.push(func.apply(null, args));
+            } else {
+                if (func.params.length !== arg){
+                    throw Error('Function called with wrong arity! Takes ' +
+                                func.params.length + ' args, given ' + args.length);
+                }
+                var scope = <Scope>{};
+                args.map(function(x:any, i:number){ //TODO why is this necessary?
+                    scope[func.params[i]] = x;
+                }); // TODO factor out creating a new environment
+                var newEnv = env.copy();
+                newEnv.scopes.push(scope);
+                bytecodeStack.push(func.code);
+                counterStack.push(0);
+                envStack.push(newEnv);
+                return; // to skip incrementing the counter, because it's
+                        // now the wrong counter that would be incremented
+            }
+            break;
+        case BC.Return:
+            bytecodeStack.pop();
+            counterStack.pop();
+            envStack.pop();
+            if (bytecodeStack.length === 0){
+                return 'done';
+            }
+            break;
+        case BC.JumpIfNot:
+            var cond = stack.pop();
+            if (!cond) {
+                counterStack[counterStack.length-1] += arg;
+            }
+            break;
+        case BC.Jump:
+            counterStack[counterStack.length-1] += arg;
+            break;
+        case BC.Pop:
+            if (arg !== null){
+                throw Error('argument to pop should always be null, was '+arg);
+            }
+            stack.pop();
+            break
+        case BC.BuildFunction:
+            var name = arg;
+            var params = stack.pop();
+            var code = stack.pop();
+            stack.push(new CompiledFunctionObject(params, code, env));
+            if (arg === null){ // lambda function
+            } else {
+                throw Error('named functions not implemented yet');
+            }
+            break;
+        case BC.Push:
+            stack.push(arg);
+            break;
+        case BC.StoreNew:
+            env.define(arg, stack[stack.length-1]);
+            break;
+        default:
+            throw Error('unrecognized bytecode: '+bc+' enumLookup:'+enumLookup(BC, bc));
+    }
+    counterStack[counterStack.length-1]++;
+}
+
+function runBytecode(bytecode: ByteCode[], env: Environment){
+    bytecode.push([BC.Return, null]) // last thing to do: return result
+    var bytecodeStack = <ByteCode[][]>[bytecode];
+    var stack = <any[]>[];
+    var counterStack = [0];
+    var envStack = [env];
+    while (true){
+        var result = runBytecodeOneStep(counterStack, bytecodeStack, stack, envStack);
+        if (result === 'done'){ break; }
+    }
+    if (stack.length !== 1){
+        throw Error('final stack is of wrong length '+stack.length+': '+stack)
+    }
     return stack.pop();
 }
 
@@ -483,26 +440,62 @@ export function run(code: string){
     return compiledResult;
 }
 
+
+// Interactive Sessions with persistent state
 abstract class Session{
     constructor(){ this.env = new Environment([Object.assign({}, funcs), {}]); }
     abstract run(s: string):any
     env: Environment;
 }
-
 export class InterpreterSession extends Session{
     run(s: string){
         var ast = parseOrShowError(s)
         if (ast === undefined) { return }
-        return ast.eval(this.env);
+        try {
+            return ast.eval(this.env);
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 export class CompilerSession extends Session{
     run(s: string){
         var ast = parseOrShowError(s)
         if (ast === undefined){ return }
-        return runBytecode(ast.compile(), this.env);}
+        var code = ast.compile();
+        try {
+            return runBytecode(code, this.env);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 }
-
+export class TraceSession extends Session{
+    constructor(){
+        this.envInterp = new Environment([Object.assign({}, funcs), {}]);
+        super();
+    }
+    envInterp: Environment;
+    run(s: string){
+        var ast = parseOrShowError(s)
+        if (ast === undefined){ return }
+        console.log('AST:');
+        console.log(indent(ast.tree()));
+        try {
+            console.log('interpreted result:', ast.eval(this.envInterp));
+        } catch (e) {
+            console.log(e);
+        }
+        var code = ast.compile();
+        console.log('bytecode:');
+        dis(code, 2);
+        try {
+            return runBytecode(code, this.env);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+}
 function parseOrShowError(s: string){
     try {
         return parser.parse(s);
@@ -511,17 +504,25 @@ function parseOrShowError(s: string){
     }
 }
 
-export function trace(code: string){
+// testing
+export function trace(code: string, env=<Environment>undefined){
+    if (env === undefined){
+        var envCompiled = new Environment([Object.assign({}, funcs), {}])
+        var envInterp = new Environment([Object.assign({}, funcs), {}])
+    } else {
+        var envCompiled = env.copy();
+        var envInterp = env.copy(); // TODO this will still bleed over
+    }
     var ast = parseOrShowError(code);
     console.log('AST:');
     console.log(indent(ast.tree()));
     var bytecode = ast.compile();
     console.log('bytecode:');
     dis(bytecode, 2);
-    var env = new Environment([Object.assign({}, funcs), {}])
-    console.log('interpreted result:', ast.eval(env));
-    var env = new Environment([Object.assign({}, funcs), {}])
-    console.log('compiled result:', runBytecode(bytecode, env));
+    console.log('interpreted result:', ast.eval(envInterp));
+    var compiledResult = runBytecode(bytecode, envCompiled)
+    console.log('compiled result:', compiledResult);
+    return compiledResult;
 }
 
 function main(){

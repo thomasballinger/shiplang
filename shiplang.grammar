@@ -1,0 +1,81 @@
+{
+    function ein(s){ // empty string if null
+        if (Array.isArray(s)){
+            s = s.join('');
+        }
+        return s === null ? '' : s;
+    }
+    function makeFunctionCallNode(funcName, spacesAndAtoms){
+        var nodes = spacesAndAtoms.map(function(x){return x[1];});
+        return new parser.nodes.FunctionCallNode(location(), funcName, nodes);
+    }
+    function doIfMultipleStatements(location, sexps){
+        if (sexps.length === 1){
+            return sexps[0];
+        } else {
+            return new parser.nodes.DoNode(location, sexps);
+        }
+    }
+}
+
+start
+  = module
+
+module
+  = _* head:sexp wsNoNewline* rest:('\\n' _* sexp)* _* { return doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[2];}))); }
+
+sexp
+  = "(" _+ ")" { return new parser.node.NullNode(location()) }
+  / ifSexp
+  / doSexp
+  / lambdaSexp
+  / defineSexp
+  / functionCallSexp
+  / atom
+
+ifSexp
+  = "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _*")" { return new parser.nodes.IfNode(location(), cond, ifTrue); }
+  / "(" _* "if" _+ cond:sexp _+ ifTrue:sexp _+ ifFalse:sexp _* ")" { return new parser.nodes.IfNode(location(), cond, ifTrue, ifFalse); }
+
+doSexp
+  = "(" _* "do" sexps:(_+ sexp)* _* ")" { return new parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]})); }
+
+lambdaSexp
+  = "(" _* "lambda" _* params:functionParams _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.LambdaNode(location(), params, doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }
+
+functionParams
+  = "(" params:(_* atom)* _* ")" { return params.map(function(x){return x[1].content}); }
+
+defineSexp
+  = "(" _* "define" _+ name:identifier _+ value:sexp _* ")" { return new parser.nodes.DefineNode(location(), name.content, value); }
+
+functionCallSexp =
+  "(" _* funcName:functionName sexps:(_* sexp)* _* ")" { return makeFunctionCallNode(funcName, sexps); }
+
+functionName
+  = name:identifier {return new parser.nodes.FunctionNameNode(location(), name.content); }
+
+atom
+  = literal
+  / identifier
+
+identifier
+  = name:([a-zA-Z0-9-+*/!$%&*+-/:<=>?@^_~]+) { return new parser.nodes.NameNode(location(), name.join('')); }
+
+literal
+  = number
+  / string
+
+string
+  = '"' value:([^"])+ '"' { return new parser.nodes.StringLiteralNode(value.join('')); }
+  / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(value.join('')); }
+
+number
+ = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
+ / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
+
+_
+  = [ \\t\\r\\n]
+
+wsNoNewline
+  = [ \\t]

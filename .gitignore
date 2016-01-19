@@ -2,3 +2,4 @@ node_modules
 built
 bundle.js
 typings
+*.map
