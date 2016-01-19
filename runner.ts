@@ -3,6 +3,8 @@ import ev = require('./eval');
 export var InterpreterSession = ev.InterpreterSession
 export var CompilerSession = ev.CompilerSession
 export var TraceSession = ev.TraceSession
+export var Environment = ev.Environment
+export var parseOrShowError = ev.parseOrShowError
 
 interface Generator {
     next: {value: any, done: boolean}
@@ -13,7 +15,7 @@ type Context = [string, ev.ByteCode[][], number[], ev.Environment[], any[], ()=>
 // A Scheduler holds multiple running threads.
 // It can run all scripts to the next tick.
 // It can run JavaScript generators and shiplang scripts.
-class Scheduler{
+export class Scheduler{
     constructor(){
         this.contexts = [];
         this.generators = [];
@@ -57,7 +59,7 @@ class Scheduler{
     }
 }
 
-function main(){
+function testing(){
     var abc = false;
     var funs = {waitForAbc: function(){ return abc; },
                 display: function(x:any){console.log(x)}
@@ -82,5 +84,3 @@ function main(){
     s.tick()
     console.log(s);
 }
-
-main();
