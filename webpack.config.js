@@ -1,5 +1,5 @@
 module.exports = {
-  entry: './eval.ts',
+  entry: './runner.ts',
   target: 'node',
   output: {
     libraryTarget: 'commonjs',

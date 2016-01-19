@@ -1,5 +1,5 @@
 
-enum BC {
+export enum BC {
     LoadConstant,
     FunctionLookup,
     FunctionCall,
@@ -12,8 +12,9 @@ enum BC {
     StoreNew,      // arg is variable name, saves TOS
     Store,         // arg is variable name, saves TOS
     Return,        // done with this bytecode
+    Yield,         // done for now, please continue when callback is true
 }
-type ByteCode = [BC, any];
+export type ByteCode = [BC, any];
 interface Scope {
   [key: string]: any;
 }
@@ -148,6 +149,17 @@ class DefineNode extends ASTNode {
     }
 }
 
+class YieldNode extends ASTNode {
+    constructor(location: Location, public content: ASTNode){ super(location); }
+    eval(env: Environment){
+        var value = this.content.eval(env)
+        console.log('yielded:', value);
+        return value;
+    }
+    tree() { return 'yield ' + this.content.tree(); }
+    compile(): ByteCode[] { return [].concat(this.content.compile(), [[BC.Yield, null]]) }
+}
+
 class IfNode extends ASTNode {
     constructor(location: Location,
                 public condition: ASTNode, public ifTrue: ASTNode, public ifFalse?: ASTNode){
@@ -261,7 +273,7 @@ class LambdaNode extends ASTNode {
     }
 }
 
-class Environment {
+export class Environment {
     constructor(public scopes: Array<any>){ }
     lookup(name: string){
         for (var scope of this.scopes){
@@ -287,7 +299,7 @@ class Environment {
 var emptyEnv = new Environment([]);
 
 
-var parser = PEG.buildParser(grammar);
+export var parser = PEG.buildParser(grammar);
 parser.nodes = {}
 parser.nodes.NumberLiteralNode = NumberLiteralNode;
 parser.nodes.StringLiteralNode = StringLiteralNode;
@@ -298,8 +310,9 @@ parser.nodes.IfNode = IfNode;
 parser.nodes.DoNode = DoNode;
 parser.nodes.LambdaNode = LambdaNode;
 parser.nodes.DefineNode = DefineNode;
+parser.nodes.YieldNode = YieldNode;
 
-function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
+export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
                             stack: any[], envStack: Environment[]){
     //console.log('bytecodeStack:', bytecodeStack);
     //console.log('counterStack:', counterStack);
@@ -359,6 +372,11 @@ function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
                 return 'done';
             }
             break;
+        case BC.Yield:
+            var callback = stack[stack.length-1];
+            counterStack[counterStack.length-1]++;
+            return callback;
+            break;
         case BC.JumpIfNot:
             var cond = stack.pop();
             if (!cond) {
@@ -396,7 +414,19 @@ function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
     counterStack[counterStack.length-1]++;
 }
 
-function runBytecode(bytecode: ByteCode[], env: Environment){
+export function initialize(code: string, env: Environment): [ByteCode[][], number[], Environment[], any[]]{
+    var ast = parser.parse(code);
+    var bytecode = ast.compile();
+    bytecode.push([BC.Return, null]) // add a last thing to do: return result
+    var bytecodeStack = <ByteCode[][]>[bytecode];
+    var stack = <any[]>[];
+    var counterStack = [0];
+    var envStack = [env];
+    return [bytecodeStack, counterStack, envStack, stack];
+}
+
+// default behavior for yieldCallback is to return the yielded callback
+function runBytecode(bytecode: ByteCode[], env: Environment, yieldCallback?: (isready:()=>boolean)=>any){
     bytecode.push([BC.Return, null]) // last thing to do: return result
     var bytecodeStack = <ByteCode[][]>[bytecode];
     var stack = <any[]>[];
@@ -404,7 +434,13 @@ function runBytecode(bytecode: ByteCode[], env: Environment){
     var envStack = [env];
     while (true){
         var result = runBytecodeOneStep(counterStack, bytecodeStack, stack, envStack);
-        if (result === 'done'){ break; }
+        if (result === undefined ){ continue; }
+        else if (result === 'done'){ break; }
+        else if (yieldCallback === undefined){
+            return result;
+        } else {
+            yieldCallback(result)
+        }
     }
     if (stack.length !== 1){
         throw Error('final stack is of wrong length '+stack.length+': '+stack)
@@ -433,7 +469,7 @@ export function run(code: string){
     var env = new Environment([Object.assign({}, funcs), {}])
     var interpResult = ast.eval(env);
     var env = new Environment([Object.assign({}, funcs), {}])
-    var compiledResult = runBytecode(bytecode, env);
+    var compiledResult = runBytecode(bytecode, env, function(x){console.log('yielded:', x)});
     if (interpResult !== compiledResult){
         throw Error('interpreted result '+interpResult+' differs from compiled result '+compiledResult);
     }
@@ -464,7 +500,7 @@ export class CompilerSession extends Session{
         if (ast === undefined){ return }
         var code = ast.compile();
         try {
-            return runBytecode(code, this.env);
+            return runBytecode(code, this.env, function(x){console.log('yielded:', x);});
         } catch (e) {
             console.log(e);
         }
@@ -496,7 +532,7 @@ export class TraceSession extends Session{
         }
     }
 }
-function parseOrShowError(s: string){
+export function parseOrShowError(s: string){
     try {
         return parser.parse(s);
     } catch (e) {

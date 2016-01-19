@@ -22,7 +22,7 @@ start
   = module
 
 module
-  = _* head:sexp wsNoNewline* rest:('\\n' _* sexp)* _* { return doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[2];}))); }
+  = _* head:sexp wsNoNewline* rest:('\n' _* sexp)* _* { return doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[2];}))); }
 
 sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }
@@ -30,6 +30,7 @@ sexp
   / doSexp
   / lambdaSexp
   / defineSexp
+  / yieldSexp
   / functionCallSexp
   / atom
 
@@ -48,6 +49,9 @@ functionParams
 
 defineSexp
   = "(" _* "define" _+ name:identifier _+ value:sexp _* ")" { return new parser.nodes.DefineNode(location(), name.content, value); }
+
+yieldSexp
+  = "(" _* "yield" _+ callback:sexp _* ")" { return new parser.nodes.YieldNode(location(), callback); }
 
 functionCallSexp =
   "(" _* funcName:functionName sexps:(_* sexp)* _* ")" { return makeFunctionCallNode(funcName, sexps); }
@@ -75,7 +79,7 @@ number
  / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
 
 _
-  = [ \\t\\r\\n]
+  = [ \t\r\n]
 
 wsNoNewline
-  = [ \\t]
+  = [ \t]
