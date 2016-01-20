@@ -1,12 +1,14 @@
 require("./style.css");
-window.pilotScriptSource = require("raw!./pilot.js");
+window.pilotScriptSource = require("raw!./pilot.sl");
 var ace = require('brace');
-require('brace/mode/javascript');
+require('brace/mode/scheme');
 require('brace/theme/monokai');
 
 var space = require('./space');
 var display = require('./display');
 var manual = require('./manual');
+
+var scripts = require('./pilot');
 
 function waitForWindow(func){
   // useful for iframes, for which window.innerWidth is 0 for a while
@@ -37,8 +39,9 @@ function main(){
   minimap.height = 200;
 
   var editor = ace.edit('editor');
-  editor.getSession().setMode('ace/mode/javascript');
+  editor.getSession().setMode('ace/mode/scheme');
   editor.setTheme('ace/theme/monokai');
+
 
   editor.setValue(pilotScriptSource);
   editor.getSession().on('change', function(e) {
@@ -71,17 +74,7 @@ function main(){
   var world;
   function resetState(s){
 
-    try{
-      eval(s);
-    } catch (e) {
-      console.log(e);
-      return;
-    }
-    window.s = s;
-    var scripts = {};
-    scripts.manualDrive = manualDrive;
-    scripts.pilotScript = pilotScript;
-    scripts.boidScript = boidScript;
+    console.log('editor state change')
 
     world = new space.SpaceWorld();
 

@@ -31,6 +31,7 @@ sexp
   / lambdaSexp
   / defnSexp
   / defineSexp
+  / foreverSexp
   / yieldSexp
   / functionCallSexp
   / atom
@@ -41,6 +42,9 @@ ifSexp
 
 doSexp
   = "(" _* "do" sexps:(_+ sexp)* _* ")" { return new parser.nodes.DoNode(location(), sexps.map(function(x){return x[1]})); }
+
+foreverSexp
+  = "(" _* "forever" _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.ForeverNode(location(), doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }
 
 lambdaSexp
   = "(" _* "lambda" _* params:functionParams _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.LambdaNode(location(), params, doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }

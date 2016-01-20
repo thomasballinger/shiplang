@@ -229,6 +229,25 @@ class DoNode extends ASTNode {
     }
 }
 
+class ForeverNode extends ASTNode {
+    constructor(location: Location,
+               public content: ASTNode){
+                   super(location);
+               }
+    eval(env: Environment) {
+        while (true){
+            this.content.eval(env);
+        }
+    }
+    tree() { return 'Forever\n' + indent(this.content.tree()); }
+    compile():ByteCode[] {
+        var code = this.content.compile();
+        code.push([BC.Pop, null]);
+        code.push([BC.Jump, -(code.length+1)])
+        return code;
+    }
+}
+
 class CompiledFunctionObject {
     constructor(public params: string[], public code: ByteCode[], public env: Environment){}
 }
@@ -254,7 +273,6 @@ class FunctionObject {
         return this.body.eval(env);
     }
 }
-
 
 class LambdaNode extends ASTNode {
     constructor(location: Location,
@@ -309,15 +327,20 @@ class DefnNode extends ASTNode {
     }
 }
 
-
 export class Environment {
     constructor(public scopes: Array<any>){ }
     lookup(name: string){
-        for (var scope of this.scopes){
-            if (scope.hasOwnProperty(name)){
-                return scope[name];
+        for (var i = this.scopes.length - 1; i >= 0; i--){
+            var scope = this.scopes[i];
+            var val = scope[name];
+            if (val !== undefined){
+                if (typeof val === 'function'){
+                    return val.bind(this.scopes);
+                }
+                return val;
             }
         }
+
         var scopeReprs = this.scopes.map(function(scope){
             return ''+Object.keys(scope);
         }).join('\n');
