@@ -4,22 +4,11 @@
 <title>missiles</title>
 </head>
 <body>
-<script type="text/javascript" src="bundle.js" charset="utf-8"></script>
+  <!-- Order important for z-index -->
+  <canvas id="canvas" width="1" height="1"></canvas>
+  <div id="editor"><code><pre>hello</pre><code></div>
+  <canvas id="minimap" width="1" height="1"></canvas>
 
-<canvas id="canvas" width="1" height="1"></canvas>
-<div id="editor"><code><pre>hello</pre><code></div>
-<canvas id="minimap" width="1" height="1"></canvas>
-<div id="errorbar"></div>
-<script>
-  var canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  var minimap = document.getElementById('minimap');
-  minimap.width = 200;
-  minimap.height = 200;
-  document.getElementById('editor').innerHTML = '<code><pre>'+pilotScriptSource+'</pre></code>';
-</script>
-
-<script> window.onPageLoad(); </script>
+  <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
 </body>
 </html>

@@ -39,7 +39,6 @@ function* missilePursuit(e){
 // maybe users would write their own controls
 function* manualDrive(e){
   while (true){
-    console.log('running');
     key = yield* manual.actOnKey(e, controls);
     if (key === 'space'){
       yield* fireMissile(e);

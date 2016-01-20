@@ -313,6 +313,7 @@ SpaceWorld.prototype.checkCollisions = function(){
         e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
       } else if (e.type !== 'explosion'){
         console.log('killing', e, 'of type', e && e.type);
+        e.dead = true;
         this.entities[index] = null;
       }
     }
@@ -322,8 +323,10 @@ SpaceWorld.prototype.checkCollisions = function(){
   for (var i=0; i<this.entities.length; i++){
     var e = this.entities[i];
     if (e !== null && e.type == 'explosion' && e.r < 10){
+      e.dead = true;
       this.entities[i] = null;
     } else if (e !== null && e.type == 'laser' && e.timeToDie < t){
+      e.dead = true;
       this.entities[i] = null;
     }
   }
