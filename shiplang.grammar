@@ -29,6 +29,7 @@ sexp
   / ifSexp
   / doSexp
   / lambdaSexp
+  / defnSexp
   / defineSexp
   / yieldSexp
   / functionCallSexp
@@ -43,6 +44,9 @@ doSexp
 
 lambdaSexp
   = "(" _* "lambda" _* params:functionParams _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.LambdaNode(location(), params, doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }
+
+defnSexp
+  = "(" _* "defn" _* name:identifier _* params:functionParams _* head:sexp _* rest:(_* sexp)* _* ")" { return new parser.nodes.DefnNode(location(), name.content, params, doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[1];})))); }
 
 functionParams
   = "(" params:(_* atom)* _* ")" { return params.map(function(x){return x[1].content}); }

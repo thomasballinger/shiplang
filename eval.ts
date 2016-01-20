@@ -280,6 +280,36 @@ class LambdaNode extends ASTNode {
     }
 }
 
+class DefnNode extends ASTNode {
+    constructor(location: Location,
+                public name: string,
+                public params: string[],
+                public body: ASTNode){
+                    super(location);
+                }
+    get content(): any[]{
+        return [this.name, this.params, this.body];
+    }
+    eval(env: Environment):any {
+        var func = new FunctionObject(this.params, this.body, env);
+        env.define(this.name, func);
+        return func;
+    }
+    tree() { return ("lambda with params (" + this.params + ")" +
+                     "\n" + indent(this.body.tree())); }
+    compile() {
+        var code = this.body.compile()
+        code.push([BC.Return, null]);
+        return <Array<ByteCode>>[
+            [BC.Push, code],
+            [BC.Push, this.params],
+            [BC.BuildFunction, this.name],
+            [BC.StoreNew, this.name]
+        ];
+    }
+}
+
+
 export class Environment {
     constructor(public scopes: Array<any>){ }
     lookup(name: string){
@@ -318,6 +348,7 @@ parser.nodes.DoNode = DoNode;
 parser.nodes.LambdaNode = LambdaNode;
 parser.nodes.DefineNode = DefineNode;
 parser.nodes.YieldNode = YieldNode;
+parser.nodes.DefnNode = DefnNode;
 
 export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
                             stack: any[], envStack: Environment[]){
@@ -406,7 +437,7 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
             stack.push(new CompiledFunctionObject(params, code, env));
             if (arg === null){ // lambda function
             } else {
-                throw Error('named functions not implemented yet');
+                //TODO when named functions are treated specially
             }
             break;
         case BC.Push:
