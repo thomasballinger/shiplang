@@ -3,3 +3,5 @@ built
 bundle.js
 typings
 *.map
+.DS_Store
+images

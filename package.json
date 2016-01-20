@@ -1,0 +1,15 @@
+{
+  "name": "shiplang",
+  "description": "Write AI for your own missiles.",
+  "author": "Thomas Ballinger <me@thomasballinger.com> (http://ballingt.com/)",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasballinger/shiplang.git"
+  },
+  "dependencies": {
+    "devpack": "0.0.0",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,29 @@
+body {
+  background-color: #111111
+}
+#editor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 450px;
+    color: white;
+}
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0px;
+  bottom: 0;
+  right: 0;
+  background-color: #010101;
+  background-size: 1000px;
+}
+#minimap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200;
+  height: 200;
+  border: 5px solid black;
+  background-color: #333333;
+}
