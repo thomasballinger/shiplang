@@ -26,9 +26,9 @@ function* missileScript(e){
 function* missilePursuit(e){
   var closest = world.findClosestShip(e);
   yield* ai.slowDownIfWrongWay(e, closest);
-  yield ai.turnTowardFor(e, ai.towards(e, closest), 0.2);
-  ai.speedInDirection(e,ai.towards(e,closest));
-  if (ai.speed(e) < 300){
+  yield ai.turnTowardFor(e, e.towards(closest), 0.2);
+  e.speedInDirection(e.towards(closest));
+  if (e.speed() < 300){
     yield ai.thrustFor(e, 0.1);
   }
 }

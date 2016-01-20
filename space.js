@@ -1,30 +1,13 @@
 'use strict';
 
+var Entity = require('./entity').Entity;
+var Ship = require('./entity').Ship;
+var runEntityScript = require('./ai.js').runEntityScript;
+var sm = require('./shipmath');
+var ships = require('./ships');
+
 var IMMUNITY_TIME_MS = 1000;
 
-var runEntityScript = require('./ai.js').runEntityScript;
-
-function dist(p1, p2, x2, y2){
-  // works with 2 or 4 arguments
-  var x1, y1;
-  if (x2 === undefined && y2 === undefined) {
-    x1 = p1[0];
-    y1 = p1[1];
-    x2 = p2[0];
-    y2 = p2[1];
-  } else {
-    x1 = p1;
-    y1 = p2;
-  }
-  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-}
-
-function x_comp(h){
-  return Math.cos(h * Math.PI / 180);
-}
-function y_comp(h){
-  return Math.sin(h * Math.PI / 180);
-}
 
 // x and y are in display space
 function drawPoly(ctx, x, y, points, h, esf){
@@ -45,64 +28,47 @@ function drawPoly(ctx, x, y, points, h, esf){
   ctx.fill();
 }
 
-
-// properties all entities are expected to have
-function makeEntity(type, x, y, dx, dy, r){
-  return {type: type, x: x, y: y, dx: dx, dy: dy, r:r};
-}
-
 function makeBoid(x, y, dx, dy, h, dh, script){
-  var boid = makeEntity('boid', x, y, dx, dy, 10);
-  if (script === undefined){
-    boid.readyCallback = 'done';
-  } else {
-    boid.script = script;
-  }
-  boid.h = h;
+  var boid = new Ship(ships.Boid, x, y, script);
+  boid.dx = dx;
+  boid.dy = dy;
   boid.dh = dh;
-  boid.maxThrust = 1;
-  boid.maxDH = Math.abs(boid.dh);
+  boid.h = h;
   return boid;
 }
 
-function makeShip(x, y, dx, dy, h, script){
-  var ship = makeEntity('ship', x, y, dx, dy, 10);
+function makeShip(x, y, h, script){
+  var ship = new Ship(ships.Ship, x, y, script);
   ship.h = h;
-  ship.thrust = 0;
-  ship.maxThrust = 300;
-  ship.maxDH = 300;
-  ship.script = script;
   return ship;
 }
 
 function makeMissile(x, y, dx, dy, h, script){
-  var missile = makeEntity('missile', x, y, dx, dy, 3);
+  var missile = new Ship(ships.Missile, x, y, script);
+  missile.dx = dx;
+  missile.dy = dy;
+  missile.r = 3;
   missile.h = h;
-  missile.thrust = 0;
-  missile.maxThrust = 400;
-  missile.maxDH = 360;
   missile.script = script;
-  missile.isMunition = true;
-  missile.explodes = true;
   return missile;
 }
 
 function fireMissile(e, script){
-  var missile = makeMissile(e.x + x_comp(e.h)*e.r,
-                        e.y + y_comp(e.h)*e.r,
-                        e.dx + x_comp(e.h) * 10,
-                        e.dy + y_comp(e.h) * 10,
+  var missile = makeMissile(e.x + sm.x_comp(e.h)*e.r,
+                        e.y + sm.y_comp(e.h)*e.r,
+                        e.dx + sm.x_comp(e.h) * 10,
+                        e.dy + sm.y_comp(e.h) * 10,
                         e.h, script);
   missile.firedBy = e;
   missile.firedAt = new Date().getTime();
   return missile;
 }
 function fireLaser(e){
-  var laser = makeEntity('laser',
-                        e.x + x_comp(e.h)*e.r,
-                        e.y + y_comp(e.h)*e.r,
-                        e.dx + x_comp(e.h) * 200,
-                        e.dy + y_comp(e.h) * 200,
+  var laser = new Entity('laser',
+                        e.x + sm.x_comp(e.h)*e.r,
+                        e.y + sm.y_comp(e.h)*e.r,
+                        e.dx + sm.x_comp(e.h) * 200,
+                        e.dy + sm.y_comp(e.h) * 200,
                         2);
   laser.firedBy = e;
   laser.firedAt = Number.MAX_VALUE;  // never damages owner
@@ -112,38 +78,7 @@ function fireLaser(e){
 }
 
 function entityMove(e, dt){
-  if (e.type === 'explosion'){
-    e.r = Math.max(e.r - 100*dt, 1);
-  }
-  e.x += e.dx * dt;
-  e.y += e.dy * dt;
-  if (e.hTarget !== undefined){
-    var diff = (e.h - e.hTarget + 3600) % 360;
-    var delta = diff <= 180 ? diff : 360 - diff;
-    diff = e.hTarget - e.h;
-    if (diff > 0 ? diff > 180 : diff >= -180){
-      e.h = (e.h - Math.min(e.maxDH*dt, delta) + 3600) % 360;
-    } else {
-      e.h = (e.h + Math.min(e.maxDH*dt, delta) + 3600) % 360;
-    }
-    if (delta < 0.01){
-      e.hTarget = undefined;
-      e.dh = 0;
-    }
-  } else if (e.dh !== undefined){
-    if (e.h === undefined){
-      throw Error("e.h is not a number: "+e);
-    }
-    e.h += e.dh * dt;
-    e.h = (e.h + 3600) % 360;
-  }
-  if (e.thrust !== undefined){
-    if (e.h === undefined){
-      throw Error("e.h is not a number: "+e);
-    }
-    e.dx += x_comp(e.h) * e.thrust * dt;
-    e.dy += y_comp(e.h) * e.thrust * dt;
-  }
+  e.move(dt);
 }
 
 function entityDraw(e, ctx, dx, dy, psf, esf){
@@ -285,7 +220,7 @@ SpaceWorld.prototype.checkCollisions = function(){
     for (var j=i+1; j<this.entities.length; j++){
       var e2 = this.entities[j];
       if (e1.r !== undefined && e2 !== undefined &&
-          dist(e1.x, e1.y, e2.x, e2.y) < e1.r + e2.r){
+          e1.distFrom(e2) < e1.r + e2.r){
         if (e1.firedBy === e2 && t < e1.firedAt + IMMUNITY_TIME_MS){
           if (e1.type !== 'explosion'){
             continue;
@@ -306,8 +241,8 @@ SpaceWorld.prototype.checkCollisions = function(){
     for (var index of collisions[k]){
       var e = this.entities[index];
       if (e === null){continue;}
-      if (e.explodes && e.type !== 'explosion'){
-        e.r = 30;
+      if (e.explosionSize > 0 && e.type !== 'explosion'){
+        e.r = e.explosionSize;
         e.type = 'explosion';
         e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
         e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
@@ -344,7 +279,7 @@ SpaceWorld.prototype.findClosest = function(e1, candidates){
   for (var i=0; i<candidates.length; i++){
     var e2 = candidates[i];
     if (e1 === e2){ continue; }
-    var d = dist(e1.x, e1.y, e2.x, e2.y);
+    var d = e1.distFrom(e2);
     if (d < minDist){
       minDist = d;
       other = e2;
@@ -357,14 +292,14 @@ SpaceWorld.prototype.distToClosest = function(e){
   if (closest === undefined){
     return Number.MAX_VALUE;
   }
-  return dist(closest.x, closest.y, e.x, e.y);
+  return sm.dist(closest.x, closest.y, e.x, e.y);
 };
 SpaceWorld.prototype.distToClosestShip = function(e){
   var closest = this.findClosestShip(e);
   if (closest === undefined){
     return Number.MAX_VALUE;
   }
-  return dist(closest.x, closest.y, e.x, e.y);
+  return sm.dist(closest.x, closest.y, e.x, e.y);
 };
 SpaceWorld.prototype.tick = function(dt){
   for (var i=0; i<this.entities.length; i++){

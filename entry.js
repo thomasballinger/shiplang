@@ -91,7 +91,7 @@ function main(){
       eval(s);
     } catch (e) {
       console.log(e);
-      return
+      return;
     }
     window.s = s;
     var scripts = {};
@@ -103,9 +103,9 @@ function main(){
 
     window.world = world; // global so pilot scripts can reference it
 
-    ship = space.makeShip(-200, 350, 0, 0, 270, scripts.manualDrive);
+    ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
     world.addEntity(ship);
-    world.addEntity(space.makeShip(70, 190, 17, 0.1, 270, scripts.pilotScript));
+    world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){
       world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
                                      boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
