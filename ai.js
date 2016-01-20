@@ -210,4 +210,3 @@ ai.speed = speed;
 ai.vHeading = vHeading;
 
 module.exports = ai;
-window.ai = ai;

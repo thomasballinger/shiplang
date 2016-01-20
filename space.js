@@ -397,4 +397,3 @@ Space.fireMissile = fireMissile;
 Space.fireLaser = fireLaser;
 
 module.exports = Space;
-window.Space = Space;

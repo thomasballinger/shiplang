@@ -6,12 +6,14 @@ var scripts = require('./pilot');
 
 function onPageLoad(){
   var controls = new manual.Controls();
-  window.controls = controls;
 
   var display = new space.SpaceDisplay('canvas');
   var minimapDisplay = new space.SpaceDisplay('minimap');
   var world = new space.SpaceWorld();
+
+  // global so referenceable in ai scripts
   window.world = world;
+  window.controls = controls;
 
   var ship = space.makeShip(400, 190, 0, 0, 270, scripts.manualDrive);
   world.addEntity(ship);

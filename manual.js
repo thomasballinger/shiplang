@@ -86,4 +86,3 @@ Manual.Controls = Controls;
 Manual.actOnKey = actOnKey;
 
 module.exports = Manual;
-window.Manual = Manual;

@@ -1,4 +1,8 @@
 // example ai script
+var ai = require('./ai');
+var manual = require('./manual');
+var space = require('./space');
+
 function* pilotScript(e){
   yield ai.thrustFor(e, .1);
   yield* ai.thrustUntilStopped(e);
@@ -35,8 +39,8 @@ function* missilePursuit(e){
 // maybe users would write their own controls
 function* manualDrive(e){
   while (true){
-    console.log('running')
-    key = yield* Manual.actOnKey(e, controls);
+    console.log('running');
+    key = yield* manual.actOnKey(e, controls);
     if (key === 'space'){
       yield* fireMissile(e);
     } else if (key == 'f'){
@@ -45,25 +49,25 @@ function* manualDrive(e){
   }
 }
 function* boidScript(e){
-  ai.setThrust(e, e.maxThrust * .5)
+  ai.setThrust(e, e.maxThrust * .5);
   yield ai.turnLeft(e, 180);
 }
 
 // this is an example of a scanner that returns data
 function* scanForEnemy(e){
   e.scanning = true;
-  yield ai.waitFor(e, 1)
+  yield ai.waitFor(e, 1);
   e.scanning = false;
   return [300, 200];
 }
 // builtins the user might have access to
 function* fireMissile(e){
     yield ai.waitFor(e, .1);
-    world.addEntity(Space.fireMissile(e, missileScript))
+    world.addEntity(space.fireMissile(e, missileScript));
     yield ai.waitFor(e, .1);
 }
 function* fireLaser(e){
-    world.addEntity(Space.fireLaser(e));
+    world.addEntity(space.fireLaser(e));
     yield ai.waitFor(e, .05);
 }
 
