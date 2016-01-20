@@ -4,20 +4,29 @@ var ace = require('brace');
 require('brace/mode/javascript');
 require('brace/theme/monokai');
 
-var sm = require('./shipmath');
-console.log(sm);
 var space = require('./space');
 var display = require('./display');
 var manual = require('./manual');
 
-window.onload = main;
+function waitForWindow(func){
+  // useful for iframes, for which window.innerWidth is 0 for a while
+  function waiter(){
+    if (!window.innerWidth){
+      setTimeout(waiter, 10);
+      return;
+    } else {
+      console.log(window.innerWidth);
+      setTimeout(func, 0);
+    }
+  }
+  waiter();
+}
+
+waitForWindow(main);
+
 function main(){
 
   // so loading in an iframe works
-  if (!window.innerWidth){
-    window.setTimeout(main, 5);
-    return;
-  }
 
   var canvas = document.getElementById('canvas');
   canvas.width = window.innerWidth;

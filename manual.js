@@ -1,7 +1,5 @@
 'use strict';
 
-var vHeading = require('./ai.js').vHeading;
-
 function Controls(obj){
   this.events = [];
   this.initialize(obj);
@@ -63,7 +61,7 @@ function* actOnKey(e, controls){
       break;
     case 40:
       if (event.type == 'keydown'){
-        e.hTarget = (vHeading(e) + 180) % 360;
+        e.hTarget = (e.vHeading() + 180) % 360;
       } else if (event.type == 'keyup'){
         e.hTarget = undefined;
       }

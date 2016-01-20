@@ -5,7 +5,7 @@ export var Boid = {
     maxDH: 100,
     maxSpeed: 100,
     isMunition: false,
-    explosionSize: 0,
+    explosionSize: 20,
 }
 export var Ship = {
     type: 'ship',
@@ -14,7 +14,7 @@ export var Ship = {
     maxDH: 300,
     maxSpeed: 100,
     isMunition: false,
-    explosionSize: 0,
+    explosionSize: 20,
 }
 
 export var Missile = {
