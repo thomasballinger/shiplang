@@ -15,6 +15,12 @@ function speed(e){
   return Math.sqrt(Math.pow(e.dx, 2) + Math.pow(e.dy, 2));
 }
 
+function speedInDirection(e, h){
+  var theta = (vHeading(e) + 3600 - h + 180) % 360 - 180;
+  return Math.cos(theta) * speed(e);
+
+}
+
 //TODO test this
 function headingWithin(h1, h2, dh){
   return (Math.abs(h1 - h2) < dh || Math.abs(h1 + 360 - h2) < dh ||
@@ -208,5 +214,6 @@ ai.slowDownIfWrongWay = slowDownIfWrongWay;
 ai.thrustUntilStopped = thrustUntilStopped;
 ai.speed = speed;
 ai.vHeading = vHeading;
+ai.speedInDirection = speedInDirection;
 
 module.exports = ai;

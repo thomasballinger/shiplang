@@ -27,7 +27,7 @@ Controls.prototype.initialize = function(obj){
         32, // spacebar
         70 // f
         ].indexOf(e.keyCode) != -1){
-      e.preventDefault();
+      //e.preventDefault(); no longer required?
       return false;
     }
   });

@@ -1,13 +1,13 @@
 function* pilotScript(e){
-  yield ai.thrustFor(e, .1);
+  yield ai.thrustFor(e, 0.1);
   yield* ai.thrustUntilStopped(e);
   while (true){
     if (e.y > 400 && e.dy > 0){
       yield ai.turnTo(e, 270);
-      yield ai.thrustFor(e, .2);
+      yield ai.thrustFor(e, 0.2);
     } else if (e.y < 200 && e.dy < 0){
       yield ai.turnTo(e, 90);
-      yield ai.thrustFor(e, .2);
+      yield ai.thrustFor(e, 0.2);
     }
     var spot = yield* scanForEnemy(e);
     yield* fireMissile(e);
@@ -17,18 +17,19 @@ function* pilotScript(e){
 // players would get to write their own ai for missiles
 // in a syncronous style, which would desugar to yields
 function* missileScript(e){
-  yield ai.thrustFor(e, .6);
+  yield ai.thrustFor(e, 0.6);
   while (true){
     yield* missilePursuit(e);
-    yield* ai.detonateIfCloserThanFor(e, world, 30, .001);
+    yield* ai.detonateIfCloserThanFor(e, world, 30, 0.001);
   }
 }
 function* missilePursuit(e){
   var closest = world.findClosestShip(e);
   yield* ai.slowDownIfWrongWay(e, closest);
-  yield ai.turnTowardFor(e, ai.towards(e, closest), .2);
+  yield ai.turnTowardFor(e, ai.towards(e, closest), 0.2);
+  ai.speedInDirection(e,ai.towards(e,closest));
   if (ai.speed(e) < 300){
-    yield ai.thrustFor(e, .1);
+    yield ai.thrustFor(e, 0.1);
   }
 }
 // maybe users would write their own controls
@@ -43,7 +44,7 @@ function* manualDrive(e){
   }
 }
 function* boidScript(e){
-  ai.setThrust(e, e.maxThrust * .5);
+  ai.setThrust(e, e.maxThrust * 0.5);
   yield ai.turnLeft(e, 180);
 }
 
@@ -56,13 +57,13 @@ function* scanForEnemy(e){
 }
 // builtins the user might have access to
 function* fireMissile(e){
-    yield ai.waitFor(e, .1);
+    yield ai.waitFor(e, 0.1);
     world.addEntity(space.fireMissile(e, missileScript));
-    yield ai.waitFor(e, .1);
+    yield ai.waitFor(e, 0.1);
 }
 function* fireLaser(e){
     world.addEntity(space.fireLaser(e));
-    yield ai.waitFor(e, .05);
+    yield ai.waitFor(e, 0.05);
 }
 
 exports.pilotScript = pilotScript;
