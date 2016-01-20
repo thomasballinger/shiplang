@@ -2,9 +2,9 @@
 
 var vHeading = require('./ai.js').vHeading;
 
-function Controls(){
+function Controls(obj){
   this.events = [];
-  this.initialize();
+  this.initialize(obj);
 }
 Controls.prototype.getEvent = function*(){
   var events = this.events;
@@ -19,9 +19,9 @@ Controls.prototype.getEvent = function*(){
   }
   return this.events.shift();
 };
-Controls.prototype.initialize = function(){
+Controls.prototype.initialize = function(obj){
   var events = this.events;
-  window.addEventListener('keydown', function(e){
+  obj.addEventListener('keydown', function(e){
     events.push(e);
     if ([37, 38, 29, 40, // arrows
         32, // spacebar
@@ -31,7 +31,7 @@ Controls.prototype.initialize = function(){
       return false;
     }
   });
-  window.addEventListener('keyup', function(e){
+  obj.addEventListener('keyup', function(e){
     events.push(e);
     return false;
   });

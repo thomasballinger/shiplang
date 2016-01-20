@@ -51,15 +51,15 @@ function makeEntity(type, x, y, dx, dy, r){
   return {type: type, x: x, y: y, dx: dx, dy: dy, r:r};
 }
 
-function makeBoid(x, y, dx, dy, script){
+function makeBoid(x, y, dx, dy, h, dh, script){
   var boid = makeEntity('boid', x, y, dx, dy, 10);
   if (script === undefined){
     boid.readyCallback = 'done';
   } else {
     boid.script = script;
   }
-  boid.h = Math.random() * 360;
-  boid.dh = Math.random() * 100 - 50;
+  boid.h = h;
+  boid.dh = dh;
   boid.maxThrust = 1;
   boid.maxDH = Math.abs(boid.dh);
   return boid;

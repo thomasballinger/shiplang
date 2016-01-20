@@ -1,8 +1,3 @@
-// example ai script
-var ai = require('./ai');
-var manual = require('./manual');
-var space = require('./space');
-
 function* pilotScript(e){
   yield ai.thrustFor(e, .1);
   yield* ai.thrustUntilStopped(e);
