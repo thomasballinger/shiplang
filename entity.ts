@@ -1,5 +1,4 @@
-var sm = require('./shipmath');
-
+import sm = require('./shipmath');
 
 type GameTime = number
 
@@ -24,6 +23,7 @@ export class Entity{
         this.r = r;
         this.h = 0;
         this.destructable = true;
+        this.drawStatus = {};
     }
     type: string;
     x: number;
@@ -37,6 +37,7 @@ export class Entity{
     timeToDie: GameTime;
     firedAt: GameTime;
     firedBy: Entity;
+    drawStatus: {[property:string]: boolean;}
 
     towards(e: Entity){
       if (e === undefined){ return 0; }

@@ -4,7 +4,10 @@ var ace = require('brace');
 require('brace/mode/javascript');
 require('brace/theme/monokai');
 
+var sm = require('./shipmath');
+console.log(sm);
 var space = require('./space');
+var display = require('./display');
 var manual = require('./manual');
 
 window.onload = main;
@@ -42,9 +45,8 @@ function main(){
   window.manual = require('./manual');
   window.space = require('./space');
 
-
-  var display = new space.SpaceDisplay('canvas');
-  var minimapDisplay = new space.SpaceDisplay('minimap');
+  var mainDisplay = new display.SpaceDisplay('canvas');
+  var minimapDisplay = new display.SpaceDisplay('minimap');
 
   var boidArgs = [];
   for (var i=0; i<20; i++){
@@ -55,33 +57,6 @@ function main(){
                    Math.random() * 360,
                    Math.random() * 100 - 50]);
   }
-
-
-  //TODO move to display code
-  function updateDisplays(ship, world){
-    var positionScaleFactor = 1;
-    var entityScaleFactor = 1;
-    display.render(world.entities,
-                   ship.x-canvas.width/2/positionScaleFactor,
-                   ship.y-canvas.height/2/positionScaleFactor,
-                   ship.x+canvas.width/2/positionScaleFactor,
-                   ship.y+canvas.height/2/positionScaleFactor,
-                   positionScaleFactor,
-                   entityScaleFactor);
-    var minimapPSF = 0.07;
-    var minimapESF = 0.2;
-    minimapDisplay.render(world.entities,
-                          ship.x-minimap.width/2/minimapPSF,
-                          ship.y-minimap.height/2/minimapPSF,
-                          ship.x+minimap.width/2/minimapPSF,
-                          ship.y+minimap.height/2/minimapPSF,
-                          minimapPSF,
-                          minimapESF);
-
-    var backgroundParallax = 0.1;
-    canvas.style.backgroundPosition=''+(0-ship.x*backgroundParallax)+' '+(0-ship.y*backgroundParallax);
-  }
-
 
   var ship;
   var world;
@@ -126,12 +101,12 @@ function main(){
     var dt = now - last_tick;
     last_tick = now;
     world.tick(dt / 1000);
-    updateDisplays(ship, world);
+    mainDisplay.renderCentered(ship, world.entities, 1, 1, 0.1);
+    minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.2, 0);
     if (ship.dead){
       resetState(s);
     }
     setTimeout(tick, 5);
   }
-
   tick();
 }

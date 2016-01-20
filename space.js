@@ -9,25 +9,6 @@ var ships = require('./ships');
 var IMMUNITY_TIME_MS = 1000;
 
 
-// x and y are in display space
-function drawPoly(ctx, x, y, points, h, esf){
-  if (esf === undefined){
-    esf = 1;
-  }
-  points = points.map(function(arr){
-    var dx = arr[0] * esf, dy = arr[1] * esf;
-    return [x + dx * Math.cos(h * Math.PI / 180) - dy * Math.sin(h * Math.PI / 180),
-            y + dx * Math.sin(h * Math.PI / 180) + dy * Math.cos(h * Math.PI / 180)];
-  });
-  ctx.beginPath();
-  ctx.moveTo(points[0][0], points[0][1]);
-  for (var i = 1; i < points.length; i++){
-    ctx.lineTo(points[i][0], points[i][1]);
-  }
-  ctx.closePath();
-  ctx.fill();
-}
-
 function makeBoid(x, y, dx, dy, h, dh, script){
   var boid = new Ship(ships.Boid, x, y, script);
   boid.dx = dx;
@@ -67,8 +48,8 @@ function fireLaser(e){
   var laser = new Entity('laser',
                         e.x + sm.x_comp(e.h)*e.r,
                         e.y + sm.y_comp(e.h)*e.r,
-                        e.dx + sm.x_comp(e.h) * 200,
-                        e.dy + sm.y_comp(e.h) * 200,
+                        e.dx + sm.x_comp(e.h) * 400,
+                        e.dy + sm.y_comp(e.h) * 400,
                         2);
   laser.firedBy = e;
   laser.firedAt = Number.MAX_VALUE;  // never damages owner
@@ -80,125 +61,6 @@ function fireLaser(e){
 function entityMove(e, dt){
   e.move(dt);
 }
-
-function entityDraw(e, ctx, dx, dy, psf, esf){
-  //dx and dy are offsets in world space for panning
-  // psf is position scale factor, used to place ships
-  // esf is entity scale factor, used to scale ship dimensions
-  entityDraws[e.type](e, ctx, dx, dy, psf, esf);
-  ctx.fillStyle="#222222";
-  ctx.strokeStyle="#222222";
-  ctx.beginPath();
-  ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
-  ctx.stroke();
-}
-
-var entityDraws = {
-  'boid': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#ffeebb";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-e.r, -e.r],
-              [-e.r, e.r],
-              [e.r, e.r],
-              [e.r, -e.r]],
-             e.h,
-             esf);
-  },
-  'ship': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#eeaa22";
-    if (e.thrust > 0){
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-13, -10],
-              [-9, -10],
-              [-9, 10],
-              [-13, 10]],
-             e.h,
-             esf);
-    }
-    if (e.scanning){
-      ctx.strokeStyle="#ffeeff";
-      ctx.beginPath();
-      ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*10*psf, 0, 2*Math.PI);
-      ctx.stroke();
-    }
-    ctx.fillStyle="#aaeebb";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[15, 0],
-              [-10, -12],
-              [-10, 12]],
-             e.h,
-             esf);
-  },
-  'explosion': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#FFA500";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-1.3*e.r, -1*e.r],
-              [-.9*e.r, 1*e.r],
-              [.9*e.r, 1*e.r],
-              [1.3*e.r, -1*e.r]],
-             e.h,
-             esf);
-  },
-  'missile': function(e, ctx, dx, dy, psf, esf){
-    if (e.armed){
-      ctx.fillStyle="#AA1144";
-    } else {
-      ctx.fillStyle="#4411AA";
-    }
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[10, -1],
-              [-10, -3],
-              [-10, 3],
-              [10, 1]],
-             e.h,
-             esf);
-    if (e.thrust > 0){
-      ctx.fillStyle="#eeaa22";
-      drawPoly(ctx,
-               (e.x-dx)*psf,
-               (e.y-dy)*psf,
-               [[-13, -4],
-                [-9, -3],
-                [-9, 3],
-                [-13, 4]],
-               e.h,
-               esf);
-    }
-  },
-  'laser': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#ffff00";
-    ctx.beginPath();
-    ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*1*psf, 0, 2*Math.PI);
-    ctx.fill();
-  }
-};
-
-function SpaceDisplay(id){
-  this.canvas = document.getElementById(id);
-  this.ctx = this.canvas.getContext('2d');
-}
-// left/top/right/bottom are in world space, scale factor relates these to display
-SpaceDisplay.prototype.render = function(entities, left, top, right, bottom,
-                                         position_scale_factor, entity_scale_factor){
-  var onscreen = entities.slice();  // TODO select just elements currently visible
-  this.ctx.fillStyle="#112233";
-  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  for (var i=0; i<onscreen.length; i++){
-    var entity = onscreen[i];
-    entityDraw(entity, this.ctx, left, top, position_scale_factor, entity_scale_factor);
-    // Given the world-space
-  }
-};
 
 function SpaceWorld(){
   this.entities = [];
@@ -329,7 +191,6 @@ SpaceWorld.prototype.deepCopyPopulate = function(copy, memo, innerDeepCopy){
 var Space = {};
 Space.makeShip = makeShip;
 Space.makeBoid = makeBoid;
-Space.SpaceDisplay = SpaceDisplay;
 Space.SpaceWorld = SpaceWorld;
 Space.fireMissile = fireMissile;
 Space.fireLaser = fireLaser;
