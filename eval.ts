@@ -383,7 +383,18 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
             var args = range(arg).map(function(){return stack.pop();});
             var func = stack.pop();
             if (typeof func === 'function'){
-                stack.push(func.apply(null, args));
+                var result = func.apply(null, args);
+                if (func.requiresYield){
+                    // Then yield, but first replace this function
+                    // on the stack with a wrapped version that doesn't
+                    // have .requiresYield set to true on it so that
+                    // upon resuming the function will be called normally.
+                    function wrapper(){
+                        return func.apply(null, arguments);
+                    }
+                    stack.push(result);
+                    return func.isReady() // this should produce the isReady function
+                }
             } else {
                 if (func.params.length !== arg){
                     throw Error('Function called with wrong arity! Takes ' +
