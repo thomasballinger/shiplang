@@ -89,8 +89,8 @@ literal
   / string
 
 string
-  = '"' value:([^"])+ '"' { return new parser.nodes.StringLiteralNode(value.join('')); }
-  / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(value.join('')); }
+  = '"' value:([^"])+ '"' { return new parser.nodes.StringLiteralNode(location(), value.join('')); }
+  / "'" value:[^']+ "'" { return new parser.nodes.StringLiteralNode(location(), value.join('')); }
 
 number
  = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }

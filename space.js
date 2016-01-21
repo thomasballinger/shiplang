@@ -172,6 +172,7 @@ SpaceWorld.prototype.tick = function(dt){
   this.checkCollisions();
   for (var i=0; i<this.entities.length; i++){
     var e = this.entities[i];
+    if (e.context === undefined){ continue; }
     scriptEnv.setCurrentEntity(e);
     scriptEnv.setGameTime(this.gameTime);
     e.context.step(e);

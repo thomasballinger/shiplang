@@ -105,7 +105,8 @@ class FunctionNameNode extends NameNode{
 class StringLiteralNode extends NameNode {
     eval(env: Environment):any { return this.content; }
     tree() { return 'StringLiteral: ' + this.content; }
-    compile(): Array<ByteCode> { return [[BC.LoadConstant, this.content]]; } }
+    compile(): Array<ByteCode> {
+        return [[BC.LoadConstant, this.content]]; } }
 
 // This time around you can't use expressions in the front position
 class FunctionCallNode extends ASTNode {
@@ -221,7 +222,6 @@ class DoNode extends ASTNode {
     compile() {
         var code = <Array<ByteCode>>[];
         for (var node of this.content){
-            console.log(node);
             code = code.concat(node.compile())
             code.push([BC.Pop, null]);
         }
@@ -350,7 +350,6 @@ export class Environment {
                     }
                     return wrapper;
                 }
-                console.log("found a non-function:", val);
                 return val;
             }
         }

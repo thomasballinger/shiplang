@@ -45,6 +45,8 @@ export class Entity{
     firedBy: Entity;
     drawStatus: {[property:string]: boolean;}
 
+    [key: string]:any; // so some metaprogramming in scriptenv.ts checks
+
     towards(e: Entity){
       if (e === undefined){ return 0; }
       return sm.towardsPoint(this.x, this.y, e.x, e.y);

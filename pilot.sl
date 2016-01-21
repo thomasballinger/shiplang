@@ -1,9 +1,8 @@
 (defn pilotScript ()
   (forever
+    (log "x:" x "y:" y "speed:" speed)
     (thrustFor .1)
-    (leftFor .1)
-    (thrustFor 1)
-    (leftFor 1)))
+    (leftFor .1)))
 (pilotScript)
 
 ;    (forever

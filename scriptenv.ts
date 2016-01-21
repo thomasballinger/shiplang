@@ -71,10 +71,12 @@ function makeControls(){
         thrustFor: thrustFor,
         leftFor: leftFor,
     }
-    Object.defineProperty(controls, 'x', { get: function() { return e.x; }, });
-    Object.defineProperty(controls, 'y', { get: function() { return e.y; }, });
-    Object.defineProperty(controls, 'dx', { get: function() { return e.dx; }, });
-    Object.defineProperty(controls, 'dy', { get: function() { return e.dy; }, });
+    for (var propname of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH',
+                          'maxThrust', 'maxSpeed']){
+        Object.defineProperty(controls, propname, { get: function() { return e[propname]; }, });
+    }
+    Object.defineProperty(controls, 'speed', { get: function() { return e.speed(); }, });
+    Object.defineProperty(controls, 'vHeading', { get: function() { return e.vHeading(); }, });
     return [setCurrentEntity, setGameTime, controls];
 }
 
