@@ -27,6 +27,18 @@ export class SLContext {
     readyCallback: ()=>boolean;
     done: boolean;
 
+    static fromFunction(f: ev.CompiledFunctionObject):SLContext {
+        if (f.params.length !== 0){ throw Error('Only functions that take no parameters can be scripts'); }
+        var name = f.name || 'anonymous function';
+        var context = new SLContext(name, undefined);
+        context.bytecodeStack = <ev.ByteCode[][]>[f.code];
+        context.stack = <any[]>[];
+        context.counterStack = [0];
+        context.envStack = [f.env];
+        // context is ready
+        return context
+    }
+
     step(e:entity.Ship){
         if (this.done){ return; }
         if (this.bytecodeStack === undefined){
@@ -34,6 +46,7 @@ export class SLContext {
             if (this.initialEnv === undefined){ throw Error('needs initialEnv!'); }
             [this.bytecodeStack, this.counterStack, this.envStack, this.stack] = ev.initialize(this.source, this.initialEnv);
             this.initialEnv = undefined;
+            // context is ready
         }
         if (this.readyCallback !== undefined && !this.readyCallback()){
             return;

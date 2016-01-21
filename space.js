@@ -48,8 +48,8 @@ function fireLaser(e){
   var laser = new Entity('laser',
                         e.x + sm.x_comp(e.h)*e.r,
                         e.y + sm.y_comp(e.h)*e.r,
-                        e.dx + sm.x_comp(e.h) * 400,
-                        e.dy + sm.y_comp(e.h) * 400,
+                        e.dx + sm.x_comp(e.h) * 600,
+                        e.dy + sm.y_comp(e.h) * 600,
                         2);
   laser.firedBy = e;
   laser.firedAt = Number.MAX_VALUE;  // never damages owner
@@ -62,6 +62,9 @@ function SpaceWorld(){
   this.entities = [];
   this.gameTime = 0;
 }
+SpaceWorld.prototype.fireMissile = function(entity, script){
+  this.addEntity(fireMissile(entity, script));
+};
 SpaceWorld.prototype.addEntity = function(entity){
   this.entities.push(entity);
 };
@@ -170,6 +173,7 @@ SpaceWorld.prototype.tick = function(dt){
     entity.move(dt);
   }
   this.checkCollisions();
+  scriptEnv.setGameWorld(this);
   for (var i=0; i<this.entities.length; i++){
     var e = this.entities[i];
     if (e.context === undefined){ continue; }

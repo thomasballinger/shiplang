@@ -8,6 +8,7 @@ var space = require('./space');
 var display = require('./display');
 var manual = require('./manual');
 var evaluation = require('./eval');
+var scriptEnv = require('./scriptenv');
 
 var scripts = require('./pilot');
 
@@ -56,7 +57,7 @@ function main(){
   editor.getSession().on('change', function(e) {
     codeChanged = true;
   });
-  var codeChanged = false;
+  var codeChanged = true;
 
   var controls = new manual.Controls(document.body);
 
@@ -81,7 +82,7 @@ function main(){
 
   var ship;
   var world;
-  function resetState(s){
+  function resetState(userScripts){
 
     console.log('editor state change');
 
@@ -90,7 +91,7 @@ function main(){
     window.world = world; // global so pilot scripts can reference it
 
     ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
-    ship2 = space.makeShip(-200, 350, 270, s);
+    ship2 = space.makeShip(-200, 350, 270, userScripts.pilotScript);
     world.addEntity(ship);
     world.addEntity(ship2);
     world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
@@ -100,10 +101,8 @@ function main(){
                                      scripts.boidScript));
     }
   }
-  var lastValid = editor.getValue();
-  resetState(lastValid);
-
   var last_tick = new Date().getTime();
+  var lastValid = {};
 
   function tick(){
     if (codeChanged){
@@ -111,7 +110,9 @@ function main(){
       var c = evaluation.parseOrShowError(s, setError);
       if (c !== undefined){
         clearError();
-        lastValid = s;
+        var userScripts = scriptEnv.getScripts(s);
+        lastValid = userScripts;
+        console.log(userScripts);
         resetState(lastValid);
       }
       codeChanged = false;

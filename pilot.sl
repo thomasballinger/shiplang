@@ -1,9 +1,19 @@
 (defn pilotScript ()
+  (leftFor .6)
   (forever
     (log "x:" x "y:" y "speed:" speed)
     (thrustFor .1)
-    (leftFor .1)))
-(pilotScript)
+    (leftFor .1)
+    (fireMissile goScript)))
+
+(defn goScript ()
+  (forever
+    (thrustFor .3)
+    (if (< distToClosestShip 30)
+        (detonate))
+    (leftFor .1)
+    (define targetHeading (headingToClosest))
+    (turnTo targetHeading)))
 
 ;    (forever
 ;        (if (and (> y 400) (> e.dy 0))

@@ -249,7 +249,7 @@ class ForeverNode extends ASTNode {
     }
 }
 
-class CompiledFunctionObject {
+export class CompiledFunctionObject {
     constructor(public params: string[], public code: ByteCode[], public env: Environment, public name: string){}
 }
 
@@ -512,7 +512,7 @@ export function initialize(code: string, env: Environment): [ByteCode[][], numbe
 }
 
 // default behavior for yieldCallback is to return the yielded callback
-function runBytecode(bytecode: ByteCode[], env: Environment, yieldCallback?: (isready:()=>boolean)=>any){
+export function runBytecode(bytecode: ByteCode[], env: Environment, yieldCallback?: (isready:()=>boolean)=>any){
     bytecode.push([BC.Return, null]) // last thing to do: return result
     var bytecodeStack = <ByteCode[][]>[bytecode];
     var stack = <any[]>[];

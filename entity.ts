@@ -74,9 +74,13 @@ export class Entity{
     }
 }
 
+function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
+    return typeof g === 'function';
+}
+
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|string){
+    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -87,7 +91,9 @@ export class Ship extends Entity{
             this.context = new codetypes.NOPContext();
         } else if (typeof script === 'string'){
             this.context = new codetypes.SLContext(script, scriptEnv.buildShipEnv());
-        } else {
+        } else if (script instanceof ev.CompiledFunctionObject){
+            this.context = codetypes.SLContext.fromFunction(script);
+        } else if (probablyReturnsGenerators(script)) {
             this.context = new codetypes.JSContext(script);
         }
         this.thrust = 0;
