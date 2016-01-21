@@ -12,7 +12,7 @@ export var Ship = {
     r: 10,
     maxThrust: 300,
     maxDH: 300,
-    maxSpeed: 100,
+    maxSpeed: 400,
     isMunition: false,
     explosionSize: 20,
 }
@@ -22,7 +22,7 @@ export var Missile = {
     r: 10,
     maxThrust: 300,
     maxDH: 300,
-    maxSpeed: 100,
+    maxSpeed: 300,
     isMunition: true,
     explosionSize: 30,
 }

@@ -143,5 +143,12 @@ export class Ship extends Entity{
             this.dx += sm.x_comp(this.h) * this.thrust * dt;
             this.dy += sm.y_comp(this.h) * this.thrust * dt;
         }
+
+        var speed = this.speed();
+        if (speed > this.maxSpeed){
+            this.dx = this.dx * (this.maxSpeed / speed);
+            this.dy = this.dy * (this.maxSpeed / speed);
+        }
+
     }
 }
