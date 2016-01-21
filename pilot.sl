@@ -11,6 +11,7 @@
         (define spot scanForEnemy)
         (ping spot)
         (fireMissile)))
+(pilotScript)
 
 
 ; when syntax checking: x, y, dx, dy, and others

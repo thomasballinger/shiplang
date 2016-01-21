@@ -327,9 +327,10 @@ class DefnNode extends ASTNode {
     }
 }
 
-interface FuncWithRequiresYield {
-  (): any;
-  requiresYield: ()=>(()=>boolean);
+interface YieldFunction {
+  (...args:any[]): ()=>boolean;
+  finish(): any;
+  requiresYield: boolean
 }
 export class Environment {
     constructor(public scopes: Array<any>){ }
@@ -339,11 +340,12 @@ export class Environment {
             var val = scope[name];
             if (val !== undefined){
                 if (typeof val === 'function'){
-                    var wrapper = <FuncWithRequiresYield>function(){
-                        return val.apply(scope, arguments);
-                    }
                     if (val.requiresYield){
-                        wrapper.requiresYield = val.requiresYield;
+                        return val; // To preserve requiresYield and finish,
+                                    // YieldFunctions don't get wrapped.
+                    }
+                    var wrapper = <YieldFunction>function(){
+                        return val.apply(scope, arguments);
                     }
                     return wrapper;
                 }
@@ -419,15 +421,10 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
             if (typeof func === 'function'){
                 if (func.requiresYield){
                     // Then yield, but first replace this function
-                    // on the stack with a wrapped version that doesn't
-                    // have .requiresYield set to true on it so that
-                    // upon resuming the function will be called normally.
-                    function wrapper(){
-                        return func.apply(null, arguments);
-                    }
-                    stack.push(wrapper);
+                    // on the stack with its .finish property
+                    stack.push(func.finish);
                     args.map(function(){return stack.push();});
-                    return func.requiresYield() // this should produce the isReady function
+                    return func.apply(null, args) // this should produce the isReady function
                 } else {
                     var result = func.apply(null, args);
                     stack.push(result);
