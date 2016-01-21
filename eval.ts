@@ -335,7 +335,9 @@ export class Environment {
             var val = scope[name];
             if (val !== undefined){
                 if (typeof val === 'function'){
-                    return val.bind(this.scopes);
+                    return function wrapper(){
+                        return val.apply(scope, arguments);
+                    }
                 }
                 return val;
             }

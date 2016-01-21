@@ -10,6 +10,9 @@ module.exports = {
   resolve: {
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
   },
+  node: {
+    fs: "empty"
+  },
   module: {
     loaders: [
       { test: /\.ts$/, loader: 'ts-loader' },

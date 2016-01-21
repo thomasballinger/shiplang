@@ -1,6 +1,12 @@
 import sm = require('./shipmath');
+import ev = require('./eval');
+import codetypes = require('./codetypes');
+import scriptEnv = require('./scriptenv');
 
 type GameTime = number
+interface Generator {
+    next(): {value: any, done: boolean}
+}
 
 // These define a ship type but not its instantaneous properties
 export interface ShipSpec {type: string,
@@ -68,7 +74,7 @@ export class Entity{
 
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script: ()=>void){
+    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|string){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -76,9 +82,11 @@ export class Ship extends Entity{
         this.isMunition = spec.isMunition;
         this.explosionSize = spec.explosionSize;
         if (script === undefined){
-            this.readyCallback = 'done';
+            this.context = new codetypes.NOPContext();
+        } else if (typeof script === 'string'){
+            this.context = new codetypes.SLContext(script, scriptEnv.buildShipEnv());
         } else {
-            this.script = script;
+            this.context = new codetypes.JSContext(script);
         }
         this.thrust = 0;
         this.dh = 0;
@@ -88,11 +96,13 @@ export class Ship extends Entity{
     maxDH: number;
     maxSpeed: number;
     explosionSize: number;
-    script: ()=>void;  // TODO clean readyCallback type up
-    readyCallback: (()=>boolean) | string;
     thrust: number;
     dh: number;
     hTarget: number;
+
+    readyCallback: ()=>boolean;
+    context: codetypes.SLContext | codetypes.JSContext | codetypes.NOPContext;
+    scriptDone: boolean;
 
     move(dt: GameTime){
         super.move(dt);

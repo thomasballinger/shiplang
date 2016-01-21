@@ -2,7 +2,6 @@
 
 var Entity = require('./entity').Entity;
 var Ship = require('./entity').Ship;
-var runEntityScript = require('./ai.js').runEntityScript;
 var sm = require('./shipmath');
 var ships = require('./ships');
 
@@ -56,10 +55,6 @@ function fireLaser(e){
   laser.timeToDie = new Date().getTime() + 1500;
   laser.isMunition = true;
   return laser;
-}
-
-function entityMove(e, dt){
-  e.move(dt);
 }
 
 function SpaceWorld(){
@@ -169,14 +164,12 @@ SpaceWorld.prototype.tick = function(dt){
     if (entity === undefined){
       throw Error('entity does not exist: ', this.entities);
     }
-    entityMove(entity, dt);
+    entity.move(dt);
   }
   this.checkCollisions();
   for (var i=0; i<this.entities.length; i++){
     var e = this.entities[i];
-    if (e.script !== undefined){
-      runEntityScript(e);
-    }
+    e.context.step(e);
   }
 };
 

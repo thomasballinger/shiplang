@@ -74,15 +74,16 @@ function main(){
   var world;
   function resetState(s){
 
-    console.log('editor state change')
+    console.log('editor state change');
 
     world = new space.SpaceWorld();
 
     window.world = world; // global so pilot scripts can reference it
 
-    ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
+    //ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
+    ship = space.makeShip(-200, 350, 270, `(log 1)`);
     world.addEntity(ship);
-    world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
+    //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){
       world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
                                      boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
@@ -95,7 +96,7 @@ function main(){
 
   function tick(){
     if (codeChanged){
-      s = editor.getValue();
+      var s = editor.getValue();
       resetState(s);
       codeChanged = false;
     }
@@ -106,7 +107,7 @@ function main(){
     mainDisplay.renderCentered(ship, world.entities, 1, 1, 0.1);
     minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.2, 0);
     if (ship.dead){
-      resetState(s);
+      resetState('');
     }
     setTimeout(tick, 5);
   }

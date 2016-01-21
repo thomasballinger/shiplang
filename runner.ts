@@ -1,4 +1,6 @@
 import ev = require('./eval');
+import entity = require('./entity');
+import codetypes = require('./codetypes');
 
 export var InterpreterSession = ev.InterpreterSession
 export var CompilerSession = ev.CompilerSession
@@ -7,20 +9,23 @@ export var Environment = ev.Environment
 export var parseOrShowError = ev.parseOrShowError
 
 interface Generator {
-    next: {value: any, done: boolean}
+    next(): {value: any, done: boolean}
 }
 
-type Context = [string, ev.ByteCode[][], number[], ev.Environment[], any[], ()=>boolean];
+
+
+
+type StandaloneContext = [string, ev.ByteCode[][], number[], ev.Environment[], any[], ()=>boolean];
 
 // A Scheduler holds multiple running threads.
 // It can run all scripts to the next tick.
 // It can run JavaScript generators and shiplang scripts.
-export class Scheduler{
+export class StandaloneScheduler{
     constructor(){
         this.contexts = [];
         this.generators = [];
     }
-    contexts: Context[];
+    contexts: StandaloneContext[];
     generators: [Generator, ()=>boolean][];
     addScript(code: string, env: ev.Environment){
         var [bytecodeStack, counterStack, envStack, stack] = ev.initialize(code, env);
@@ -34,7 +39,7 @@ export class Scheduler{
         this.generators.push([generator, undefined])
     }
     tick(){ //TODO do this in discrete steps
-        var newContexts = <Context[]>[];
+        var newContexts = <StandaloneContext[]>[];
         for (var [src, bcs, cs, es, stack, isReady] of this.contexts){
             if (isReady !== undefined && !isReady()){
                 newContexts.push([src, bcs, cs, es, stack, isReady]);
@@ -75,7 +80,7 @@ function testing(){
     if (ev.parseOrShowError(script) === undefined){ return; }
     var env = new ev.Environment([funs, {}]);
 
-    var s = new Scheduler();
+    var s = new StandaloneScheduler();
     s.addScript(script, env)
     console.log(s);
     s.tick()

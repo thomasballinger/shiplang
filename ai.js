@@ -120,44 +120,7 @@ function* detonateIfCloserThanFor(e, world, d, x){
   }
 }
 
-function runEntityScript(e){
-  if (e.readyCallback === 'done'){
-    return;
-  }
-  if (e.scriptInProgress === undefined){
-    if (e.script === undefined){
-      throw Error("need script to run");
-    }
-    e.scriptInProgress = e.script(e);
-
-  }
-  if (e.readyCallback === undefined){
-    var request = e.scriptInProgress.next();  /*jshint -W038 */
-    if (request.done){
-      console.log('script done, it had no async', e);
-      e.readyCallback = 'done';
-      return;
-    }
-    e.readyCallback = request.value;
-  }
-  while (e.readyCallback()){
-    request = e.scriptInProgress.next();
-    if (request.done){
-      console.log('script done for e', e);
-      e.readyCallback = 'done';
-      break;
-    } else {
-      e.readyCallback = request.value;
-      if (e.readyCallback === 'done'){
-        break;
-      }
-    }
-  }
-}
-
-
 var ai = {};
-ai.runEntityScript = runEntityScript;
 ai.thrustFor = thrustFor;
 ai.turnLeft = turnLeft;
 ai.turnRight = turnRight;
