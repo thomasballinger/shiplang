@@ -327,6 +327,10 @@ class DefnNode extends ASTNode {
     }
 }
 
+interface FuncWithRequiresYield {
+  (): any;
+  requiresYield: ()=>(()=>boolean);
+}
 export class Environment {
     constructor(public scopes: Array<any>){ }
     lookup(name: string){
@@ -335,9 +339,13 @@ export class Environment {
             var val = scope[name];
             if (val !== undefined){
                 if (typeof val === 'function'){
-                    return function wrapper(){
+                    var wrapper = <FuncWithRequiresYield>function(){
                         return val.apply(scope, arguments);
                     }
+                    if (val.requiresYield){
+                        wrapper.requiresYield = val.requiresYield;
+                    }
+                    return wrapper;
                 }
                 return val;
             }
@@ -406,9 +414,9 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
             break;
         case BC.FunctionCall:
             var args = range(arg).map(function(){return stack.pop();});
+            args.reverse();
             var func = stack.pop();
             if (typeof func === 'function'){
-                var result = func.apply(null, args);
                 if (func.requiresYield){
                     // Then yield, but first replace this function
                     // on the stack with a wrapped version that doesn't
@@ -417,8 +425,12 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
                     function wrapper(){
                         return func.apply(null, arguments);
                     }
+                    stack.push(wrapper);
+                    args.map(function(){return stack.push();});
+                    return func.requiresYield() // this should produce the isReady function
+                } else {
+                    var result = func.apply(null, args);
                     stack.push(result);
-                    return func.isReady() // this should produce the isReady function
                 }
             } else {
                 if (func.params.length !== arg){

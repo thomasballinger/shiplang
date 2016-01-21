@@ -24,6 +24,7 @@ var funcs = {
       }, 0);
     },
     '*': function(a:number, b:number){ return a * b; },
+    'waitTwo': waitTwo,
 
 }
 
