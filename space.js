@@ -62,8 +62,10 @@ function SpaceWorld(){
   this.entities = [];
   this.gameTime = 0;
 }
-SpaceWorld.prototype.fireMissile = function(entity, script){
-  this.addEntity(fireMissile(entity, script));
+SpaceWorld.prototype.fireMissile = function(entity, script, color){
+  var missile = fireMissile(entity, script);
+  missile.drawStatus.color = color;
+  this.addEntity(missile);
 };
 SpaceWorld.prototype.addEntity = function(entity){
   this.entities.push(entity);

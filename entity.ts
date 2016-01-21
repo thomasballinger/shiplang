@@ -43,7 +43,7 @@ export class Entity{
     timeToDie: GameTime;
     firedAt: GameTime;
     firedBy: Entity;
-    drawStatus: {[property:string]: boolean;}
+    drawStatus: {[property:string]: any;}
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 

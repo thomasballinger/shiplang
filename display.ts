@@ -135,7 +135,7 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
     if (e.drawStatus['armed']){
       ctx.fillStyle="#AA1144";
     } else {
-      ctx.fillStyle="#4411AA";
+      ctx.fillStyle=e.drawStatus['color'] || "#4411AA";
     }
     drawPoly(ctx,
              (e.x-dx)*psf,

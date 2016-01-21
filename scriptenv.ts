@@ -73,6 +73,7 @@ function makeControls(){
     turnTo.finish = function(){}
 
     var detonate = <YieldFunction>function():any{
+      console.log('manual detonation!');
       e.r = e.explosionSize;
       e.type = 'explosion';
       e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
@@ -82,14 +83,14 @@ function makeControls(){
     detonate.requiresYield = true;
     turnTo.finish = function(){}
 
-    var fireMissile = <YieldFunction>function(script):any{
+    var fireMissile = <YieldFunction>function(script, color):any{
         var startTime = t;
         var missileFired = false;
         return function(){
             if (t < startTime + .1){
                 return false;
             } else if (!missileFired){
-                w.fireMissile(e, script);
+                w.fireMissile(e, script, color);
                 missileFired = true;
             } else if (t < startTime + .2){
                 return false;
@@ -123,6 +124,7 @@ function makeControls(){
         fireMissile: fireMissile,
         waitFor: waitFor,
         turnTo: turnTo,
+        detonate: detonate,
         distToClosestShip: <YieldFunction>function(){ return w.distToClosestShip(e); },
         headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
     }
