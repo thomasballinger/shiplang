@@ -619,11 +619,11 @@ export class TraceSession extends Session{
         }
     }
 }
-export function parseOrShowError(s: string){
+export function parseOrShowError(s: string, callback = function(s:string){console.log(s);}){
     try {
         return parser.parse(s);
     } catch (e) {
-        console.log(e)
+        callback(e);
     }
 }
 

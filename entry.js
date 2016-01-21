@@ -39,6 +39,14 @@ function main(){
   minimap.width = 200;
   minimap.height = 200;
 
+  var errorbar = document.getElementById('errorbar');
+  function setError(s){
+    errorbar.innerHTML = s;
+    errorbar.hidden = false;
+  }
+  function clearError(){ errorbar.hidden = true; }
+  clearError();
+
   var editor = ace.edit('editor');
   editor.getSession().setMode('ace/mode/scheme');
   editor.setTheme('ace/theme/monokai');
@@ -99,8 +107,9 @@ function main(){
   function tick(){
     if (codeChanged){
       var s = editor.getValue();
-      var c = evaluation.parseOrShowError(s);
+      var c = evaluation.parseOrShowError(s, setError);
       if (c !== undefined){
+        clearError();
         lastValid = s;
         resetState(lastValid);
       }

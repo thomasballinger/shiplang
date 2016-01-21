@@ -28,3 +28,13 @@ body {
   border: 5px solid black;
   background-color: #333333;
 }
+#errorbar {
+  position: absolute;
+  top: 100;
+  left: 660px;
+  bottom: 100;
+  right: 30;
+  background-color: #ff99cc;
+  text-align: center;
+  font-size: 2em;
+}

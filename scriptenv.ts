@@ -44,6 +44,13 @@ function makeControls(){
         t = time;
     }
 
+    // Functions available to scripts
+    //
+    // It's advisable to let the argument undefined do something reasonable
+    //
+    //TODO add arity checks to these (maybe ranges?) and ideally have a parse
+    //step that looks for them!
+
     var thrustFor = <YieldFunction>function(n){
         e.thrust = e.maxThrust;
         var timeFinished = t + n;
@@ -64,6 +71,10 @@ function makeControls(){
         thrustFor: thrustFor,
         leftFor: leftFor,
     }
+    Object.defineProperty(controls, 'x', { get: function() { return e.x; }, });
+    Object.defineProperty(controls, 'y', { get: function() { return e.y; }, });
+    Object.defineProperty(controls, 'dx', { get: function() { return e.dx; }, });
+    Object.defineProperty(controls, 'dy', { get: function() { return e.dy; }, });
     return [setCurrentEntity, setGameTime, controls];
 }
 

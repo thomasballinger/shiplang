@@ -95,6 +95,7 @@ string
 number
  = unary:[+-]? before:[0-9]* decimal:'.'? after:[0-9]+ { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
  / unary:[+-]? before:[0-9]+ decimal:'.'? after:[0-9]* { return new parser.nodes.NumberLiteralNode(location(), ein(unary)+ein(before)+ein(decimal)+ein(after)); }
+ / unary:[+-]? '.' {return new parser.nodes.NumberLiteralNode(location(), '0.0'); }
 
 _
   = [ \t\r\n]
