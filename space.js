@@ -4,6 +4,7 @@ var Entity = require('./entity').Entity;
 var Ship = require('./entity').Ship;
 var sm = require('./shipmath');
 var ships = require('./ships');
+var scriptEnv = require('./scriptenv');
 
 var IMMUNITY_TIME_MS = 1000;
 
@@ -169,6 +170,7 @@ SpaceWorld.prototype.tick = function(dt){
   this.checkCollisions();
   for (var i=0; i<this.entities.length; i++){
     var e = this.entities[i];
+    scriptEnv.setCurrentEntity(e);
     e.context.step(e);
   }
 };

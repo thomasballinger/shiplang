@@ -37,19 +37,19 @@ function makeControls(){
         e = ent;
     }
 
-    var thrustFor = <YieldFunction>function(){
+    var thrustFor = <YieldFunction>function(n){
+        e.thrust = e.maxThrust;
         var t0 = new Date().getTime();
         return function(){
-            console.log('checking...')
             var t1 = new Date().getTime();
-            return t1 - t0 > 2000;
+            return t1 - t0 > n*1000;
+        }
     }
     thrustFor.requiresYield = true;
     thrustFor.finish = function(){
-        e.thrust = e.maxThrust;
         e.thrust = 0;
-        }
     }
+    console.log('when it was built,', thrustFor);
 
     var controls:{[name: string]: YieldFunction} = {
         thrustFor: thrustFor,
@@ -57,10 +57,10 @@ function makeControls(){
     return [setCurrentEntity, controls];
 }
 
-
+export var [setCurrentEntity, controls] = makeControls();
 
 //TODO make piloting things available here
 
 export function buildShipEnv():evaluation.Environment{
-    return new evaluation.Environment([console, funcs, {}]);
+    return new evaluation.Environment([console, controls, funcs, {}]);
 }

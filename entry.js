@@ -81,7 +81,7 @@ function main(){
     window.world = world; // global so pilot scripts can reference it
 
     //ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
-    ship = space.makeShip(-200, 350, 270, `(do (log 1) (waitTwo) (waitTwo))`);
+    ship = space.makeShip(-200, 350, 270, `(do (log 1) (thrustFor 10) (log 2))`);
     world.addEntity(ship);
     //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){

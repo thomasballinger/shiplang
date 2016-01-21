@@ -349,6 +349,7 @@ export class Environment {
                     }
                     return wrapper;
                 }
+                console.log("found a non-function:", val);
                 return val;
             }
         }
@@ -404,6 +405,8 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
         throw Error('counter went off the end of bytecode: missing return?')
     }
     var [bc, arg] = bytecode[counterStack[counterStack.length-1]];
+    console.log('current stack:', stack)
+    console.log('current bytecode:'+bc+' '+enumLookup(BC, bc), arg);
     switch (bc){
         case BC.LoadConstant:
             stack.push(arg)
@@ -422,14 +425,16 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
                 if (func.requiresYield){
                     // Then yield, but first replace this function
                     // on the stack with its .finish property
+                    console.log('found one that requires yield:', func);
                     stack.push(func.finish);
-                    args.map(function(){return stack.push();});
+                    args.map(function(x:any){return stack.push(x);});
                     return func.apply(null, args) // this should produce the isReady function
                 } else {
                     var result = func.apply(null, args);
                     stack.push(result);
                 }
             } else {
+                console.log(stack);
                 if (func.params.length !== arg){
                     throw Error('Function called with wrong arity! Takes ' +
                                 func.params.length + ' args, given ' + args.length);
