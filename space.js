@@ -60,6 +60,7 @@ function fireLaser(e){
 
 function SpaceWorld(){
   this.entities = [];
+  this.gameTime = 0;
 }
 SpaceWorld.prototype.addEntity = function(entity){
   this.entities.push(entity);
@@ -160,6 +161,7 @@ SpaceWorld.prototype.distToClosestShip = function(e){
   return sm.dist(closest.x, closest.y, e.x, e.y);
 };
 SpaceWorld.prototype.tick = function(dt){
+  this.gameTime += dt;
   for (var i=0; i<this.entities.length; i++){
     var entity = this.entities[i];
     if (entity === undefined){
@@ -171,6 +173,7 @@ SpaceWorld.prototype.tick = function(dt){
   for (var i=0; i<this.entities.length; i++){
     var e = this.entities[i];
     scriptEnv.setCurrentEntity(e);
+    scriptEnv.setGameTime(this.gameTime);
     e.context.step(e);
   }
 };

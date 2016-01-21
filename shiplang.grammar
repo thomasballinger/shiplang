@@ -22,7 +22,17 @@ start
   = module
 
 module
-  = _* head:sexp wsNoNewline* rest:('\n' _* sexp)* _* { return doIfMultipleStatements(location(), [head].concat(rest.map(function(x){return x[2];}))); }
+  = _* head:(commentOrSexpInList) rest:('\n' _* commentOrSexpInList)* _* { return doIfMultipleStatements(location(), [].concat.apply([], [head].concat(rest.map(function(x){ return x[2]; })))); }
+
+commentOrSexpInList
+  = sexpAsList
+  / comment
+
+sexpAsList
+  = s:sexp { return [s]; }
+
+comment
+  = ";" [^\n]* { return []; }
 
 sexp
   = "(" _+ ")" { return new parser.node.NullNode(location()) }

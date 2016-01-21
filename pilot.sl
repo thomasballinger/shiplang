@@ -1,18 +1,21 @@
-(defn pilotScript (e)
-    (thrustFor 0.1)
-    (thrustUntilStopped)
-    (forever
-        (if (and (> y 400) (> e.dy 0))
-	        (do (turnTo 270)
-                (thrustFor .2))
-            (if (and (< y 200) (< dy 0))
-                (do (turnTo 90)
-                    (thrustFor .2))))
-        (define spot scanForEnemy)
-        (ping spot)
-        (fireMissile)))
+(defn pilotScript ()
+  (forever
+    (thrustFor .1)
+    (leftFor .1)
+    (thrustFor 1)
+    (leftFor 1)))
 (pilotScript)
 
+;    (forever
+;        (if (and (> y 400) (> e.dy 0))
+;	        (do (turnTo 270)
+;                (thrustFor .2))
+;            (if (and (< y 200) (< dy 0))
+;                (do (turnTo 90)
+;                    (thrustFor .2))))
+;        (define spot scanForEnemy)
+;        (ping spot)
+;        (fireMissile)))
 
 ; when syntax checking: x, y, dx, dy, and others
 ; are all dynamic scope. Assigning to them is an error.

@@ -221,6 +221,7 @@ class DoNode extends ASTNode {
     compile() {
         var code = <Array<ByteCode>>[];
         for (var node of this.content){
+            console.log(node);
             code = code.concat(node.compile())
             code.push([BC.Pop, null]);
         }
@@ -249,7 +250,7 @@ class ForeverNode extends ASTNode {
 }
 
 class CompiledFunctionObject {
-    constructor(public params: string[], public code: ByteCode[], public env: Environment){}
+    constructor(public params: string[], public code: ByteCode[], public env: Environment, public name: string){}
 }
 
 class FunctionObject {
@@ -385,6 +386,7 @@ parser.nodes.LambdaNode = LambdaNode;
 parser.nodes.DefineNode = DefineNode;
 parser.nodes.YieldNode = YieldNode;
 parser.nodes.DefnNode = DefnNode;
+parser.nodes.ForeverNode = ForeverNode;
 
 export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
                             stack: any[], envStack: Environment[]){
@@ -405,8 +407,6 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
         throw Error('counter went off the end of bytecode: missing return?')
     }
     var [bc, arg] = bytecode[counterStack[counterStack.length-1]];
-    console.log('current stack:', stack)
-    console.log('current bytecode:'+bc+' '+enumLookup(BC, bc), arg);
     switch (bc){
         case BC.LoadConstant:
             stack.push(arg)
@@ -425,7 +425,6 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
                 if (func.requiresYield){
                     // Then yield, but first replace this function
                     // on the stack with its .finish property
-                    console.log('found one that requires yield:', func);
                     stack.push(func.finish);
                     args.map(function(x:any){return stack.push(x);});
                     return func.apply(null, args) // this should produce the isReady function
@@ -434,7 +433,6 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
                     stack.push(result);
                 }
             } else {
-                console.log(stack);
                 if (func.params.length !== arg){
                     throw Error('Function called with wrong arity! Takes ' +
                                 func.params.length + ' args, given ' + args.length);
@@ -484,9 +482,10 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
             var name = arg;
             var params = stack.pop();
             var code = stack.pop();
-            stack.push(new CompiledFunctionObject(params, code, env));
             if (arg === null){ // lambda function
+                stack.push(new CompiledFunctionObject(params, code, env, undefined));
             } else {
+                stack.push(new CompiledFunctionObject(params, code, env, arg));
                 //TODO when named functions are treated specially
             }
             break;

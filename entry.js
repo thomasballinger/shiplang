@@ -7,6 +7,7 @@ require('brace/theme/monokai');
 var space = require('./space');
 var display = require('./display');
 var manual = require('./manual');
+var evaluation = require('./eval');
 
 var scripts = require('./pilot');
 
@@ -81,7 +82,7 @@ function main(){
     window.world = world; // global so pilot scripts can reference it
 
     //ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
-    ship = space.makeShip(-200, 350, 270, `(do (log 1) (thrustFor 10) (log 2))`);
+    ship = space.makeShip(-200, 350, 270, s);
     world.addEntity(ship);
     //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){
@@ -90,14 +91,19 @@ function main(){
                                      scripts.boidScript));
     }
   }
-  resetState(editor.getValue());
+  var lastValid = editor.getValue();
+  resetState(lastValid);
 
   var last_tick = new Date().getTime();
 
   function tick(){
     if (codeChanged){
       var s = editor.getValue();
-      resetState(s);
+      var c = evaluation.parseOrShowError(s);
+      if (c !== undefined){
+        lastValid = s;
+        resetState(lastValid);
+      }
       codeChanged = false;
     }
     var now = new Date().getTime();
@@ -107,7 +113,7 @@ function main(){
     mainDisplay.renderCentered(ship, world.entities, 1, 1, 0.1);
     minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.2, 0);
     if (ship.dead){
-      resetState('');
+      resetState(lastValid);
     }
     setTimeout(tick, 5);
   }
