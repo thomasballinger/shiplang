@@ -62,6 +62,8 @@ function SpaceWorld(){
   this.entities = [];
   this.gameTime = 0;
 }
+SpaceWorld.prototype.copy = function(){
+}
 SpaceWorld.prototype.fireMissile = function(entity, script, color){
   var missile = fireMissile(entity, script);
   missile.drawStatus.color = color;

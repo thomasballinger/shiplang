@@ -15,8 +15,10 @@ var scripts = require('./pilot');
 
 
 setup.stealBacktick();
-setup.randomizeBackground();
+//setup.randomizeBackground();
 setup.makeFullscreen();
+setup.setBackgroundClassToSimulation();
+
 
 
 setup.waitForWindow(main);
@@ -114,7 +116,9 @@ function main(){
     var dt = now - last_tick;
     last_tick = now;
     world.tick(dt / 1000);
-    mainDisplay.renderCentered(ship, world.entities, 1, 1, 0.1);
+
+    var inSimMode = document.getElementsByClassName('grid-background').length > 0;
+    mainDisplay.renderCentered(ship, world.entities, 1, 1, inSimMode ? 1 : 0.1);
     minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.3, 0);
     if (ship.dead){
       resetState(lastValid);
