@@ -1,6 +1,7 @@
 import evaluation = require('./eval');
 import entity = require('./entity');
 var ai = require('./ai');
+var manual = require('./manual');
 
 type GameTime = number;
 
@@ -40,14 +41,12 @@ function makeControls(){
     var e = <entity.Ship>undefined;
     var t = <GameTime>undefined;
     var w = <any>undefined;
-    function setCurrentEntity(ent:any){
-        e = ent;
-    }
-    function setGameTime(time:GameTime){
-        t = time;
-    }
-    function setGameWorld(world: any){
-        w = world;
+    var keys = <any>undefined;
+    function setCurrentEntity(ent:any){ e = ent; }
+    function setGameTime(time:GameTime){ t = time; }
+    function setGameWorld(world: any){ w = world; }
+    function setKeyControls(keyControls: any){
+        keys = keyControls;
     }
 
     // Functions available to scripts
@@ -56,6 +55,21 @@ function makeControls(){
     //
     //TODO add arity checks to these (maybe ranges?) and ideally have a parse
     //step that looks for them!
+
+    var keygen = <any>undefined;
+    var keypress = <YieldFunction>function(){
+        console.log('key requested');
+        keygen = keys.getEvent();
+        var {value, done} = keygen.next()
+        if (done) { throw Error('expected done to be false'); }
+        return value;
+    }
+    keypress.requiresYield = true;
+    keypress.finish = function(){
+        var {value, done} = keygen.next()
+        if (!done) { throw Error('expected done to be true'); }
+        return value;
+    }
 
     //TODO why do I have to annotate these with 'any'?
     var waitFor = <YieldFunction>function(n):any{
@@ -127,6 +141,7 @@ function makeControls(){
         detonate: detonate,
         distToClosestShip: <YieldFunction>function(){ return w.distToClosestShip(e); },
         headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
+        keypress: keypress,
     }
     for (var propname of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH',
                           'maxThrust', 'maxSpeed']){
@@ -134,10 +149,11 @@ function makeControls(){
     }
     Object.defineProperty(controls, 'speed', { get: function() { return e.speed(); }, });
     Object.defineProperty(controls, 'vHeading', { get: function() { return e.vHeading(); }, });
-    return [setCurrentEntity, setGameTime, setGameWorld, controls];
+    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, controls];
 }
 
-export var [setCurrentEntity, setGameTime, setGameWorld, controls] = makeControls();
+export var [setCurrentEntity, setGameTime, setGameWorld,
+            setKeyControls, controls] = makeControls();
 
 export function getScripts(s: string){
     var ast = evaluation.parser.parse(s);

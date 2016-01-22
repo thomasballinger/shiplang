@@ -1,6 +1,7 @@
 (defn pilotScript ()
   (leftFor .6)
   (forever
+    (log (keypress))
     (thrustFor .1)
     (leftFor .1)
     (fireMissile goScript "#ffaabb")))

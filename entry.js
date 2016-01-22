@@ -60,6 +60,7 @@ function main(){
   var codeChanged = true;
 
   var controls = new manual.Controls(document.body);
+  scriptEnv.setKeyControls(controls);
 
    // global so pilot scripts can reference it
   window.controls = controls;
@@ -92,7 +93,7 @@ function main(){
 
     ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
     ship2 = space.makeShip(-200, 350, 270, userScripts.pilotScript);
-    world.addEntity(ship);
+    //world.addEntity(ship);
     world.addEntity(ship2);
     world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){
