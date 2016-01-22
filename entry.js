@@ -76,13 +76,14 @@ function main(){
 
   function saveAndSwapWorld(){
     var newWorld = world.copy();
-    function swapWorld(){
-      world = newWorld;
-      ship = newWorld.entities.filter(function(x){return x.imtheplayer;})[0];
-    }
-    setTimeout(swapWorld, 1000);
+    setTimeout(function(){swapWorld(newWorld); }, 1000);
   }
-  setup.stealBacktick(saveAndSwapWorld);
+  function swapWorld(newWorld){
+    world = newWorld;
+    ship = newWorld.entities.filter(function(x){return x.imtheplayer;})[0];
+  }
+  //setup.stealBacktick(saveAndSwapWorld);
+  setup.stealBacktick(function(){swapWorld(savedWorlds[0]);});
 
   var ship;
   var world;
@@ -108,6 +109,7 @@ function main(){
   }
   var last_tick = new Date().getTime();
   var lastValid = {};
+  savedWorlds = [];
 
   function tick(){
     if (codeChanged){
@@ -132,6 +134,10 @@ function main(){
     minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.3, 0);
     if (ship.dead){
       resetState(lastValid);
+    }
+    savedWorlds.push(world.copy());
+    if (savedWorlds.length > 100){
+      savedWorlds.shift();
     }
     setTimeout(tick, 5);
   }
