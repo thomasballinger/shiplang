@@ -2,7 +2,7 @@ require("./style.css");
 window.pilotScriptSource = require("raw!./pilot.sl");
 var ace = require('brace');
 require('brace/mode/scheme');
-require('brace/theme/monokai');
+require('brace/theme/terminal');
 
 var space = require('./space');
 var display = require('./display');
@@ -13,15 +13,16 @@ var scriptEnv = require('./scriptenv');
 var scripts = require('./pilot');
 
 function makeFullscreen(){
-  var elem = document.getElementsByTagName("body")[0];
-  console.log(elem);
-  elem.addEventListener('click', function(){
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) {
-      elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
+  var canvas = document.getElementsByTagName("canvas")[0];
+  var body = document.getElementsByTagName("body")[0];
+  console.log(canvas);
+  canvas.addEventListener('click', function(){
+    if (body.requestFullscreen) {
+      body.requestFullscreen();
+    } else if (body.mozRequestFullScreen) {
+      body.mozRequestFullScreen();
+    } else if (body.webkitRequestFullscreen) {
+      body.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
     }
     setTimeout(resizeCanvas, 1000);
   });
@@ -76,7 +77,7 @@ function main(){
 
   var editor = ace.edit('editor');
   editor.getSession().setMode('ace/mode/scheme');
-  editor.setTheme('ace/theme/monokai');
+  editor.setTheme('ace/theme/terminal');
 
 
   editor.setValue(pilotScriptSource);

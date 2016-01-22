@@ -1,9 +1,9 @@
 (defn pilotScript ()
   (forever
     (define key (keypress))
-    (if (= key "space")
+    (if (= key " ")
         (fireMissile goScript "#3322bb"))
-    (if (= key "f")
+    (if (= key "~")
         (toggleEditor))))
 
 (defn goScript ()

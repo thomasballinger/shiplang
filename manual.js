@@ -1,5 +1,7 @@
 'use strict';
 
+var keyboardMap = require('./keyboardmap').keyboardMap;
+
 function Controls(obj){
   this.events = [];
   this.initialize(obj);
@@ -46,36 +48,29 @@ function* actOnKey(e, controls){
       }
       break;
     case 37:
-      if (event.type == 'keydown'){
+      if (event.type === 'keydown'){
         e.dh = -e.maxDH;
-      } else if (event.type == 'keyup'){
+      } else if (event.type === 'keyup'){
         e.dh = 0;
       }
       break;
     case 39:
-      if (event.type == 'keydown'){
+      if (event.type === 'keydown'){
         e.dh = e.maxDH;
       } else if (event.type == 'keyup'){
         e.dh = 0;
       }
       break;
     case 40:
-      if (event.type == 'keydown'){
+      if (event.type === 'keydown'){
         e.hTarget = (e.vHeading() + 180) % 360;
       } else if (event.type == 'keyup'){
         e.hTarget = undefined;
       }
       break;
-    case 32:
-      if (event.type == 'keydown'){
-        return 'space';
-      }
-      break;
-    case 70:
-      if (event.type == 'keydown'){
-        return 'f';
-      }
-      break;
+    default: if (event.type === 'keydown'){
+      return keyboardMap[event.keyCode];
+    }
   }
   return null;
 }

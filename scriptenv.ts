@@ -11,8 +11,9 @@ interface YieldFunction {
     requiresYield: boolean;
 }
 
-function makeChrome(id: string){
-    var editor = document.getElementById(id);
+function makeChrome(){
+    var editor = document.getElementById('editor');
+    var canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
     return {
         toggleEditor: function(){
@@ -20,6 +21,7 @@ function makeChrome(id: string){
                 editor.hidden = false;
             } else {
                 editor.hidden = true;
+                canvas.focus();
             }
         }
     }
@@ -179,7 +181,7 @@ export function getScripts(s: string){
     return env.scopes[env.scopes.length-1];
 }
 
-var chrome = makeChrome('editor');
+var chrome = makeChrome();
 
 export function buildShipEnv():evaluation.Environment{
     return new evaluation.Environment([console, chrome, controls, funcs, {}]);
