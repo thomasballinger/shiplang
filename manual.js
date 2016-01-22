@@ -77,6 +77,7 @@ function* actOnKey(e, controls){
       }
       break;
   }
+  return null;
 }
 
 var Manual = {};

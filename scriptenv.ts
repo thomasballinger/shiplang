@@ -11,6 +11,20 @@ interface YieldFunction {
     requiresYield: boolean;
 }
 
+function makeChrome(id: string){
+    var editor = document.getElementById(id);
+
+    return {
+        toggleEditor: function(){
+            if(editor.hidden){
+                editor.hidden = false;
+            } else {
+                editor.hidden = true;
+            }
+        }
+    }
+}
+
 var waitTwo = <YieldFunction>function():any{
     var t0 = new Date().getTime();
     return function(){
@@ -33,6 +47,7 @@ var funcs = {
     '*': function(a:number, b:number){ return a * b; },
     '>': function(a:number, b:number){ return a > b; },
     '<': function(a:number, b:number){ return a < b; },
+    '=': function(a:number, b:number){ return a === b; },
     'waitTwo': waitTwo,
 }
 
@@ -58,8 +73,7 @@ function makeControls(){
 
     var keygen = <any>undefined;
     var keypress = <YieldFunction>function(){
-        console.log('key requested');
-        keygen = keys.getEvent();
+        keygen = manual.actOnKey(e, keys)
         var {value, done} = keygen.next()
         if (done) { throw Error('expected done to be false'); }
         return value;
@@ -165,8 +179,8 @@ export function getScripts(s: string){
     return env.scopes[env.scopes.length-1];
 }
 
-//TODO make piloting things available here
+var chrome = makeChrome('editor');
 
 export function buildShipEnv():evaluation.Environment{
-    return new evaluation.Environment([console, controls, funcs, {}]);
+    return new evaluation.Environment([console, chrome, controls, funcs, {}]);
 }

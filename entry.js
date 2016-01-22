@@ -12,6 +12,28 @@ var scriptEnv = require('./scriptenv');
 
 var scripts = require('./pilot');
 
+function makeFullscreen(){
+  var elem = document.getElementsByTagName("body")[0];
+  console.log(elem);
+  elem.addEventListener('click', function(){
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    }
+    setTimeout(resizeCanvas, 1000);
+  });
+}
+makeFullscreen();
+function randomizeBackground(){
+  var canvas = document.getElementById('canvas');
+  canvas.style.backgroundImage = "url('/images/" + Math.ceil( Math.random()*8) + ".jpg')";
+}
+randomizeBackground();
+
+
 function waitForWindow(func){
   // useful for iframes, for which window.innerWidth is 0 for a while
   function waiter(){
@@ -26,15 +48,19 @@ function waitForWindow(func){
   waiter();
 }
 
+
+function resizeCanvas(){
+  var canvas = document.getElementById('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
 waitForWindow(main);
 
 function main(){
 
   // so loading in an iframe works
-
-  var canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  resizeCanvas();
 
   var minimap = document.getElementById('minimap');
   minimap.width = 200;
@@ -91,9 +117,9 @@ function main(){
 
     window.world = world; // global so pilot scripts can reference it
 
-    ship = space.makeShip(-200, 350, 270, scripts.manualDrive);
-    ship2 = space.makeShip(-200, 350, 270, userScripts.pilotScript);
-    //world.addEntity(ship);
+    ship = space.makeShip(-200, 350, 270, userScripts.pilotScript);
+    ship2 = space.makeShip(-300, 350, 270, userScripts.enemyScript);
+    world.addEntity(ship);
     world.addEntity(ship2);
     world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){

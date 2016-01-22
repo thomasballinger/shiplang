@@ -1,10 +1,10 @@
 (defn pilotScript ()
-  (leftFor .6)
   (forever
-    (log (keypress))
-    (thrustFor .1)
-    (leftFor .1)
-    (fireMissile goScript "#ffaabb")))
+    (define key (keypress))
+    (if (= key "space")
+        (fireMissile goScript "#3322bb"))
+    (if (= key "f")
+        (toggleEditor))))
 
 (defn goScript ()
   (thrustFor .4)
@@ -15,6 +15,12 @@
     (define targetHeading (headingToClosest))
     (turnTo targetHeading)))
 
+(defn enemyScript ()
+  (leftFor .6)
+  (forever
+    (fireMissile goScript "#ffaabb")
+    (thrustFor .1)
+    (leftFor .1)))
 ;    (forever
 ;        (if (and (> y 400) (> e.dy 0))
 ;	        (do (turnTo 270)

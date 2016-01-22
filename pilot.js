@@ -46,6 +46,11 @@ function* manualDrive(e){
 function* boidScript(e){
   ai.setThrust(e, e.maxThrust * 0.5);
   yield ai.turnLeft(e, 180);
+  yield ai.waitFor(e, 10);
+  yield ai.turnLeft(e, 180);
+  yield ai.waitFor(e, 10);
+  yield ai.turnLeft(e, 180);
+  yield ai.waitFor(e, 10);
 }
 
 // this is an example of a scanner that returns data
