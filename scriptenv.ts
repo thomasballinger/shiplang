@@ -11,11 +11,6 @@ interface YieldFunction {
     requiresYield: boolean;
 }
 
-function makeChrome(){
-    return {
-    };
-}
-
 var waitTwo = <YieldFunction>function():any{
     var t0 = new Date().getTime();
     return function(){
@@ -41,9 +36,13 @@ var funcs = {
     '=': function(a:number, b:number){ return a === b; },
     'waitTwo': waitTwo,
 }
+// Even though it wouldn't hurt to copy this object, all the functions would
+// be deepCopy passthroughs anyway. If a way to *modify* this array were added,
+// in addition to deepCopying being an issue communication between simultaneously
+// running scripts could be achieved through it!
+Object.defineProperty(funcs, '__deepCopyPassthrough', {value: true})
 
 function makeControls(){
-
     var e = <entity.Ship>undefined;
     var t = <GameTime>undefined;
     var w = <any>undefined;
@@ -154,6 +153,11 @@ function makeControls(){
     }
     Object.defineProperty(controls, 'speed', { get: function() { return e.speed(); }, });
     Object.defineProperty(controls, 'vHeading', { get: function() { return e.vHeading(); }, });
+
+    // So long as an entity, game time, and game world are
+    // reset (so copies don't happen during ticks) a controls
+    // object doesn't need to be copied.
+    Object.defineProperty(controls, '__deepCopyPassthrough', {value: true})
     return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, controls];
 }
 
@@ -170,8 +174,6 @@ export function getScripts(s: string){
     return env.scopes[env.scopes.length-1];
 }
 
-var chrome = makeChrome();
-
 export function buildShipEnv():evaluation.Environment{
-    return new evaluation.Environment([console, chrome, controls, funcs, {}]);
+    return new evaluation.Environment([console, controls, funcs, {}]);
 }

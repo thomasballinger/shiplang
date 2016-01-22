@@ -25,7 +25,7 @@ function setBackgroundClassToSimulation(){
   canvas.classList.toggle('grid-background');
 }
 
-function stealBacktick(){
+function stealBacktick(onQ){
   var editor = document.getElementById('editor');
   var canvas = document.getElementById('canvas');
   function toggleEditor(){
@@ -41,6 +41,11 @@ function stealBacktick(){
     if ([192  // back tick
         ].indexOf(e.keyCode) !== -1){
       toggleEditor();
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (e.keyCode === 81){
+      onQ();
       e.stopPropagation();
       e.preventDefault();
     }

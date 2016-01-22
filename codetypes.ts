@@ -39,6 +39,10 @@ export class SLContext {
         return context
     }
 
+    deepCopyCreate():SLContext{
+        return new SLContext(undefined, undefined);
+    }
+
     step(e:entity.Ship){
         if (this.done){ return; }
         if (this.bytecodeStack === undefined){

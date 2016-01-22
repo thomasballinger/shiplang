@@ -5,6 +5,7 @@ var Ship = require('./entity').Ship;
 var sm = require('./shipmath');
 var ships = require('./ships');
 var scriptEnv = require('./scriptenv');
+var deepcopy = require('./deepcopy');
 
 var IMMUNITY_TIME_MS = 1000;
 
@@ -63,7 +64,9 @@ function SpaceWorld(){
   this.gameTime = 0;
 }
 SpaceWorld.prototype.copy = function(){
-}
+  var world = deepcopy(this);
+  return world;
+};
 SpaceWorld.prototype.fireMissile = function(entity, script, color){
   var missile = fireMissile(entity, script);
   missile.drawStatus.color = color;
@@ -168,6 +171,8 @@ SpaceWorld.prototype.distToClosestShip = function(e){
   return sm.dist(closest.x, closest.y, e.x, e.y);
 };
 SpaceWorld.prototype.tick = function(dt){
+  this.inTick = true;
+
   this.gameTime += dt;
   for (var i=0; i<this.entities.length; i++){
     var entity = this.entities[i];
@@ -185,13 +190,16 @@ SpaceWorld.prototype.tick = function(dt){
     scriptEnv.setGameTime(this.gameTime);
     e.context.step(e);
   }
+  this.inTick = false;
 };
 
 SpaceWorld.prototype.deepCopyCreate = function(){
+  if (this.inTick){ throw Error("SpaceWorld can't be copied during a tick!"); }
   return new SpaceWorld();
 };
 SpaceWorld.prototype.deepCopyPopulate = function(copy, memo, innerDeepCopy){
   copy.entities = innerDeepCopy(this.entities, memo);
+  copy.gameTime = this.gameTime;
 };
 
 

@@ -14,7 +14,6 @@ var setup = require('./setup');
 var scripts = require('./pilot');
 
 
-setup.stealBacktick();
 //setup.randomizeBackground();
 setup.makeFullscreen();
 setup.setBackgroundClassToSimulation();
@@ -75,6 +74,16 @@ function main(){
                    Math.random() * 100 - 50]);
   }
 
+  function saveAndSwapWorld(){
+    var newWorld = world.copy();
+    function swapWorld(){
+      world = newWorld;
+      ship = newWorld.entities.filter(function(x){return x.imtheplayer;})[0];
+    }
+    setTimeout(swapWorld, 1000);
+  }
+  setup.stealBacktick(saveAndSwapWorld);
+
   var ship;
   var world;
   function resetState(userScripts){
@@ -86,14 +95,15 @@ function main(){
     window.world = world; // global so pilot scripts can reference it
 
     ship = space.makeShip(-200, 350, 270, userScripts.pilotScript);
+    ship.imtheplayer = true;
     ship2 = space.makeShip(-300, 350, 270, userScripts.enemyScript);
     world.addEntity(ship);
     world.addEntity(ship2);
-    world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
+    //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){
       world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
                                      boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
-                                     scripts.boidScript));
+                                     userScripts.enemyScript));
     }
   }
   var last_tick = new Date().getTime();

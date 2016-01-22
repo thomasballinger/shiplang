@@ -251,6 +251,16 @@ class ForeverNode extends ASTNode {
 
 export class CompiledFunctionObject {
     constructor(public params: string[], public code: ByteCode[], public env: Environment, public name: string){}
+    deepCopyCreate():CompiledFunctionObject{
+        return new CompiledFunctionObject(undefined, undefined, undefined, undefined);
+    }
+    // bytecode and params are passed through for efficiency as they *shouldn't* ever change.
+    deepCopyPopulate(copy: CompiledFunctionObject, memo:any, deepcopy:(x:any, memo:any)=>any){
+        copy.params = this.params;
+        copy.code = this.code;
+        copy.name = this.name;
+        copy.env = deepcopy(this.env, memo);
+    }
 }
 
 class FunctionObject {
@@ -367,6 +377,9 @@ export class Environment {
     // an additional provided scope
     copy(): Environment{
         return new Environment(this.scopes.slice(0));
+    }
+    deepCopyCreate():Environment{
+        return new Environment([]);
     }
 }
 var emptyEnv = new Environment([]);

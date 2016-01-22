@@ -72,6 +72,9 @@ export class Entity{
         this.x += this.dx * dt;
         this.y += this.dy * dt;
     }
+    deepCopyCreate():Entity{
+        return new Entity(undefined, undefined, undefined, undefined, undefined, undefined);
+    }
 }
 
 function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
@@ -150,5 +153,8 @@ export class Ship extends Entity{
             this.dy = this.dy * (this.maxSpeed / speed);
         }
 
+    }
+    deepCopyCreate():Ship{
+        return new Ship(<ShipSpec>{}, undefined, undefined, undefined);
     }
 }
