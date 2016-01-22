@@ -12,19 +12,8 @@ interface YieldFunction {
 }
 
 function makeChrome(){
-    var editor = document.getElementById('editor');
-    var canvas = <HTMLCanvasElement>document.getElementById('canvas');
-
     return {
-        toggleEditor: function(){
-            if(editor.hidden){
-                editor.hidden = false;
-            } else {
-                editor.hidden = true;
-                canvas.focus();
-            }
-        }
-    }
+    };
 }
 
 var waitTwo = <YieldFunction>function():any{

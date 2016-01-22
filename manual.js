@@ -15,7 +15,8 @@ Controls.prototype.getEvent = function*(){
       this.events[0].keyCode === this.events[1].keyCode &&
       this.events[0].type === 'keydown' &&
       this.events[1].type === 'keydown'){
-    console.log('cleaned', this.events.shift());
+    var cleaned = this.events.shift();
+    //console.log('cleaned', cleaned);
   }
   return this.events.shift();
 };
@@ -23,14 +24,19 @@ Controls.prototype.initialize = function(obj){
   var events = this.events;
   obj.addEventListener('keydown', function(e){
     events.push(e);
+
     if ([37, 38, 29, 40, // arrows
         32, // spacebar
-        70 // f
-        ].indexOf(e.keyCode) != -1){
-      //e.preventDefault(); no longer required?
-      return false;
+        8, // backspace
+        9, // tab
+        ].indexOf(e.keyCode) !== -1){
+      e.preventDefault(); // prevents scrolling, back behavior etc.
+      //e.stopPropagation();
     }
   });
+  /*obj.addEventListener('keydown', function(e){
+  }, true); // useCapture true, so on the way down instead of up!
+  */
   obj.addEventListener('keyup', function(e){
     events.push(e);
     return false;

@@ -2,9 +2,7 @@
   (forever
     (define key (keypress))
     (if (= key " ")
-        (fireMissile goScript "#3322bb"))
-    (if (= key "~")
-        (toggleEditor))))
+        (fireMissile goScript "#3322bb"))))
 
 (defn goScript ()
   (thrustFor .4)

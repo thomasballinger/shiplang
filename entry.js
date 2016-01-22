@@ -9,59 +9,22 @@ var display = require('./display');
 var manual = require('./manual');
 var evaluation = require('./eval');
 var scriptEnv = require('./scriptenv');
+var setup = require('./setup');
 
 var scripts = require('./pilot');
 
-function makeFullscreen(){
-  var canvas = document.getElementsByTagName("canvas")[0];
-  var body = document.getElementsByTagName("body")[0];
-  console.log(canvas);
-  canvas.addEventListener('click', function(){
-    if (body.requestFullscreen) {
-      body.requestFullscreen();
-    } else if (body.mozRequestFullScreen) {
-      body.mozRequestFullScreen();
-    } else if (body.webkitRequestFullscreen) {
-      body.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    }
-    setTimeout(resizeCanvas, 1000);
-  });
-}
-makeFullscreen();
-function randomizeBackground(){
-  var canvas = document.getElementById('canvas');
-  canvas.style.backgroundImage = "url('/images/" + Math.ceil( Math.random()*8) + ".jpg')";
-}
-randomizeBackground();
+
+setup.stealBacktick();
+setup.randomizeBackground();
+setup.makeFullscreen();
 
 
-function waitForWindow(func){
-  // useful for iframes, for which window.innerWidth is 0 for a while
-  function waiter(){
-    if (!window.innerWidth){
-      setTimeout(waiter, 10);
-      return;
-    } else {
-      console.log(window.innerWidth);
-      setTimeout(func, 0);
-    }
-  }
-  waiter();
-}
-
-
-function resizeCanvas(){
-  var canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-waitForWindow(main);
+setup.waitForWindow(main);
 
 function main(){
 
   // so loading in an iframe works
-  resizeCanvas();
+  setup.resizeCanvas();
 
   var minimap = document.getElementById('minimap');
   minimap.width = 200;
@@ -86,7 +49,9 @@ function main(){
   });
   var codeChanged = true;
 
-  var controls = new manual.Controls(document.body);
+  var canvas = document.getElementById('canvas');
+  var controls = new manual.Controls(canvas);
+  canvas.focus();
   scriptEnv.setKeyControls(controls);
 
    // global so pilot scripts can reference it
