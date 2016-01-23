@@ -35,17 +35,17 @@ function makeMissile(x, y, dx, dy, h, script){
   return missile;
 }
 
-function fireMissile(e, script){
+function fireMissile(e, script, t){
   var missile = makeMissile(e.x + sm.x_comp(e.h)*e.r,
                         e.y + sm.y_comp(e.h)*e.r,
                         e.dx + sm.x_comp(e.h) * 10,
                         e.dy + sm.y_comp(e.h) * 10,
                         e.h, script);
   missile.firedBy = e;
-  missile.firedAt = new Date().getTime();
+  missile.firedAt = t;
   return missile;
 }
-function fireLaser(e){
+function fireLaser(e, gameTime){
   var laser = new Entity('laser',
                         e.x + sm.x_comp(e.h)*e.r,
                         e.y + sm.y_comp(e.h)*e.r,
@@ -54,7 +54,7 @@ function fireLaser(e){
                         2);
   laser.firedBy = e;
   laser.firedAt = Number.MAX_VALUE;  // never damages owner
-  laser.timeToDie = new Date().getTime() + 1500;
+  laser.timeToDie = gameTime + 1.5;
   laser.isMunition = true;
   return laser;
 }
@@ -68,7 +68,12 @@ SpaceWorld.prototype.copy = function(){
   return world;
 };
 SpaceWorld.prototype.fireMissile = function(entity, script, color){
-  var missile = fireMissile(entity, script);
+  var missile = fireMissile(entity, script, this.gameTime);
+  missile.drawStatus.color = color;
+  this.addEntity(missile);
+};
+SpaceWorld.prototype.fireLaser = function(entity, script, color){
+  var missile = fireLaser(entity, this.gameTime);
   missile.drawStatus.color = color;
   this.addEntity(missile);
 };
@@ -82,7 +87,6 @@ SpaceWorld.prototype.munitions = function(){
   return this.entities.filter(function(x){return x.isMunition;});
 };
 SpaceWorld.prototype.checkCollisions = function(){
-  var t = new Date().getTime();
   var collisions = [];
   for (var i=0; i<this.entities.length; i++){
     var e1 = this.entities[i];
@@ -90,12 +94,12 @@ SpaceWorld.prototype.checkCollisions = function(){
       var e2 = this.entities[j];
       if (e1.r !== undefined && e2 !== undefined &&
           e1.distFrom(e2) < e1.r + e2.r){
-        if (e1.firedBy === e2 && t < e1.firedAt + IMMUNITY_TIME_MS){
+        if (e1.firedBy === e2 && this.gameTime < e1.firedAt + IMMUNITY_TIME_MS){
           if (e1.type !== 'explosion'){
             continue;
           }
         }
-        if (e2.firedBy === e1 && t < e2.firedAt + IMMUNITY_TIME_MS){
+        if (e2.firedBy === e1 && this.gameTime < e2.firedAt + IMMUNITY_TIME_MS){
           if (e2.type !== 'explosion'){
             continue;
           }
@@ -129,7 +133,8 @@ SpaceWorld.prototype.checkCollisions = function(){
     if (e !== null && e.type == 'explosion' && e.r < 10){
       e.dead = true;
       this.entities[i] = null;
-    } else if (e !== null && e.type == 'laser' && e.timeToDie < t){
+    } else if (e !== null && e.type == 'laser' && e.timeToDie < this.gameTime){
+      console.log('killing b/c time to die:', e.timeToDie, 'gametime', this.gameTime);
       e.dead = true;
       this.entities[i] = null;
     }
@@ -207,7 +212,5 @@ var Space = {};
 Space.makeShip = makeShip;
 Space.makeBoid = makeBoid;
 Space.SpaceWorld = SpaceWorld;
-Space.fireMissile = fireMissile;
-Space.fireLaser = fireLaser;
 
 module.exports = Space;

@@ -11,8 +11,6 @@ var evaluation = require('./eval');
 var scriptEnv = require('./scriptenv');
 var setup = require('./setup');
 
-var scripts = require('./pilot');
-
 
 //setup.randomizeBackground();
 setup.makeFullscreen();
@@ -54,12 +52,6 @@ function main(){
   var controls = new manual.Controls(canvas);
   canvas.focus();
   scriptEnv.setKeyControls(controls);
-
-   // global so pilot scripts can reference it
-  window.controls = controls;
-  window.ai = require('./ai');
-  window.manual = require('./manual');
-  window.space = require('./space');
 
   var mainDisplay = new display.SpaceDisplay('canvas');
   var minimapDisplay = new display.SpaceDisplay('minimap');
@@ -107,11 +99,11 @@ function main(){
                                      userScripts.enemyScript));
     }
   }
-  var last_tick = new Date().getTime();
   var lastValid = {};
   savedWorlds = [];
 
   function tick(){
+    var tickStartTime = new Date().getTime();
     if (codeChanged){
       var s = editor.getValue();
       var c = evaluation.parseOrShowError(s, setError);
@@ -124,10 +116,7 @@ function main(){
       }
       codeChanged = false;
     }
-    var now = new Date().getTime();
-    var dt = now - last_tick;
-    last_tick = now;
-    world.tick(dt / 1000);
+    world.tick(0.016); // 60fps (if the drawing and logic took 0 time)
 
     var inSimMode = document.getElementsByClassName('grid-background').length > 0;
     mainDisplay.renderCentered(ship, world.entities, 1, 1, inSimMode ? 1 : 0.1);
@@ -139,7 +128,9 @@ function main(){
     if (savedWorlds.length > 100){
       savedWorlds.shift();
     }
-    setTimeout(tick, 5);
+    var tickTime = new Date().getTime() - tickStartTime;
+    setTimeout(tick, Math.max(5, 16.77-tickTime)); // 60 draws per second if drawing took zero time
+    // if tick takes over ~10ms to render, start to slow down simulation
   }
   tick();
 }

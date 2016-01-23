@@ -1,6 +1,5 @@
 import evaluation = require('./eval');
 import entity = require('./entity');
-var ai = require('./ai');
 var manual = require('./manual');
 
 type GameTime = number;
@@ -11,19 +10,6 @@ interface YieldFunction {
     requiresYield: boolean;
 }
 
-var waitTwo = <YieldFunction>function():any{
-    var t0 = new Date().getTime();
-    return function(){
-        console.log('checking...')
-        var t1 = new Date().getTime();
-        return t1 - t0 > 2000;
-    }
-}
-waitTwo.requiresYield = true;
-waitTwo.finish = function(){
-    console.log('hello 2 seconds later!');
-};
-
 var funcs = {
     '+': function(){
       return Array.prototype.slice.call(arguments).reduce(function(a:number, b:number){
@@ -33,8 +19,12 @@ var funcs = {
     '*': function(a:number, b:number){ return a * b; },
     '>': function(a:number, b:number){ return a > b; },
     '<': function(a:number, b:number){ return a < b; },
-    '=': function(a:number, b:number){ return a === b; },
-    'waitTwo': waitTwo,
+    '=': function(a:any, b:any){
+        if (typeof a === 'string' && typeof b === 'string'){
+            return a.toLowerCase() === b.toLowerCase();
+        }
+        return a === b;
+    },
 }
 // Even though it wouldn't hurt to copy this object, all the functions would
 // be deepCopy passthroughs anyway. If a way to *modify* this array were added,
@@ -120,6 +110,20 @@ function makeControls(){
     fireMissile.requiresYield = true;
     fireMissile.finish = function(){}
 
+    var fireLaser = <YieldFunction>function(script, color):any{
+        var startTime = t;
+        w.fireLaser(e, color);
+        return function(){
+            if (t < startTime + .1){
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+    fireLaser.requiresYield = true;
+    fireLaser.finish = function(){}
+
     var thrustFor = <YieldFunction>function(n):any{
         e.thrust = e.maxThrust;
         var timeFinished = t + n;
@@ -140,6 +144,7 @@ function makeControls(){
         thrustFor: thrustFor,
         leftFor: leftFor,
         fireMissile: fireMissile,
+        fireLaser: fireLaser,
         waitFor: waitFor,
         turnTo: turnTo,
         detonate: detonate,

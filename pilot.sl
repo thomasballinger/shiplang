@@ -2,7 +2,9 @@
   (forever
     (define key (keypress))
     (if (= key " ")
-        (fireMissile goScript "#3322bb"))))
+        (fireMissile goScript "#3322bb"))
+    (if (= key "F")
+        (fireLaser "#11dd55"))))
 
 (defn goScript ()
   (thrustFor .4)
