@@ -16,7 +16,7 @@ export var Ship = {
     maxSpeed: 400,
     isMunition: false,
     explosionSize: 20,
-    armorMax: 200,
+    armorMax: 20,
 }
 
 export var Missile = {

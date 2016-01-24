@@ -10,6 +10,7 @@ var manual = require('./manual');
 var evaluation = require('./eval');
 var scriptEnv = require('./scriptenv');
 var setup = require('./setup');
+var hud = require('./hud');
 
 
 //setup.randomizeBackground();
@@ -28,6 +29,9 @@ function main(){
   var minimap = document.getElementById('minimap');
   minimap.width = 200;
   minimap.height = 200;
+  var playerArmor = document.getElementById('player-armor');
+  playerArmor.width = 200;
+  playerArmor.height = 20;
 
   var errorbar = document.getElementById('errorbar');
   function setError(s){
@@ -55,6 +59,7 @@ function main(){
 
   var mainDisplay = new display.SpaceDisplay('canvas');
   var minimapDisplay = new display.SpaceDisplay('minimap');
+  var playerArmor = new hud.Lerper('player-armor', '#cc8800');
 
   var boidArgs = [];
   for (var i=0; i<20; i++){
@@ -121,6 +126,7 @@ function main(){
     var inSimMode = document.getElementsByClassName('grid-background').length > 0;
     mainDisplay.renderCentered(ship, world.entities, 1, 1, inSimMode ? 1 : 0.1);
     minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.3, 0);
+    playerArmor.update(ship.armor, ship.armorMax);
     if (ship.dead){
       resetState(lastValid);
     }

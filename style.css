@@ -30,6 +30,15 @@ body {
   border: 5px solid black;
   background-color: #001900;
 }
+#player-armor {
+  position: absolute;
+  top: 210;
+  right: 0;
+  width: 200;
+  height: 20;
+  border: 5px solid black;
+  background-color: #001900;
+}
 #errorbar {
   position: absolute;
   top: 100;
