@@ -92,7 +92,7 @@ function getCollisionPairs(entities){
     var e1 = entities[i];
     for (var j=i+1; j<entities.length; j++){
       var e2 = entities[j];
-      if (e1.distFrom(e2) < e1.r + e2.r){
+      if (Math.pow(e1.x - e2.x, 2) + Math.pow(e1.y - e2.y, 2) < (Math.pow(e1.r + e2.r, 2))){
         collisions.push([e1, e2]);
       }
     }
