@@ -15,7 +15,9 @@ export interface ShipSpec {type: string,
                     maxDH: number,
                     maxSpeed: number,
                     explosionSize: number,
-                    isMunition: boolean}
+                    isMunition: boolean,
+                    armorMax: number,
+}
 
 // Asteroids, missiles, ships, planets, projectiles.
 // If a projectile wouldn't need it, doesn't belong here
@@ -28,8 +30,11 @@ export class Entity{
         this.dy = dy;
         this.r = r;
         this.h = 0;
+        this.armor = 0;
         this.destructable = true;
         this.drawStatus = {};
+        this.armorMax = 1;
+        this.armor = this.armorMax
     }
     type: string;
     x: number;
@@ -44,6 +49,8 @@ export class Entity{
     firedAt: GameTime;
     firedBy: Entity;
     drawStatus: {[property:string]: any;}
+    armor: number;
+    armorMax: number;
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
@@ -102,6 +109,8 @@ export class Ship extends Entity{
         this.thrust = 0;
         this.dh = 0;
         this.hTarget = undefined;
+        this.armorMax = spec.armorMax;
+        this.armor = spec.armorMax;
     }
     maxThrust: number;
     maxDH: number;

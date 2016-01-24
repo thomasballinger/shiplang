@@ -6,6 +6,7 @@ export var Boid = {
     maxSpeed: 100,
     isMunition: false,
     explosionSize: 20,
+    armorMax: 4,
 }
 export var Ship = {
     type: 'ship',
@@ -15,6 +16,7 @@ export var Ship = {
     maxSpeed: 400,
     isMunition: false,
     explosionSize: 20,
+    armorMax: 200,
 }
 
 export var Missile = {
@@ -25,4 +27,5 @@ export var Missile = {
     maxSpeed: 300,
     isMunition: true,
     explosionSize: 30,
+    armorMax: 1,
 }

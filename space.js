@@ -86,60 +86,94 @@ SpaceWorld.prototype.ships = function(){
 SpaceWorld.prototype.munitions = function(){
   return this.entities.filter(function(x){return x.isMunition;});
 };
-SpaceWorld.prototype.checkCollisions = function(){
+function getCollisionPairs(entities){
   var collisions = [];
-  for (var i=0; i<this.entities.length; i++){
-    var e1 = this.entities[i];
-    for (var j=i+1; j<this.entities.length; j++){
-      var e2 = this.entities[j];
-      if (e1.r !== undefined && e2 !== undefined &&
-          e1.distFrom(e2) < e1.r + e2.r){
-        if (e1.firedBy === e2 && this.gameTime < e1.firedAt + IMMUNITY_TIME_MS){
-          if (e1.type !== 'explosion'){
-            continue;
-          }
-        }
-        if (e2.firedBy === e1 && this.gameTime < e2.firedAt + IMMUNITY_TIME_MS){
-          if (e2.type !== 'explosion'){
-            continue;
-          }
-        }
-        if (e1.isMunition || e2.isMunition){
-          collisions.push([i, j]);
-        }
+  for (var i=0; i<entities.length; i++){
+    var e1 = entities[i];
+    for (var j=i+1; j<entities.length; j++){
+      var e2 = entities[j];
+      if (e1.distFrom(e2) < e1.r + e2.r){
+        collisions.push([e1, e2]);
       }
     }
   }
-  for (var k=0; k<collisions.length; k++){
-    for (var index of collisions[k]){
-      var e = this.entities[index];
-      if (e === null){continue;}
-      if (e.explosionSize > 0 && e.type !== 'explosion'){
-        e.r = e.explosionSize;
-        e.type = 'explosion';
-        e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
-        e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
-      } else if (e.type !== 'explosion'){
-        console.log('killing', e, 'of type', e && e.type);
-        e.dead = true;
-        this.entities[index] = null;
-      }
+  return collisions;
+}
+
+function beingLaunchedByCollider(pair, gameTime){
+    var e1 = pair[0]; var e2 = pair[1];
+    if (e1.firedBy === e2 && gameTime < e1.firedAt + IMMUNITY_TIME_MS &&
+        e1.type !== 'explosion'){ return true; }
+    if (e2.firedBy === e1 && gameTime < e2.firedAt + IMMUNITY_TIME_MS &&
+        e2.type !== 'explosion'){ return true; }
+}
+
+// If an entity is an explosion, find collisions to deal damage,
+// then set .inactive = true on it so it doesn't keep doing damage.
+// .inactive things are NOT CLEANED UP!
+// Set .dead = true
+// and then inactivate it
+SpaceWorld.prototype.checkCollisions = function(){
+  var gameTime = this.gameTime;
+
+  // eliminate old explosions and other things fading away
+  var activeEntities = this.entities.filter(function(x){return !x.inactive;});
+
+  var collisions = getCollisionPairs(activeEntities);
+  var touchingExplosion = collisions.map(function(x){
+    var e1 = x[0]; var e2 = x[1];
+    if (e1.type === 'explosion' && e2.type === 'explosion'){return undefined;}
+    if (e1.type !== 'explosion' && e2.type !== 'explosion'){return undefined;}
+    if (e1.type === 'explosion'){ return e2; }
+    if (e2.type === 'explosion'){ return e1; }
+    throw Error('I thought that was exhaustive...');
+  }).filter(function(x){
+    return x; });
+
+  var EXPLOSION_DAMAGE = 3;
+  touchingExplosion.map(function(x){
+    x.armor -= EXPLOSION_DAMAGE;
+  });
+
+  // Inactivate explosions that have already had a frame to cause damage
+  activeEntities.filter(function(e){
+    return e.type === 'explosion';
+  }).map(function(e){ e.inactive = true; });
+
+  // Now cause new explosions of munitions
+  var weaponCollisions = collisions.filter(function(x){
+    return (x[0].isMunition || x[1].isMunition);
+  }).filter(function(x){return !beingLaunchedByCollider(x, gameTime);});
+
+  for (var k=0; k<weaponCollisions.length; k++){
+    for (var e of weaponCollisions[k]){
+
+      e.armor -= 1; // hitting things causes munitions to lose armor
     }
   }
 
-  // cull explosions (should be moved out of collisions)
-  for (var i=0; i<this.entities.length; i++){
-    var e = this.entities[i];
-    if (e !== null && e.type == 'explosion' && e.r < 10){
+  for (var e of this.entities){
+    if (e.armor <= 0 && e.explosionSize > 0 && e.type !== 'explosion'){
+      e.r = e.explosionSize;
+      e.type = 'explosion';
+      e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), 0.2) || 0;
+      e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), 0.2) || 0;
+    } else if (e.armor <= 0 && !e.inactive){
       e.dead = true;
-      this.entities[i] = null;
-    } else if (e !== null && e.type == 'laser' && e.timeToDie < this.gameTime){
-      console.log('killing b/c time to die:', e.timeToDie, 'gametime', this.gameTime);
-      e.dead = true;
-      this.entities[i] = null;
     }
   }
-  this.entities = this.entities.filter(function(x){return x !== null;});
+
+  // cull inactive explosions of size <10
+  this.entities.filter(function(x){
+    return x.type === 'explosion' && x.inactive && x.r < 10;
+  }).map(function(x){ x.dead = true; });
+
+  // remove old laser shots
+  this.entities.filter(function(x){
+    return (x.type == 'laser' && x.timeToDie < gameTime);
+  }).map(function(x){ x.dead = true; });
+
+  this.entities = this.entities.filter(function(x){return x.dead !== true;});
 };
 SpaceWorld.prototype.findClosestShip = function(e1){
   return this.findClosest(e1, this.ships());
