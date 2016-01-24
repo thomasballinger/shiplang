@@ -21,7 +21,8 @@ export class SpaceDisplay{
     ctx: CanvasRenderingContext2D;
     render(entities: entity.Entity[], left: number, top: number, right: number, bottom: number,
            position_scale_factor: number, entity_scale_factor: number){
-        var onscreen = entities.slice();  // TODO select just elements currently visible
+        var onscreen = this.visibleEntities(entities, left, top, right, bottom); //TODO profile: does this make a difference?
+        //var onscreen = entities;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (var i=0; i<onscreen.length; i++){
             var entity = onscreen[i];
@@ -29,6 +30,15 @@ export class SpaceDisplay{
             // Given the world-space
         }
     };
+    visibleEntities(entities: entity.Entity[], left: number, top: number, right: number, bottom: number): entity.Entity[]{
+        left -= 100;
+        right += 100;
+        top -= 100;
+        bottom += 100;
+        return entities.filter(function(e){
+            return (e.x > left && e.x < right && e.y > top && e.y < bottom)
+        })
+    }
 }
 
 function entityDraw(e:entity.Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number):void{

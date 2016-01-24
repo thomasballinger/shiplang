@@ -64,7 +64,9 @@ function SpaceWorld(){
   this.gameTime = 0;
 }
 SpaceWorld.prototype.copy = function(){
+  var t0 = window.performance.now();
   var world = deepcopy(this);
+  console.log(window.performance.now() - t0);
   return world;
 };
 SpaceWorld.prototype.fireMissile = function(entity, script, color){
