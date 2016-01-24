@@ -81,7 +81,6 @@ function makeControls(){
     turnTo.finish = function(){}
 
     var detonate = <YieldFunction>function():any{
-      console.log('manual detonation!');
       e.r = e.explosionSize;
       e.type = 'explosion';
       e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;

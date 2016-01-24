@@ -59,7 +59,8 @@ function main(){
 
   var mainDisplay = new display.SpaceDisplay('canvas');
   var minimapDisplay = new display.SpaceDisplay('minimap');
-  var playerArmor = new hud.Lerper('player-armor', '#cc8800');
+  var playerArmorDisplay = new hud.Lerper('player-armor', '#cc8800');
+  var fps = new hud.FPS('fps');
 
   var boidArgs = [];
   for (var i=0; i<20; i++){
@@ -126,7 +127,8 @@ function main(){
     var inSimMode = document.getElementsByClassName('grid-background').length > 0;
     mainDisplay.renderCentered(ship, world.entities, 1, 1, inSimMode ? 1 : 0.1);
     minimapDisplay.renderCentered(ship, world.entities, 0.07, 0.3, 0);
-    playerArmor.update(ship.armor, ship.armorMax);
+    playerArmorDisplay.update(ship.armor, ship.armorMax);
+    fps.tick(world.entities.length);
     if (ship.dead){
       resetState(lastValid);
     }

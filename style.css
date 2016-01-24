@@ -39,6 +39,16 @@ body {
   border: 5px solid black;
   background-color: #001900;
 }
+#fps {
+  position: absolute;
+  top: 230;
+  right: 0;
+  width: 200;
+  height: 20;
+  border: 5px solid black;
+  background-color: #001900;
+  color: yellow;
+}
 #errorbar {
   position: absolute;
   top: 100;
