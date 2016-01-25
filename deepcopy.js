@@ -128,7 +128,7 @@
       }
       return copy;
     }
-    throw Error("Can't deep copy "+typeof x + " " + x.constructor + " "+x);
+    throw Error("Can't deep copy "+typeof x + " " + x.constructor, x);
   }
 
   function deepCopy(x){

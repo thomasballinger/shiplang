@@ -1,4 +1,3 @@
-
 import entity = require('./entity');
 import sm = require('./shipmath');
 import ships = require('./ships');
@@ -242,6 +241,9 @@ export class SpaceWorld{
         }
         this.inTick = false;
     };
+    getPlayer(){
+        return this.entities.filter(function(x){return x.imtheplayer;})[0];
+    }
 
     deepCopyCreate():SpaceWorld{
         if (this.inTick){ throw Error("SpaceWorld can't be copied during a tick!"); }

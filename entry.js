@@ -12,6 +12,7 @@ var evaluation = require('./eval');
 var scriptEnv = require('./scriptenv');
 var setup = require('./setup');
 var hud = require('./hud');
+var scenarios = require('./scenarios');
 
 // document body fullscreen
 document.body.addEventListener('click', function(e){
@@ -58,55 +59,29 @@ var minimapDisplay = new display.SpaceDisplay('minimap');
 var playerArmorDisplay = new hud.Lerper('player-armor', '#cc8800');
 var fps = new hud.FPS('fps');
 
-var boidArgs = [];
-for (var i=0; i<20; i++){
-  boidArgs.push([Math.random()*1000-500,
-                 Math.random()*1000-500,
-                 Math.random()*10-5,
-                 Math.random()*10-5,
-                 Math.random() * 360,
-                 Math.random() * 100 - 50]);
-}
-
 function saveAndSwapWorld(){
   var newWorld = world.copy();
   setTimeout(function(){swapWorld(newWorld); }, 1000);
 }
 function swapWorld(newWorld){
   world = newWorld;
-  ship = newWorld.entities.filter(function(x){return x.imtheplayer;})[0];
+  ship = world.getPlayer();
 }
 //setup.stealBacktick(saveAndSwapWorld);
 setup.stealBacktick(function(){swapWorld(savedWorlds[0]);});
 
 
-var builtinScripts = scriptEnv.getScripts(builtinSLScripts);
 var ship;
 var world;
-function resetState(userScripts){
-  var scriptNames = Object.keys(userScripts);
-  var boidScripts;
-  if (scriptNames.length === 1){
-    boidScript = userScripts[scriptNames[0]];
-  } else {
-    boidScript = builtinScripts.enemyScript;
-  }
-
-  world = new space.SpaceWorld();
-
-  ship = space.makeShip(-200, 350, 270, builtinScripts.pilotScript);
-  ship.imtheplayer = true;
-  ship2 = space.makeShip(-300, 350, 270, builtinScripts.enemyScript);
-  world.addEntity(ship);
-  world.addEntity(ship2);
-  //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
-  for (var i=0; i<20; i++){
-    world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
-                                   boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
-                                   boidScript));
-  }
-}
 var lastValid = {};
+
+var getWorld = scenarios.scenario1();
+console.log(scenarios.scenario1.instructions);
+function resetState(){
+  world = getWorld(lastValid);
+  ship = world.getPlayer();
+}
+
 savedWorlds = [];
 
 resetState('1');
@@ -141,7 +116,8 @@ function tick(){
     }
     codeChanged = false;
   }
-  world.tick(0.016); // 60fps (if the drawing and logic took 0 time)
+  //world.tick(0.016); // 60fps (if the drawing and logic took 0 time)
+  world.tick(0.032); // 30fps (if the drawing and logic took 0 time)
 
   var inSimMode = document.getElementsByClassName('grid-background').length > 0;
   mainDisplay.renderCentered(ship, world.entities, 1, 1, inSimMode ? 1 : 0.1);
@@ -156,7 +132,8 @@ function tick(){
     savedWorlds.shift();
   }
   var tickTime = new Date().getTime() - tickStartTime;
-  setTimeout(tick, Math.max(5, 16.77-tickTime)); // 60 draws per second if drawing took zero time
+  setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30 draws per second if drawing took zero time
+  //setTimeout(tick, Math.max(5, 16.77-tickTime)); // 60 draws per second if drawing took zero time
   // if tick takes over ~10ms to render, start to slow down simulation
 }
 tick();

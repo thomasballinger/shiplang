@@ -58,6 +58,7 @@ export class Entity{
     // some bookkeeping props for SpaceWorld
     dead: boolean;     // will be cleaned up this tick
     inactive: boolean; // sticking around for a bit to look pretty
+    imtheplayer: boolean;
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
