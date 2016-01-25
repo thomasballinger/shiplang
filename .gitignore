@@ -5,3 +5,5 @@ typings
 *.map
 .DS_Store
 images
+blockly-master
+blockly.tar.gz

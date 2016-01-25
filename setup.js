@@ -16,7 +16,8 @@ function makeFullscreen(){
 
 function randomizeBackground(){
   var canvas = document.getElementById('canvas');
-  canvas.style.backgroundImage = "url('/images/" + Math.ceil( Math.random()*8) + ".jpg')";
+  var template = "images/857-tileable-classic-nebula-space-patterns/";
+  canvas.style.backgroundImage = "url('" + path + Math.ceil( Math.random()*8) + ".jpg')";
 }
 
 function setBackgroundClassToSimulation(){
