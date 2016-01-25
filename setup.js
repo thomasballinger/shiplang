@@ -1,29 +1,11 @@
-function makeFullscreen(){
-  var canvas = document.getElementsByTagName("canvas")[0];
-  var body = document.getElementsByTagName("body")[0];
-  console.log(canvas);
-  canvas.addEventListener('click', function(){
-    if (body.requestFullscreen) {
-      body.requestFullscreen();
-    } else if (body.mozRequestFullScreen) {
-      body.mozRequestFullScreen();
-    } else if (body.webkitRequestFullscreen) {
-      body.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    }
-    setTimeout(resizeCanvas, 1000);
-  });
-}
-
-function randomizeBackground(){
-  var canvas = document.getElementById('canvas');
-  var template = "images/857-tileable-classic-nebula-space-patterns/";
-  canvas.style.backgroundImage = "url('" + path + Math.ceil( Math.random()*8) + ".jpg')";
-}
-
-function setBackgroundClassToSimulation(){
-  var canvas = document.getElementById('canvas');
-  canvas.classList.toggle('space-background');
-  canvas.classList.toggle('grid-background');
+function makeFullscreen(element){
+  if (element.requestFullscreen) {
+   element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  }
 }
 
 function stealBacktick(onQ){
@@ -67,8 +49,8 @@ function waitForWindow(func){
   waiter();
 }
 
-function resizeCanvas(){
-  var canvas = document.getElementById('canvas');
+function resizeCanvas(id){
+  var canvas = document.getElementById(id);
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
@@ -76,6 +58,4 @@ function resizeCanvas(){
 exports.resizeCanvas = resizeCanvas;
 exports.waitForWindow = waitForWindow;
 exports.stealBacktick = stealBacktick;
-exports.randomizeBackground = randomizeBackground;
 exports.makeFullscreen = makeFullscreen;
-exports.setBackgroundClassToSimulation = setBackgroundClassToSimulation;
