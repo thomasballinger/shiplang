@@ -31,10 +31,10 @@ export var scenario1 = <Scenario>function():any{
         if (scriptNames.length === 1){
             boidScript = userScripts[scriptNames[0]];
         } else {
-            boidScript = builtinScripts.enemyScript || builtinScripts.enemyScript;
+            boidScript = '1' || builtinScripts.enemyScript || builtinScripts.enemyScript;
         }
         var playerScript = userScripts.pilotScript || builtinScripts.pilotScript;
-        var enemyScript = userScripts.ship || builtinScripts.enemyScript;
+        var enemyScript = '1' || userScripts.ship || builtinScripts.enemyScript;
         console.log(boidScript, playerScript, enemyScript)
 
         var world = new space.SpaceWorld();

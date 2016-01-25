@@ -184,7 +184,8 @@ function makeControls():MakeControlsReturnType{
         turnTo: turnTo,
         detonate: detonate,
         distToClosestShip: <YieldFunction>function(){ return w.distToClosestShip(e); },
-        headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
+        headingToClosestShip: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
+        headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosest(e)); },
         keypress: keypress,
     }
     for (var propname of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH',

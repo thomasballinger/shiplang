@@ -4,7 +4,7 @@
     (if (= key " ")
         (fireMissile goScript "#3322bb"))
     (if (= key "G")
-        (fireNeedleMissile goScript "#77ee33"))
+        (fireNeedleMissile needleScript "#77ee33"))
     (if (= key "F")
         (fireLaser "#11dd55"))))
 
@@ -14,8 +14,15 @@
     (thrustFor .2)
     (if (< (distToClosestShip) 30)
         (detonate))
+    (define targetHeading (headingToClosestShip))
+    (turnTo targetHeading)))
+
+(defn needleScript ()
+  (thrustFor .4)
+  (forever
     (define targetHeading (headingToClosest))
     (turnTo targetHeading)))
+
 
 (defn enemyScript ()
   (leftFor .6)

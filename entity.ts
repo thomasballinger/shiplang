@@ -19,6 +19,7 @@ export interface ShipSpec {type: string,
                     isMunition: boolean,
                     armorMax: number,
                     isInertialess: boolean,
+                    lifespan: number,
 }
 
 // Asteroids, missiles, ships, planets, projectiles.
@@ -121,6 +122,9 @@ export class Ship extends Entity{
         this.armorMax = spec.armorMax;
         this.armor = spec.armorMax;
         this.isInertialess = spec.isInertialess;
+        if (spec.lifespan !== undefined){
+            this.timeToDie = -spec.lifespan;
+        }
     }
     maxThrust: number;
     maxDH: number;

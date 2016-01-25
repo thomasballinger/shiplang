@@ -9,7 +9,7 @@ var Entity = entity.Entity;
 var Ship = entity.Ship;
 
 
-var IMMUNITY_TIME_MS = 1000;
+var IMMUNITY_TIME_S = 1;
 
 export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:number, script:entity.Script){
     var boid = new Ship(ships.Boid, x, y, script);
@@ -63,9 +63,9 @@ function fireLaser(e:entity.Entity, gameTime:GameTime){
 
 function beingLaunchedByCollider(pair:[entity.Entity, entity.Entity], gameTime:GameTime):boolean{
     var e1 = pair[0]; var e2 = pair[1];
-    if (e1.firedBy === e2 && gameTime < e1.firedAt + IMMUNITY_TIME_MS &&
+    if (e1.firedBy === e2 && gameTime < e1.firedAt + IMMUNITY_TIME_S &&
         e1.type !== 'explosion'){ return true; }
-    if (e2.firedBy === e1 && gameTime < e2.firedAt + IMMUNITY_TIME_MS &&
+    if (e2.firedBy === e1 && gameTime < e2.firedAt + IMMUNITY_TIME_S &&
         e2.type !== 'explosion'){ return true; }
 }
 
@@ -154,7 +154,7 @@ export class SpaceWorld{
         // Now cause new explosions of munitions
         var weaponCollisions = collisions.filter(function(x){
             return (x[0].isMunition || x[1].isMunition);
-        }).filter(function(x){return !beingLaunchedByCollider(x, gameTime);});
+        }).filter(function(x){ return !beingLaunchedByCollider(x, gameTime);});
 
         for (var k=0; k<weaponCollisions.length; k++){
             for (var e of weaponCollisions[k]){
@@ -174,14 +174,19 @@ export class SpaceWorld{
             }
         }
 
-        // cull inactive explosions of size <10
+        // cull small inactive explosions
         this.entities.filter(function(x){
-            return x.type === 'explosion' && x.inactive && x.r < 10;
+            return x.type === 'explosion' && x.inactive && x.r < 8;
         }).map(function(x){ x.dead = true; });
 
-        // remove old laser shots
+        // start timers for those that haven't started;
         this.entities.filter(function(x){
-            return (x.type == 'laser' && x.timeToDie < gameTime);
+            return (x.timeToDie < 0);
+        }).map(function(x){ x.timeToDie = gameTime - x.timeToDie; });
+
+        // remove old things
+        this.entities.filter(function(x){
+            return (x.timeToDie !== undefined && !x.inactive && x.timeToDie < gameTime);
         }).map(function(x){ x.dead = true; });
 
         this.entities = this.entities.filter(function(x){return x.dead !== true;});

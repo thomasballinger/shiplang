@@ -8,6 +8,7 @@ export var Boid = {
     explosionSize: 20,
     armorMax: 4,
     isInertialess: false,
+    lifespan: <number>undefined,
 }
 export var Ship = {
     type: 'ship',
@@ -19,6 +20,7 @@ export var Ship = {
     explosionSize: 20,
     armorMax: 20,
     isInertialess: false,
+    lifespan: <number>undefined,
 }
 
 export var DroneMissile = {
@@ -31,6 +33,7 @@ export var DroneMissile = {
     explosionSize: 30,
     armorMax: 1,
     isInertialess: false,
+    lifespan: <number>undefined,
 }
 
 export var NeedleMissile = {
@@ -43,4 +46,5 @@ export var NeedleMissile = {
     explosionSize: 10,
     armorMax: 1,
     isInertialess: true,
+    lifespan: 6,
 }
