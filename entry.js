@@ -1,8 +1,9 @@
 require("./style.css");
 window.pilotScriptSource = require("raw!./pilot.sl");
-var ace = require('brace');
-require('brace/mode/scheme');
-require('brace/theme/terminal');
+//var ace = require('brace');
+//require('brace/mode/scheme');
+//require('brace/theme/terminal');
+var builtinSLScripts = require("raw!./pilot.sl");
 
 var space = require('./space');
 var display = require('./display');
@@ -41,16 +42,25 @@ function main(){
   function clearError(){ errorbar.hidden = true; }
   clearError();
 
-  var editor = ace.edit('editor');
-  editor.getSession().setMode('ace/mode/scheme');
-  editor.setTheme('ace/theme/terminal');
+  //var editor = ace.edit('editor');
+  //editor.getSession().setMode('ace/mode/scheme');
+  //editor.setTheme('ace/theme/terminal');
 
 
-  editor.setValue(pilotScriptSource);
-  editor.getSession().on('change', function(e) {
+  //editor.setValue(pilotScriptSource);
+  //editor.getSession().on('change', function(e) {
+  //  codeChanged = true;
+  //});
+
+  var workspace = Blockly.inject('editor',
+      {toolbox: document.getElementById('toolbox')});
+
+  function myUpdateFunction() {
     codeChanged = true;
-  });
-  var codeChanged = true;
+  }
+  workspace.addChangeListener(myUpdateFunction);
+
+  var codeChanged;
 
   var canvas = document.getElementById('canvas');
   var controls = new manual.Controls(canvas);
@@ -83,42 +93,58 @@ function main(){
   //setup.stealBacktick(saveAndSwapWorld);
   setup.stealBacktick(function(){swapWorld(savedWorlds[0]);});
 
+
+  var builtinScripts = scriptEnv.getScripts(builtinSLScripts);
   var ship;
   var world;
   function resetState(userScripts){
 
-    console.log('editor state change');
+    var boidScript = userScripts.dosomething || builtinScripts.enemyScript;
 
     world = new space.SpaceWorld();
 
-    window.world = world; // global so pilot scripts can reference it
-
-    ship = space.makeShip(-200, 350, 270, userScripts.pilotScript);
+    ship = space.makeShip(-200, 350, 270, builtinScripts.pilotScript);
     ship.imtheplayer = true;
-    ship2 = space.makeShip(-300, 350, 270, userScripts.enemyScript);
+    ship2 = space.makeShip(-300, 350, 270, builtinScripts.enemyScript);
     world.addEntity(ship);
     world.addEntity(ship2);
     //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
     for (var i=0; i<20; i++){
       world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
                                      boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
-                                     userScripts.enemyScript));
+                                     boidScript));
     }
   }
   var lastValid = {};
   savedWorlds = [];
 
+  resetState('1');
+  console.log('editor state change');
+
   function tick(){
     var tickStartTime = new Date().getTime();
     if (codeChanged){
-      var s = editor.getValue();
+      var code = Blockly.ShipLang.workspaceToCode(workspace);
+      //document.getElementById('errorbar').value = code;
+      //document.getElementById('errorbar').hidden = false;
+
+      var s = code; //editor.getValue();
+      console.log(code);
       var c = evaluation.parseOrShowError(s, setError);
+      console.log(c);
       if (c !== undefined){
         clearError();
-        var userScripts = scriptEnv.getScripts(s);
-        lastValid = userScripts;
-        console.log(userScripts);
-        resetState(lastValid);
+        try {
+          var userScripts = scriptEnv.getScripts(s);
+        } catch (e) {
+          setError(e.message);
+          var userScripts = undefined;
+        }
+        if(userScripts){
+          lastValid = userScripts;
+          console.log('resetting world with:', userScripts);
+          resetState(lastValid);
+        }
       }
       codeChanged = false;
     }

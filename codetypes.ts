@@ -42,6 +42,15 @@ export class SLContext {
     deepCopyCreate():SLContext{
         return new SLContext(undefined, undefined);
     }
+    deepCopyPopulate(copy:SLContext, memo:any, deepcopy:any){
+        copy.source = this.source
+        copy.done = this.done;
+        copy.initialEnv = this.initialEnv;
+        copy.bytecodeStack = this.bytecodeStack.slice(0) // the bytecode chunks don't mutate
+        copy.stack = deepcopy(this.stack, memo);
+        copy.counterStack = deepcopy(this.counterStack, memo);
+        copy.envStack = deepcopy(this.envStack, memo);
+    }
 
     step(e:entity.Ship){
         if (this.done){ return; }

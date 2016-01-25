@@ -48,6 +48,7 @@
       create: function(obj){ return []; },
       populate: function(obj, copy, memo){
         for (var i = 0; i < obj.length; i++){
+          //console.log('copying', obj, '[', i, '] which is', obj[i]);
           copy.push(innerDeepCopy(obj[i], memo));
         }
       }
@@ -61,6 +62,7 @@
             if (property == '__obj_id'){
               // nop
             } else {
+              //console.log('copying', obj, '.', property, 'which is', obj[property]);
               copy[property] = innerDeepCopy(obj[property], memo);
             }
           }
@@ -85,6 +87,8 @@
     if (isDOM(x) || isBrowser(x)) { return x; }
     if (x.__deepCopyPassthrough){ return x; }
 
+    //var now = new Date().getTime();
+    //while(new Date().getTime() < now + .01){ /* do nothing */ }
 
     var id = objectId(x);
     var copy = memo[id];
@@ -117,6 +121,7 @@
           if (property == '__obj_id'){
             // nop
           } else {
+            //console.log('copying', x, '.', property, 'which is', x[property]);
             copy[property] = innerDeepCopy(x[property], memo);
           }
         }
