@@ -32,7 +32,13 @@ var funcs = {
 // running scripts could be achieved through it!
 Object.defineProperty(funcs, '__deepCopyPassthrough', {value: true})
 
-function makeControls(){
+type MakeControlsReturnType = [(e: any)=>void,
+                               (t: any)=>void,
+                               (w: any)=>void,
+                               (k: any)=>void,
+                               {[a:string]:any;}];
+
+function makeControls():MakeControlsReturnType{
     var e = <entity.Ship>undefined;
     var t = <GameTime>undefined;
     var w = <any>undefined;
@@ -175,7 +181,9 @@ function makeControls(){
 }
 
 export var [setCurrentEntity, setGameTime, setGameWorld,
-            setKeyControls, controls] = makeControls();
+     setKeyControls, controls] = makeControls();
+//var stuff = makeControls();
+//export var setCurrentEntity = <(x: any)=>void>stuff[0]
 
 export function getScripts(s: string){
     var ast = evaluation.parser.parse(s);

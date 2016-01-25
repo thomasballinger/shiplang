@@ -7,6 +7,7 @@ type GameTime = number
 interface Generator {
     next(): {value: any, done: boolean}
 }
+export type Script = ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject
 
 // These define a ship type but not its instantaneous properties
 export interface ShipSpec {type: string,
@@ -35,6 +36,7 @@ export class Entity{
         this.drawStatus = {};
         this.armorMax = 1;
         this.armor = this.armorMax
+        this.explosionSize = 0;
     }
     type: string;
     x: number;
@@ -51,6 +53,11 @@ export class Entity{
     drawStatus: {[property:string]: any;}
     armor: number;
     armorMax: number;
+    explosionSize: number;
+
+    // some bookkeeping props for SpaceWorld
+    dead: boolean;     // will be cleaned up this tick
+    inactive: boolean; // sticking around for a bit to look pretty
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
@@ -115,7 +122,6 @@ export class Ship extends Entity{
     maxThrust: number;
     maxDH: number;
     maxSpeed: number;
-    explosionSize: number;
     thrust: number;
     dh: number;
     hTarget: number;
