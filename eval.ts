@@ -399,6 +399,7 @@ parser.nodes.DefineNode = DefineNode;
 parser.nodes.YieldNode = YieldNode;
 parser.nodes.DefnNode = DefnNode;
 parser.nodes.ForeverNode = ForeverNode;
+parser.nodes.NullNode = NullNode;
 
 export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
                             stack: any[], envStack: Environment[]){

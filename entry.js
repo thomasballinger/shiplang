@@ -59,6 +59,7 @@ function main(){
     codeChanged = true;
   }
   workspace.addChangeListener(myUpdateFunction);
+  window.workspace = workspace;
 
   var codeChanged;
 
@@ -98,8 +99,13 @@ function main(){
   var ship;
   var world;
   function resetState(userScripts){
-
-    var boidScript = userScripts.dosomething || builtinScripts.enemyScript;
+    var scriptNames = Object.keys(userScripts);
+    var boidScripts;
+    if (scriptNames.length === 1){
+      boidScript = userScripts[scriptNames[0]];
+    } else {
+      boidScript = builtinScripts.enemyScript;
+    }
 
     world = new space.SpaceWorld();
 

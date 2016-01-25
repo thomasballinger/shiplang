@@ -1,4 +1,17 @@
+function spacesToDashes(target){
+  return target.replace(new RegExp(' ', 'g'), '-');
+}
 
+function codeZeroIfNaN(num){
+  return num === 'NaN' ? '0': num;
+}
+
+
+
+// To graphically edit blocks, visit https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#umswkp
+// with the relevat hash.
+
+// umswkp
 Blockly.Blocks['thrustfor'] = {
   init: function() {
     this.appendValueInput("time")
@@ -12,7 +25,7 @@ Blockly.Blocks['thrustfor'] = {
   }
 };
 Blockly.ShipLang['thrustfor'] = function(block) {
-  arg = Blockly.JavaScript.valueToCode(block, 'time', 1);
+  arg = codeZeroIfNaN(Blockly.JavaScript.valueToCode(block, 'time', 1));
   return ' ( thrustFor ' + arg + ' ) ';
 };
 
@@ -35,7 +48,7 @@ Blockly.Blocks['turn'] = {
 };
 Blockly.ShipLang['turn'] = function(block) {
   var dropdown_direction = block.getFieldValue('direction');
-  var t = Blockly.JavaScript.valueToCode(block, 'time', 1);
+  var t = codeZeroIfNaN(Blockly.JavaScript.valueToCode(block, 'time', 1));
   if (dropdown_direction === 'left'){
     return '( leftFor ' + t + ' )';
   } else {
@@ -45,14 +58,28 @@ Blockly.ShipLang['turn'] = function(block) {
 
 Blockly.ShipLang['procedures_defnoreturn'] = function(block) {
   // Define a procedure with a return value.
-  var funcName = block.getFieldValue('NAME');
-  var branch = Blockly.ShipLang.statementToCode(block, 'STACK');
+  var funcName = spacesToDashes(block.getFieldValue('NAME'));
+  var branch = Blockly.ShipLang.statementToCode(block, 'STACK') || '()';
   var args = [];
   for (var x = 0; x < block.arguments_.length; x++) {
     args[x] = block.arguments_[x];
   }
   var code = '( defn '+funcName+' (' + args.join(' ') + ') \n' +
-      branch + ' )';
+      branch + '\n() )';
+  code = Blockly.ShipLang.scrub_(block, code);
+  return code;
+};
+
+Blockly.ShipLang['procedures_defreturn'] = function(block) {
+  // Define a procedure with a return value.
+  var funcName = spacesToDashes(block.getFieldValue('NAME'));
+  var branch = Blockly.ShipLang.statementToCode(block, 'STACK') || '()';
+  var args = [];
+  for (var x = 0; x < block.arguments_.length; x++) {
+    args[x] = block.arguments_[x];
+  }
+  var code = '( defn '+funcName+' (' + args.join(' ') + ') \n' +
+      branch + ')';
   code = Blockly.ShipLang.scrub_(block, code);
   return code;
 };
@@ -70,7 +97,7 @@ Blockly.Blocks['forever'] = {
 };
 Blockly.ShipLang['forever'] = function(block) {
   console.log(block);
-  var branch = Blockly.ShipLang.statementToCode(block, 'body');
+  var branch = Blockly.ShipLang.statementToCode(block, 'body') || '()';
   return '( forever\n' + branch + ' ) ';
 };
 
@@ -78,8 +105,9 @@ Blockly.ShipLang['math_number'] = function(block) {
   var num = parseFloat(block.getFieldValue('NUM'));
   if (isNaN(num)){
     code = (0).toString();
+  } else {
+    code = num.toString();
   }
-  code = num.toString();
   return code;
 };
 
@@ -90,5 +118,22 @@ Blockly.ShipLang['text_print'] = function(block) {
 };
 
 
-
+Blockly.ShipLang['logic_compare'] = function(block) {
+  // Comparison operator.
+  var OPERATORS = {
+    'EQ': '=',
+    'NEQ': '!=',
+    'LT': '<',
+    'LTE': '<=',
+    'GT': '>',
+    'GTE': '>='
+  };
+  var operator = OPERATORS[block.getFieldValue('OP')];
+  var order = (operator == '=' || operator == '!=') ?
+      Blockly.JavaScript.ORDER_EQUALITY : Blockly.JavaScript.ORDER_RELATIONAL;
+  var argument0 = Blockly.JavaScript.valueToCode(block, 'A', order) || '0';
+  var argument1 = Blockly.JavaScript.valueToCode(block, 'B', order) || '0';
+  var code = '(' + operator + ' ' + argument0 + ' ' + argument1 + ')';
+  return [code, order];
+};
 

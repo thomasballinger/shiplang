@@ -26,3 +26,37 @@ Blockly.ShipLang.scrub_ = function(block, code){
   var nextCode = Blockly.ShipLang.blockToCode(nextBlock);
   return code +'\n'+ nextCode;
 };
+
+Blockly.ShipLang.workspaceToCode = function(workspace) {
+  var code = [];
+  var blocks = workspace.getTopBlocks(true);
+
+
+  for (var x = 0, block; block = blocks[x]; x++) {
+    if (block.type !== 'procedures_defnoreturn'){
+      console.log('skipping block of type', block.type, ':', block);
+      continue;
+    }
+    var line = this.blockToCode(block);
+    if (goog.isArray(line)) {
+      // Value blocks return tuples of code and operator order.
+      // Top-level blocks don't care about operator order.
+      line = line[0];
+    }
+    if (line) {
+      if (block.outputConnection && this.scrubNakedValue) {
+        // This block is a naked value.  Ask the language's code generator if
+        // it wants to append a semicolon, or something.
+        line = this.scrubNakedValue(line);
+      }
+      code.push(line);
+    }
+  }
+  code = code.join('\n');  // Blank line between each section.
+  code = this.finish(code);
+  // Final scrubbing of whitespace.
+  code = code.replace(/^\s+\n/, '');
+  code = code.replace(/\n\s+$/, '\n');
+  code = code.replace(/[ \t]+\n/g, '\n');
+  return code;
+};

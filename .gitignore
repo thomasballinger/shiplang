@@ -4,6 +4,9 @@ bundle.js
 typings
 *.map
 .DS_Store
+
+# assets pulled in by Makefile
 images
 blockly-master
 blockly.tar.gz
+spaceimages.zip

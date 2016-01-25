@@ -139,9 +139,18 @@ function makeControls(){
     leftFor.requiresYield = true;
     leftFor.finish = function(){ e.dh = 0; }
 
+    var rightFor = <YieldFunction>function(n):any{
+        e.dh = -e.maxDH;
+        var timeFinished = t + n;
+        return function(){ return t > timeFinished; }
+    }
+    rightFor.requiresYield = true;
+    rightFor.finish = function(){ e.dh = 0; }
+
     var controls:{[name: string]: YieldFunction} = {
         thrustFor: thrustFor,
         leftFor: leftFor,
+        rightFor: rightFor,
         fireMissile: fireMissile,
         fireLaser: fireLaser,
         waitFor: waitFor,

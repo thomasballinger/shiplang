@@ -35,7 +35,7 @@ comment
   = ";" [^\n]* { return []; }
 
 sexp
-  = "(" _+ ")" { return new parser.node.NullNode(location()) }
+  = "(" _* ")" { return new parser.nodes.NullNode(location()) }
   / ifSexp
   / doSexp
   / lambdaSexp
