@@ -1,6 +1,7 @@
 import evaluation = require('./eval');
 import entity = require('./entity');
 var manual = require('./manual');
+import ships = require('./ships');
 
 type GameTime = number;
 
@@ -103,7 +104,7 @@ function makeControls():MakeControlsReturnType{
             if (t < startTime + .1){
                 return false;
             } else if (!missileFired){
-                w.fireMissile(e, script, color);
+                w.fireMissile(e, ships.DroneMissile, script, color);
                 missileFired = true;
             } else if (t < startTime + .2){
                 return false;
@@ -114,6 +115,25 @@ function makeControls():MakeControlsReturnType{
     }
     fireMissile.requiresYield = true;
     fireMissile.finish = function(){}
+
+    var fireNeedleMissile = <YieldFunction>function(script, color):any{
+        var startTime = t;
+        var missileFired = false;
+        return function(){
+            if (t < startTime + .1){
+                return false;
+            } else if (!missileFired){
+                w.fireMissile(e, ships.NeedleMissile, script, color);
+                missileFired = true;
+            } else if (t < startTime + .2){
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+    fireNeedleMissile.requiresYield = true;
+    fireNeedleMissile.finish = function(){}
 
     var fireLaser = <YieldFunction>function(script, color):any{
         var startTime = t;
@@ -158,6 +178,7 @@ function makeControls():MakeControlsReturnType{
         leftFor: leftFor,
         rightFor: rightFor,
         fireMissile: fireMissile,
+        fireNeedleMissile: fireNeedleMissile,
         fireLaser: fireLaser,
         waitFor: waitFor,
         turnTo: turnTo,

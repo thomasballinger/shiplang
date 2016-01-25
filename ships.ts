@@ -7,6 +7,7 @@ export var Boid = {
     isMunition: false,
     explosionSize: 20,
     armorMax: 4,
+    isInertialess: false,
 }
 export var Ship = {
     type: 'ship',
@@ -17,10 +18,11 @@ export var Ship = {
     isMunition: false,
     explosionSize: 20,
     armorMax: 20,
+    isInertialess: false,
 }
 
-export var Missile = {
-    type: 'missile',
+export var DroneMissile = {
+    type: 'dronemissile',
     r: 10,
     maxThrust: 300,
     maxDH: 300,
@@ -28,4 +30,17 @@ export var Missile = {
     isMunition: true,
     explosionSize: 30,
     armorMax: 1,
+    isInertialess: false,
+}
+
+export var NeedleMissile = {
+    type: 'needlemissile',
+    r: 10,
+    maxThrust: 100,
+    maxDH: 300,
+    maxSpeed: 350,
+    isMunition: true,
+    explosionSize: 10,
+    armorMax: 1,
+    isInertialess: true,
 }

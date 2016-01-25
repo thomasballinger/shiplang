@@ -18,6 +18,7 @@ export interface ShipSpec {type: string,
                     explosionSize: number,
                     isMunition: boolean,
                     armorMax: number,
+                    isInertialess: boolean,
 }
 
 // Asteroids, missiles, ships, planets, projectiles.
@@ -119,6 +120,7 @@ export class Ship extends Entity{
         this.hTarget = undefined;
         this.armorMax = spec.armorMax;
         this.armor = spec.armorMax;
+        this.isInertialess = spec.isInertialess;
     }
     maxThrust: number;
     maxDH: number;
@@ -126,6 +128,7 @@ export class Ship extends Entity{
     thrust: number;
     dh: number;
     hTarget: number;
+    isInertialess: boolean;
 
     readyCallback: ()=>boolean;
     context: codetypes.SLContext | codetypes.JSContext | codetypes.NOPContext;
@@ -155,7 +158,7 @@ export class Ship extends Entity{
             this.h = (this.h + 3600) % 360;
         }
 
-        if (this.thrust !== undefined){
+        if (this.thrust !== undefined && !this.isInertialess){
             if (this.h === undefined){
                 throw Error("this.h is not a number: "+this);
             }
@@ -164,7 +167,13 @@ export class Ship extends Entity{
         }
 
         var speed = this.speed();
-        if (speed > this.maxSpeed){
+        if (this.isInertialess){
+            speed = Math.max(this.maxSpeed) + this.thrust * dt;
+            this.dx = sm.x_comp(this.h) * speed;
+            this.dy = sm.y_comp(this.h) * speed;
+        }
+
+        if (speed > this.maxSpeed && !this.isInertialess){
             this.dx = this.dx * (this.maxSpeed / speed);
             this.dy = this.dy * (this.maxSpeed / speed);
         }

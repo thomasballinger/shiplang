@@ -26,8 +26,8 @@ export function makeShip(x: number, y: number, h: number, script:entity.Script){
     return ship;
 }
 
-function makeMissile(x: number, y: number, dx: number, dy: number, h: number, script:entity.Script){
-    var missile = new Ship(ships.Missile, x, y, script);
+function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: entity.ShipSpec, script:entity.Script){
+    var missile = new Ship(ship, x, y, script);
     missile.dx = dx;
     missile.dy = dy;
     missile.r = 3;
@@ -35,16 +35,17 @@ function makeMissile(x: number, y: number, dx: number, dy: number, h: number, sc
     return missile;
 }
 
-function fireMissile(e:entity.Entity, script:entity.Script, t:GameTime){
+function fireMissile(e:entity.Entity, ship: entity.ShipSpec, script:entity.Script, t:GameTime){
     var missile = makeMissile(e.x + sm.x_comp(e.h)*e.r,
                               e.y + sm.y_comp(e.h)*e.r,
-    e.dx + sm.x_comp(e.h) * 10,
-    e.dy + sm.y_comp(e.h) * 10,
-    e.h, script);
+                              e.dx + sm.x_comp(e.h) * 10,
+                              e.dy + sm.y_comp(e.h) * 10,
+                              e.h, ship, script);
     missile.firedBy = e;
     missile.firedAt = t;
     return missile;
 }
+
 function fireLaser(e:entity.Entity, gameTime:GameTime){
     var laser = new Entity('laser',
                            e.x + sm.x_comp(e.h)*e.r,
@@ -84,8 +85,8 @@ export class SpaceWorld{
         //console.log(window.performance.now() - t0);
         return world;
     }
-    fireMissile(entity:entity.Entity, script: entity.Script, color:string){
-        var missile = fireMissile(entity, script, this.gameTime);
+    fireMissile(entity:entity.Entity, ship: entity.ShipSpec, script: entity.Script, color:string){
+        var missile = fireMissile(entity, ship, script, this.gameTime);
         missile.drawStatus['color'] = color;
         this.addEntity(missile);
     }

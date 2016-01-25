@@ -141,7 +141,7 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              e.h,
              esf);
   },
-  'missile': function(e, ctx, dx, dy, psf, esf){
+  'dronemissile': function(e, ctx, dx, dy, psf, esf){
     if (e.drawStatus['armed']){
       ctx.fillStyle="#AA1144";
     } else {
@@ -168,5 +168,21 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
                e.h,
                esf);
     }
+  },
+  'needlemissile': function(e, ctx, dx, dy, psf, esf){
+    if (e.drawStatus['armed']){
+      ctx.fillStyle="#AA1144";
+    } else {
+      ctx.fillStyle=e.drawStatus['color'] || "#4488AA";
+    }
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[7, -1],
+              [-7, -2],
+              [-7, 2],
+              [7, 1]],
+             e.h,
+             esf);
   },
 };

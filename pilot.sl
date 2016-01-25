@@ -3,6 +3,8 @@
     (define key (keypress))
     (if (= key " ")
         (fireMissile goScript "#3322bb"))
+    (if (= key "G")
+        (fireNeedleMissile goScript "#77ee33"))
     (if (= key "F")
         (fireLaser "#11dd55"))))
 
