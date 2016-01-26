@@ -46,10 +46,12 @@ export class SLContext {
         copy.source = this.source
         copy.done = this.done;
         copy.initialEnv = this.initialEnv;
-        copy.bytecodeStack = this.bytecodeStack.slice(0) // the bytecode chunks don't mutate
-        copy.stack = deepcopy(this.stack, memo);
-        copy.counterStack = deepcopy(this.counterStack, memo);
-        copy.envStack = deepcopy(this.envStack, memo);
+        if (this.bytecodeStack !== undefined){
+            copy.bytecodeStack = this.bytecodeStack.slice(0) // the bytecode chunks don't mutate
+            copy.stack = deepcopy(this.stack, memo);
+            copy.counterStack = deepcopy(this.counterStack, memo);
+            copy.envStack = deepcopy(this.envStack, memo);
+        }
     }
 
     step(e:entity.Ship){
