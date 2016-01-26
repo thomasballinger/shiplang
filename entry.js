@@ -1,8 +1,5 @@
 require("./style.css");
 var pilotScriptSource = require("raw!./pilot.sl");
-//var ace = require('brace');
-//require('brace/mode/scheme');
-//require('brace/theme/terminal');
 var builtinSLScripts = require("raw!./pilot.sl");
 
 var display = require('./display');
@@ -11,6 +8,7 @@ var hud = require('./hud');
 var scenarios = require('./scenarios');
 var updater = require('./updater');
 var errorbar = require('./errorbar');
+var editors = require('./editors');
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -31,21 +29,20 @@ canvas.focus();
 //  codeChanged = true;
 //});
 
-var workspace = Blockly.inject('editor',
-    {toolbox: document.getElementById('toolbox')});
-
-workspace.addChangeListener(function(){ updater.notifyOfCodeChange(); });
-
 setup.stealBacktick(function(){ updater.rewind(); });
+
+var editor = new editors.BlocklySL('editor');
 
 var updater = new updater.Updater(
   errorbar.setError, // alerts user that current code is very wrong
   errorbar.clearError,
   function(msg){}, // queue warning
-  function(){ return Blockly.ShipLang.workspaceToCode(workspace); },
+  function(){ return editor.getCode(); },
   'canvas', // where to put key handlers
   scenarios.scenario1() // how to contruct a new world
 );
+
+editor.setListener(function(){ updater.notifyOfCodeChange(); });
 
 updater.registerObserver({
   update: function(){
