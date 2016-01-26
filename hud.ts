@@ -11,6 +11,7 @@ export class Lerper{
     target: number
     current: number
     max: number
+
     update(current?:number, max?:number){
         if (max === undefined && this.max === undefined){
             throw Error('Need to initialize max value!');

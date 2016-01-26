@@ -9,11 +9,14 @@ var builtinScripts = scriptEnv.getScripts(builtinSource);
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
 interface Scenario {
-    (): ()=>any;
+    (): WorldBuilder;
+}
+export interface WorldBuilder {
+    (scripts: any): space.SpaceWorld;
     instructions: string
 }
 
-export var scenario1 = <Scenario>function():any{
+export var scenario1 = function():any{
     var boidArgs = <number[][]>[];
     for (var i=0; i<20; i++){
       boidArgs.push([Math.random()*1000-500,
@@ -24,7 +27,7 @@ export var scenario1 = <Scenario>function():any{
                      Math.random() * 100 - 50]);
     }
 
-    function reset(userScripts: any): space.SpaceWorld {
+    var reset = <WorldBuilder>function reset(userScripts: any): space.SpaceWorld {
 
         var scriptNames = Object.keys(userScripts);
         var boidScript = <entity.Script>undefined;
@@ -53,13 +56,13 @@ export var scenario1 = <Scenario>function():any{
 
         return world;
     }
+    reset.instructions = `
+    field of boids shooting missiles, or uses user script for boids
+    if it defines one function. If more than one function is defined,
+    looks for
+    * a function called "boid" to use for boids,
+    * a function called "ship" to use for an enemy ship, and
+    * a function called "pilot" to use for player's ship
+    `
     return reset;
 }
-scenario1.instructions = `
-field of boids shooting missiles, or uses user script for boids
-if it defines one function. If more than one function is defined,
-looks for
-* a function called "boid" to use for boids,
-* a function called "ship" to use for an enemy ship, and
-* a function called "pilot" to use for player's ship
-`

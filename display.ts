@@ -1,7 +1,8 @@
 import entity = require('./entity');
+import space = require('./space');
 
 export class SpaceDisplay{
-    constructor(id: string){
+    constructor(id: string, public psf: number, public esf: number, public bgp: number){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);
         this.ctx = this.canvas.getContext('2d');
     }
@@ -16,6 +17,9 @@ export class SpaceDisplay{
                     positionScaleFactor,
                     entityScaleFactor);
         this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
+    }
+    update(center: entity.Entity, w: space.SpaceWorld){
+        this.renderCentered(center, w.entities, this.psf, this.esf, this.bgp);
     }
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;

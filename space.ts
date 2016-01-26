@@ -247,8 +247,8 @@ export class SpaceWorld{
         }
         this.inTick = false;
     };
-    getPlayer(){
-        return this.entities.filter(function(x){return x.imtheplayer;})[0];
+    getPlayer():entity.Ship{
+        return <entity.Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
     }
 
     deepCopyCreate():SpaceWorld{
