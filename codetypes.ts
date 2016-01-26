@@ -10,6 +10,7 @@ export class NOPContext {
     }
     done: boolean;
     step(e:entity.Ship){}
+    safelyStep(e: entity.Ship){}
 }
 
 export class SLContext {
@@ -80,6 +81,16 @@ export class SLContext {
                 this.readyCallback = result;
                 break;
             }
+        }
+    }
+
+    safelyStep(e:entity.Ship, onError: (e: string)=>void){
+        try{
+            this.step(e);
+            return true;
+        } catch (e) {
+            onError(e)
+            return false;
         }
     }
 }

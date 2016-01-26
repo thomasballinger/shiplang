@@ -20,18 +20,10 @@ var canvas = document.getElementById('canvas');
 errorbar.clearError();
 canvas.focus();
 
-//var editor = ace.edit('editor');
-//editor.getSession().setMode('ace/mode/scheme');
-//editor.setTheme('ace/theme/terminal');
-
-//editor.setValue(pilotScriptSource);
-//editor.getSession().on('change', function(e) {
-//  codeChanged = true;
-//});
-
 setup.stealBacktick(function(){ updater.rewind(); });
 
-var editor = new editors.BlocklySL('editor');
+//var editor = new editors.BlocklySL('editor');
+var editor = new editors.AceSL('editor');
 
 var updater = new updater.Updater(
   errorbar.setError, // alerts user that current code is very wrong

@@ -65,7 +65,6 @@ export class Updater{
 
         if (this.codeHasChanged){
             var s = this.getCode();
-            console.log('got code from editor:', s);
             var c = evaluation.parseOrShowError(s, this.setError);
             if (c !== undefined){
                 this.clearError();
@@ -77,7 +76,6 @@ export class Updater{
                 }
                 if (userScripts){
                     this.lastValid = userScripts;
-                    console.log('resetting world with:', this.worldBuilder);
                     this.world = this.worldBuilder(this.lastValid);
                     this.player = this.world.getPlayer();
                 }
@@ -92,7 +90,7 @@ export class Updater{
             this.player.thrust = 0;
         }
 
-        this.world.tick(dt);
+        this.world.tick(dt, this.setError);
         var world = this.world;
         this.observers.map(function(obs){
             obs.update(world.getPlayer(), world);

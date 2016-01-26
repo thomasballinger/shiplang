@@ -225,7 +225,7 @@ export class SpaceWorld{
         }
         return sm.dist(closest.x, closest.y, e.x, e.y);
     };
-    tick = function(dt:GameTime){
+    tick = function(dt:GameTime, setError:(msg: string)=>void){
         this.inTick = true;
 
         this.gameTime += dt;
@@ -243,7 +243,7 @@ export class SpaceWorld{
             if (e.context === undefined){ continue; }
             scriptEnv.setCurrentEntity(e);
             scriptEnv.setGameTime(this.gameTime);
-            e.context.step(e);
+            var success = e.context.safelyStep(e, setError);
         }
         this.inTick = false;
     };

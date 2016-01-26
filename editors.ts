@@ -7,7 +7,26 @@ interface Editor {
     setListener(cb: ()=>void): void;
 }
 
-export class BlocklySL{
+export class AceSL {
+    constructor(){
+        this.editor = ace.edit('editor');
+        this.editor.getSession().setMode('ace/mode/scheme');
+        this.editor.setTheme('ace/theme/terminal');
+    }
+    editor: any;
+    getCode(){
+        return this.editor.getSession().getValue();
+    }
+    setListener(cb: ()=>void){
+        this.editor.getSession().on('change', cb);
+    }
+}
+
+
+//editor.setValue(pilotScriptSource);
+
+
+export class BlocklySL {
     constructor(id: string){
         if (!(<any>window).Blockly){ throw Error('Blockly not loaded!'); }
         createBlocklyToolbox();
