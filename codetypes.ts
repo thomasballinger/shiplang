@@ -1,5 +1,12 @@
 import ev = require('./eval');
 import entity = require('./entity');
+require('./JS-Interpreter-master/acorn.js')
+require('./JS-Interpreter-master/interpreter.js')
+
+var Interpreter = (<any>window).Interpreter;
+
+console.log(Interpreter);
+
 interface Generator {
     next(): {value: any, done: boolean}
 }

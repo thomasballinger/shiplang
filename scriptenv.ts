@@ -207,7 +207,7 @@ export var [setCurrentEntity, setGameTime, setGameWorld,
 //var stuff = makeControls();
 //export var setCurrentEntity = <(x: any)=>void>stuff[0]
 
-export function getScripts(s: string){
+export function SLgetScripts(s: string){
     var ast = evaluation.parser.parse(s);
     var env = buildShipEnv();
     var code = ast.compile();
@@ -215,6 +215,13 @@ export function getScripts(s: string){
         throw Error("yielding not allowed at top level");
     });
     return env.scopes[env.scopes.length-1];
+}
+
+export function SLFunctionFromString(s: string){
+    var ast = evaluation.parser.parse(s);
+    var env = buildShipEnv();
+    var code = ast.compile();
+    var func = new evaluation.CompiledFunctionObject([], code, env, 'fromString')
 }
 
 export function buildShipEnv():evaluation.Environment{

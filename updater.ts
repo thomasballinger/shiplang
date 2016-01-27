@@ -4,7 +4,7 @@ import entity = require('./entity');
 var manual = require('./manual');
 import scriptEnv = require('./scriptenv');
 import scenarios = require('./scenarios');
-import evaluation = require('./eval');
+import SLeval = require('./eval');
 
 interface Updateable {
     update(e: entity.Entity, w: space.SpaceWorld): void;
@@ -16,7 +16,8 @@ export class Updater{
                 public queueWarning: (msg: string)=>void,
                 public getCode: ()=>string, // gets updated code
                 public keyHandlerId: string, // where to set key handlers
-                public worldBuilder: scenarios.WorldBuilder){
+                public worldBuilder: scenarios.WorldBuilder,
+                public language: string){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
         this.controls = new manual.Controls(keyHandlerTarget);
@@ -59,26 +60,39 @@ export class Updater{
     // restore an old state
     rewind(){ this.pleaseRewind = true; }
 
+    loadSL(){
+        var s = this.getCode();
+        var c = SLeval.parseOrShowError(s, this.setError);
+        if (c !== undefined){
+            this.clearError();
+            try {
+                var userScripts = scriptEnv.SLgetScripts(s);
+            } catch (e) {
+                this.setError(e.message);
+                var userScripts = undefined;
+            }
+            if (userScripts){
+                this.lastValid = userScripts;
+                this.world = this.worldBuilder(this.lastValid);
+                this.player = this.world.getPlayer();
+            }
+        }
+    }
+
+    loadJS(){
+    }
+
     // please advance world state one tick and update displays
     tick(dt: number):number{
         var tickStartTime = new Date().getTime();
 
         if (this.codeHasChanged){
-            var s = this.getCode();
-            var c = evaluation.parseOrShowError(s, this.setError);
-            if (c !== undefined){
-                this.clearError();
-                try {
-                    var userScripts = scriptEnv.getScripts(s);
-                } catch (e) {
-                    this.setError(e.message);
-                    var userScripts = undefined;
-                }
-                if (userScripts){
-                    this.lastValid = userScripts;
-                    this.world = this.worldBuilder(this.lastValid);
-                    this.player = this.world.getPlayer();
-                }
+            if (this.language.toLowerCase() === 'shiplang'){
+                this.loadSL();
+            } else if (this.language.toLowerCase() == 'javascript'){
+                this.loadJS();
+            } else {
+                throw Error("don't know language "+this.language)
             }
             this.codeHasChanged = false;
         } else if (this.pleaseRewind){
@@ -90,10 +104,11 @@ export class Updater{
             this.player.thrust = 0;
         }
 
-        this.world.tick(dt, this.setError);
         var world = this.world;
+        var player = this.world.getPlayer();
+        world.tick(dt, this.setError);
         this.observers.map(function(obs){
-            obs.update(world.getPlayer(), world);
+            obs.update(player, world);
         })
 
         if (this.player.dead){

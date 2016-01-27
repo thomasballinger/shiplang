@@ -110,6 +110,7 @@ export class Ship extends Entity{
         if (script === undefined){
             this.context = new codetypes.NOPContext();
         } else if (typeof script === 'string'){
+            throw Error('please compile a function object first instead of passing a string');
             this.context = new codetypes.SLContext(script, scriptEnv.buildShipEnv());
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);

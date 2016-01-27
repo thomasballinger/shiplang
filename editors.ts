@@ -1,5 +1,6 @@
 var ace = require('brace');
 require('brace/mode/scheme');
+require('brace/mode/javascript');
 require('brace/theme/terminal');
 
 interface Editor {
@@ -22,6 +23,20 @@ export class AceSL {
     }
 }
 
+export class AceJS {
+    constructor(){
+        this.editor = ace.edit('editor');
+        this.editor.getSession().setMode('ace/mode/javascript');
+        this.editor.setTheme('ace/theme/terminal');
+    }
+    editor: any;
+    getCode(){
+        return this.editor.getSession().getValue();
+    }
+    setListener(cb: ()=>void){
+        this.editor.getSession().on('change', cb);
+    }
+}
 
 //editor.setValue(pilotScriptSource);
 

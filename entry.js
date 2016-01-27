@@ -22,8 +22,7 @@ canvas.focus();
 
 setup.stealBacktick(function(){ updater.rewind(); });
 
-//var editor = new editors.BlocklySL('editor');
-var editor = new editors.AceSL('editor');
+var editor = new editors.AceJS('editor');
 
 var updater = new updater.Updater(
   errorbar.setError, // alerts user that current code is very wrong
@@ -31,7 +30,8 @@ var updater = new updater.Updater(
   function(msg){}, // queue warning
   function(){ return editor.getCode(); },
   'canvas', // where to put key handlers
-  scenarios.scenario1() // how to contruct a new world
+  scenarios.scenario1(), // how to contruct a new world
+  'JavaScript'
 );
 
 editor.setListener(function(){ updater.notifyOfCodeChange(); });

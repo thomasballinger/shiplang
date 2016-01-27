@@ -4,7 +4,7 @@ import space = require('./space');
 import scriptEnv = require('./scriptenv');
 
 var builtinSource = require("raw!./pilot.sl");
-var builtinScripts = scriptEnv.getScripts(builtinSource);
+var builtinScripts = scriptEnv.SLgetScripts(builtinSource);
 
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
@@ -34,11 +34,10 @@ export var scenario1 = function():any{
         if (scriptNames.length === 1){
             boidScript = userScripts[scriptNames[0]];
         } else {
-            boidScript = '1' || builtinScripts.enemyScript || builtinScripts.enemyScript;
+            boidScript = scriptEnv.SLFunctionFromString('1') || builtinScripts.enemyScript || builtinScripts.enemyScript;
         }
         var playerScript = userScripts.pilotScript || builtinScripts.pilotScript;
-        var enemyScript = '1' || userScripts.ship || builtinScripts.enemyScript;
-        console.log(boidScript, playerScript, enemyScript)
+        var enemyScript = scriptEnv.SLFunctionFromString('1') || userScripts.ship || builtinScripts.enemyScript;
 
         var world = new space.SpaceWorld();
 
