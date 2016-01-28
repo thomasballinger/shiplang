@@ -2,6 +2,7 @@ import sm = require('./shipmath');
 import ev = require('./eval');
 import codetypes = require('./codetypes');
 import scriptEnv = require('./scriptenv');
+import userfunctionbodies = require('./userfunctionbodies');
 
 type GameTime = number
 interface Generator {
@@ -105,7 +106,7 @@ function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
 
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject){
+    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|[string, userfunctionbodies.UserFunctionBodies]|ev.CompiledFunctionObject|string){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -114,15 +115,18 @@ export class Ship extends Entity{
         this.explosionSize = spec.explosionSize;
         if (script === undefined){
             this.context = new codetypes.NOPContext();
-        } else if (typeof script === 'string'){
-            this.context = new codetypes.JSContext(script);
+        } else if (Array.isArray(script)){
+            var [source, bodies] = <[string, userfunctionbodies.UserFunctionBodies]>script;
+            this.context = new codetypes.JSContext(source, bodies);
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);
         } else if (probablyReturnsGenerators(script)) {
             this.context = new codetypes.JSGeneratorContext(script);
+        } else if (typeof script === 'string'){
+                throw Error('please compile a function object first instead of passing a string');
+                this.context = new codetypes.SLContext(script, scriptEnv.buildShipEnv());
         } else {
-            console.log('whoops');
-            console.log((<any>script).constructor);
+            throw Error('whoops:' + script)
         }
         this.thrust = 0;
         this.dh = 0;

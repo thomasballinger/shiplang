@@ -1,6 +1,7 @@
 import ev = require('./eval');
 import entity = require('./entity');
 import scriptEnv = require('./scriptenv');
+import userfunctionbodies = require('./userfunctionbodies');
 
 var Interpreter = (<any>window).Interpreter;
 
@@ -106,16 +107,18 @@ export class SLContext {
     }
 }
 
-
-
 var MAXSTEPS = 1000;
 export class JSContext {
-    constructor(public source: string){}
+    constructor(public source: string, public userFunctionBodies?: userfunctionbodies.UserFunctionBodies){}
     done: boolean;
     interpreter: Interpreter;
     step(e: entity.Ship){
         if (this.interpreter === undefined){
-            this.interpreter = new (<any>window).Interpreter(this.source, scriptEnv.initShipEnv);
+            if (this.userFunctionBodies){
+                this.interpreter = new (<any>window).Interpreter(this.source, scriptEnv.initShipEnv, undefined, this.userFunctionBodies);
+            } else {
+                this.interpreter = new (<any>window).Interpreter(this.source, scriptEnv.initShipEnv);
+            }
         }
 
         // infinite loop prevention

@@ -228,7 +228,9 @@ export function SLFunctionFromString(s: string){
     var ast = evaluation.parser.parse(s);
     var env = buildShipEnv();
     var code = ast.compile();
+    code.push([evaluation.BC.Return, null]);
     var func = new evaluation.CompiledFunctionObject([], code, env, 'fromString')
+    return func;
 }
 
 export function buildShipEnv():evaluation.Environment{

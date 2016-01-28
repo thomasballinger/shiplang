@@ -5,6 +5,7 @@ var manual = require('./manual');
 import scriptEnv = require('./scriptenv');
 import scenarios = require('./scenarios');
 import SLeval = require('./eval');
+import userfunctionbodies = require('./userfunctionbodies');
 
 interface Updateable {
     update(e: entity.Entity, w: space.SpaceWorld): void;
@@ -31,6 +32,7 @@ export class Updater{
         this.player = this.world.getPlayer();
         this.codeHasChanged = false;
         this.pleaseRewind = false;
+        this.userFunctionBodies = new userfunctionbodies.UserFunctionBodies();
     }
     world: space.SpaceWorld;
     lastValid: any;
@@ -41,6 +43,7 @@ export class Updater{
     savedWorlds: space.SpaceWorld[];
     player: entity.Ship;
     pleaseRewind: boolean;
+    userFunctionBodies: userfunctionbodies.UserFunctionBodies;
 
     // objects to call .update() on ever tick
     registerObserver(obj: Updateable){
@@ -85,7 +88,7 @@ export class Updater{
         try {
             (<any>window).acorn.parse(s);
             userScripts = {};
-            userScripts.ship = s;
+            userScripts.ship = [s, this.userFunctionBodies];
             this.clearError();
         } catch (e) {
             this.setError(e);
@@ -132,12 +135,10 @@ export class Updater{
             this.world = this.worldBuilder(this.lastValid);
             this.player = this.world.getPlayer();
         }
-        /*
         this.savedWorlds.push(this.world.copy());
         if (this.savedWorlds.length > 100){
             this.savedWorlds.shift();
         }
-        */
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime
