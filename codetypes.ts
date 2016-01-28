@@ -1,11 +1,15 @@
 import ev = require('./eval');
 import entity = require('./entity');
-require('./JS-Interpreter-master/acorn.js')
-require('./JS-Interpreter-master/interpreter.js')
+import scriptEnv = require('./scriptenv');
 
 var Interpreter = (<any>window).Interpreter;
 
-console.log(Interpreter);
+interface Interpreter {
+    step(): boolean;
+    run(): boolean;
+    isReady: ()=>boolean;
+    paused_: boolean;
+}
 
 interface Generator {
     next(): {value: any, done: boolean}
@@ -102,7 +106,52 @@ export class SLContext {
     }
 }
 
+
+
+var MAXSTEPS = 1000;
 export class JSContext {
+    constructor(public source: string){}
+    done: boolean;
+    interpreter: Interpreter;
+    step(e: entity.Ship){
+        if (this.interpreter === undefined){
+            this.interpreter = new (<any>window).Interpreter(this.source, scriptEnv.initShipEnv);
+        }
+
+        // infinite loop prevention
+        for (var i=0; i<MAXSTEPS; i++){
+            var unfinished = this.interpreter.step();
+            if (unfinished && this.interpreter.paused_){ return true; }
+            if (!unfinished){ return false; }
+        }
+        return true;
+    }
+    safelyStep(e:entity.Ship, onError: (e: string)=>void){
+        if (this.done){ return; }
+        try{
+            var unfinished = this.step(e);
+            if (!unfinished){
+                this.done = true;
+                console.log('finished JS script');
+            }
+            return true;
+        } catch (e) {
+            onError(e)
+            return false;
+        }
+    }
+    deepCopyCreate():JSContext{
+        return new JSContext(undefined);
+    }
+    deepCopyPopulate(copy:JSContext, memo:any, deepcopy:any){
+        copy.done = this.done
+        if (this.interpreter){
+            copy.interpreter = (<any>this.interpreter).copy();
+        }
+    }
+}
+
+export class JSGeneratorContext {
     constructor(script: (e:entity.Entity)=>Generator){
         this.script = script
         this.done = false;

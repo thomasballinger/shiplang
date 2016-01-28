@@ -7,6 +7,11 @@ type GameTime = number
 interface Generator {
     next(): {value: any, done: boolean}
 }
+interface Interpreter {
+    step(): boolean;
+    run(): boolean;
+    isReady: ()=>boolean;
+}
 export type Script = ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject
 
 // These define a ship type but not its instantaneous properties
@@ -110,12 +115,14 @@ export class Ship extends Entity{
         if (script === undefined){
             this.context = new codetypes.NOPContext();
         } else if (typeof script === 'string'){
-            throw Error('please compile a function object first instead of passing a string');
-            this.context = new codetypes.SLContext(script, scriptEnv.buildShipEnv());
+            this.context = new codetypes.JSContext(script);
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);
         } else if (probablyReturnsGenerators(script)) {
-            this.context = new codetypes.JSContext(script);
+            this.context = new codetypes.JSGeneratorContext(script);
+        } else {
+            console.log('whoops');
+            console.log((<any>script).constructor);
         }
         this.thrust = 0;
         this.dh = 0;
@@ -135,8 +142,7 @@ export class Ship extends Entity{
     hTarget: number;
     isInertialess: boolean;
 
-    readyCallback: ()=>boolean;
-    context: codetypes.SLContext | codetypes.JSContext | codetypes.NOPContext;
+    context: codetypes.SLContext | codetypes.JSGeneratorContext | codetypes.NOPContext | codetypes.JSContext;
     scriptDone: boolean;
 
     move(dt: GameTime){

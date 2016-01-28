@@ -17,8 +17,9 @@ export interface WorldBuilder {
 }
 
 export var scenario1 = function():any{
+    var NUMBOIDS = 20
     var boidArgs = <number[][]>[];
-    for (var i=0; i<20; i++){
+    for (var i=0; i<NUMBOIDS; i++){
       boidArgs.push([Math.random()*1000-500,
                      Math.random()*1000-500,
                      Math.random()*10-5,
@@ -47,7 +48,7 @@ export var scenario1 = function():any{
         world.addEntity(ship);
         world.addEntity(ship2);
         //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
-        for (var i=0; i<20; i++){
+        for (var i=0; i<boidArgs.length; i++){
             world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
                                            boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
                                            boidScript));

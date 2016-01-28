@@ -80,6 +80,23 @@ export class Updater{
     }
 
     loadJS(){
+        var s = this.getCode();
+        var userScripts = <any>undefined;
+        try {
+            (<any>window).acorn.parse(s);
+            userScripts = {};
+            userScripts.ship = s;
+            this.clearError();
+        } catch (e) {
+            this.setError(e);
+            userScripts = undefined;
+        }
+        if (userScripts){
+            this.lastValid = userScripts;
+            console.log(userScripts);
+            this.world = this.worldBuilder(this.lastValid);
+            this.player = this.world.getPlayer();
+        }
     }
 
     // please advance world state one tick and update displays
@@ -115,10 +132,12 @@ export class Updater{
             this.world = this.worldBuilder(this.lastValid);
             this.player = this.world.getPlayer();
         }
+        /*
         this.savedWorlds.push(this.world.copy());
         if (this.savedWorlds.length > 100){
             this.savedWorlds.shift();
         }
+        */
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime

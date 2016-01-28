@@ -69,15 +69,42 @@
         }
       }
     },
+    'nullObject': {
+      canCopy: function(obj){
+        return (obj.constructor === undefined && obj.__proto__ === undefined); },
+      create: function(obj){ return Object.create(null); },
+      populate: function(obj, copy, memo){
+        for (var property in obj){
+          if (Object.hasOwnProperty.call(obj, property)){
+            if (property == '__obj_id'){
+              // nop
+            } else {
+              //console.log('copying', obj, '.', property, 'which is', obj[property]);
+              copy[property] = innerDeepCopy(obj[property], memo);
+            }
+          }
+        }
+      }
+    },
   };
 
   function isDOM(obj){
     return obj.nodeType > 0;
   }
   function isBrowser(obj){
+    if (typeof window === 'undefined') {
+      return (obj === global ||
+             obj === process);
+    }
     return (obj === window ||
             obj === console);
   }
+
+  function isAcorn(obj){
+    return (obj.constructor === acorn.Node ||
+            (obj.hasOwnProperty('start') && obj.hasOwnProperty('end')));
+  }
+  function isPrimitive(obj){ return obj.isPrimitive; }
 
   function innerDeepCopy(x, memo){
     if (memo === undefined){
@@ -86,6 +113,7 @@
     if (passthroughCopier.canCopy(x)){ return x; }
     if (isDOM(x) || isBrowser(x)) { return x; }
     if (x.__deepCopyPassthrough){ return x; }
+    if (isAcorn(x) || isPrimitive(x)){ return x; }
 
     //var now = new Date().getTime();
     //while(new Date().getTime() < now + .01){ /* do nothing */ }
@@ -128,6 +156,9 @@
       }
       return copy;
     }
+    console.log('object is undefined:', x === undefined);
+    console.log('object keys:', Object.keys(x));
+    console.log('object prototype:', x.__proto__);
     throw Error("Can't deep copy "+typeof x + " " + x.constructor, x);
   }
 

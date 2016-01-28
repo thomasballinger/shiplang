@@ -1,4 +1,4 @@
-all: images/857-tileable-classic-nebula-space-patterns blockly-master JS-Interpreter-master
+all: images/857-tileable-classic-nebula-space-patterns blockly-master JS-Interpreter-master hotswapping-js-interp
 
 blockly-master: blockly.tar.gz
 	tar xzf blockly.tar.gz
@@ -17,3 +17,6 @@ JS-Interpreter-master: JS-Interpreter.tar.gz
 
 JS-Interpreter.tar.gz:
 	curl -L -o JS-Interpreter.tar.gz https://github.com/NeilFraser/JS-Interpreter/archive/master.tar.gz
+
+hotswapping-js-interp:
+	git clone https://github.com/thomasballinger/hotswapping-js-interp.git

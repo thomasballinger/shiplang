@@ -188,12 +188,19 @@ function makeControls():MakeControlsReturnType{
         headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosest(e)); },
         keypress: keypress,
     }
+
+    function makeAccessor(prop: string){ return function() { return e[prop]; }; }
+
     for (var propname of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH',
                           'maxThrust', 'maxSpeed']){
-        Object.defineProperty(controls, propname, { get: function() { return e[propname]; }, });
+        Object.defineProperty(controls, propname, { get: makeAccessor(propname) });
     }
     Object.defineProperty(controls, 'speed', { get: function() { return e.speed(); }, });
     Object.defineProperty(controls, 'vHeading', { get: function() { return e.vHeading(); }, });
+
+
+
+
 
     // So long as an entity, game time, and game world are
     // reset (so copies don't happen during ticks) a controls
@@ -226,4 +233,26 @@ export function SLFunctionFromString(s: string){
 
 export function buildShipEnv():evaluation.Environment{
     return new evaluation.Environment([console, controls, funcs, {}]);
+}
+
+export function initShipEnv(interpreter: any, scope: any){
+    for (var prop of Object.keys(controls)){
+        if (controls[prop].requiresYield){
+            if (!controls[prop].finish){ continue; }
+            interpreter.setProperty(scope, prop,
+                interpreter.createAsyncFunction(controls[prop]));
+        }
+    }
+    interpreter.setProperty(scope, 'log',
+        interpreter.createNativeFunction(function(x: any){ console.log('from jsinterp:', x); }));
+    for (var prop of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH', 'maxThrust', 'maxSpeed', 'speed', 'vHeading']){
+        // these are properties hopefully?
+        interpreter.setProperty(scope, prop,
+            interpreter.createNativeFunction(
+                (function(p: any){
+                    return function(){
+                        return interpreter.createPrimitive(controls[p]);
+                    };
+                })(prop)));
+    }
 }
