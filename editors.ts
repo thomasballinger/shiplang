@@ -5,6 +5,7 @@ require('brace/theme/terminal');
 
 interface Editor {
     getCode(): string;
+    setCode(s: any): void;
     setListener(cb: ()=>void): void;
 }
 
@@ -15,8 +16,9 @@ export class AceSL {
         this.editor.setTheme('ace/theme/terminal');
     }
     editor: any;
-    getCode(){
-        return this.editor.getSession().getValue();
+    getCode(): string{ return this.editor.getSession().getValue(); }
+    setCode(s: string){
+        return this.editor.getSession().setValue(s);
     }
     setListener(cb: ()=>void){
         this.editor.getSession().on('change', cb);
@@ -28,13 +30,24 @@ export class AceJS {
         this.editor = ace.edit('editor');
         this.editor.getSession().setMode('ace/mode/javascript');
         this.editor.setTheme('ace/theme/terminal');
+        var self = this;
+        this.editor.getSession().on('change', function(){self.onChange();});
+        this.callbacks = []
     }
+    callbacks: any[];
     editor: any;
-    getCode(){
-        return this.editor.getSession().getValue();
+    getCode(): string{ return this.editor.getSession().getValue(); }
+    setCode(s: string){
+        this.editor.getSession().setValue(s);
+        this.onChange();
     }
     setListener(cb: ()=>void){
-        this.editor.getSession().on('change', cb);
+        this.callbacks.push(cb);
+    }
+    onChange(){
+        for (var i=0; i<this.callbacks.length; i++){
+            this.callbacks[0]();
+        }
     }
 }
 

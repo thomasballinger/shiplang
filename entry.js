@@ -1,5 +1,5 @@
 require("./style.css");
-var pilotScriptSource = require("raw!./pilot.sl");
+var pilotScriptSource = require("raw!./pilot.js");
 var builtinSLScripts = require("raw!./pilot.sl");
 
 var display = require('./display');
@@ -57,12 +57,10 @@ updater.registerObserver({
   update: function(player, world){ this.hud.tick(world.entities.length); }
 });
 
-function tick(){
-  //var tickTime = updater.tick(0.016); // 60fps (if a tick took zero time)
-  var tickTime = updater.tick(0.032); // 30fps (if a tick took zero time)
+editor.setCode(pilotScriptSource);
 
-  //setTimeout(tick, Math.max(5, 16.77-tickTime)); // 60 draws per second if drawing took zero time
-  setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30 draws per second if drawing took zero time
-  // if tick takes over ~28ms to render, start to slow down simulation
+function tick(){
+  var tickTime = updater.tick(0.032); // 30fps
+  setTimeout(tick, Math.max(5, 33.5-tickTime));
 }
 tick();
