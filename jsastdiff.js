@@ -1,11 +1,26 @@
 var acorn = require('acorn');
 acorn.walk = require('acorn/dist/walk');
 
+
+
 //TODO translate dalsegno function diff algorithms to JavaScript diffing acorn ASTs.
 
-console.log(acorn.walk);
 
+function findNamedFunctions(ast){
+  var nodes = [];
+  acorn.walk.simple(ast, {'FunctionDeclaration':function(x){ nodes.push(x); }});
+  console.log(nodes.map(function(x){ return x; }));
+  return nodes;
+}
 
+function functionBodiesDifferent(f1, f2){
+  return  (JSON.stringify(this.body) !== JSON.stringify(other.body) ||
+           JSON.stringify(this.params) !== JSON.stringify(other.params));
+}
+
+function changedNamedFunctions(){
+  return {};
+}
 
 function test(){
 
@@ -54,15 +69,8 @@ var ast3 = acorn.parse(`
     }
   } `);
 
-changed = astdiff(ast1, ast2);
-console.log(change.foo !== undefined);
-console.log(change.bar === undefined);
-console.log(change.baz === undefined);
-
-changed = astdiff(ast1, ast3);
-console.log(change.foo !== undefined);
-console.log(change.bar === undefined);
-console.log(change.baz === undefined);
+  findNamedFunctions(ast1);
 }
 
 test();
+exports.changedNamedFunctions = changedNamedFunctions;
