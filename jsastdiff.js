@@ -13,9 +13,11 @@ function findNamedFunctions(ast){
   return nodes;
 }
 
+// returns whether two ASTs are identical ignoring named function definitions
+function treeDiff(n1, n2){
+}
+
 function functionBodiesDifferent(f1, f2){
-  return  (JSON.stringify(this.body) !== JSON.stringify(other.body) ||
-           JSON.stringify(this.params) !== JSON.stringify(other.params));
 }
 
 function changedNamedFunctions(){
