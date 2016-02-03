@@ -50,7 +50,32 @@ var ast3 = acorn.parse(`
     }
   } `);
 
+var simple1 = acorn.parse(`1 + 2`);
+var simple2 = acorn.parse(`1 + 3`);
+var simple3 = acorn.parse(`1 - 2`);
+
+var simple1WithSpace = acorn.parse(` 1 +   2`);
+
+var function1 = acorn.parse(`1 + 2; function foo(){ return 1; }`);
+var function2 = acorn.parse(`1 + 2; function foo(){ return 2; }`);
+
 describe('ast diff', function(){
+  it('identifies different asts', function(){
+    assert.isFalse(jsastdiff.diff(simple1, simple1));
+    assert.isTrue(jsastdiff.diff(simple1, simple2));
+    assert.isTrue(jsastdiff.diff(simple1, simple3));
+  });
+  it('ignores whitespace changes', function(){
+    assert.isFalse(jsastdiff.diff(simple1, simple1));
+    assert.isFalse(jsastdiff.diff(simple1, simple1WithSpace));
+  });
+  it('ignores function bodies', function(){
+    assert.isFalse(jsastdiff.diff(function1, function1));
+    assert.isFalse(jsastdiff.diff(function1, function2));
+  });
+});
+
+describe('changed function names', function(){
 
   it('returns only functions whose bodies have changed', function(){
     var changed = jsastdiff.changedNamedFunctions(ast1, ast2);
