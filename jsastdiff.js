@@ -9,6 +9,8 @@ acorn.walk = require('acorn/dist/walk');
 // has changed. If a function's name has changed, that's a change
 // to the outer function.
 //
+// Also needs to report if the program (top level function-like thing)
+// has changed.
 
 //TODO translate dalsegno function diff algorithms to JavaScript diffing acorn ASTs.
 
@@ -19,9 +21,8 @@ function findNamedFunctions(ast){
   return nodes;
 }
 
-// returns whether two ASTs are identical ignoring named function definitions
-// but counting named function bodies
-function diffIgnoringFunctionDeclarations(n1, n2){
+function diff(n1, n2, ignoreNamedFunctions){
+  ignoreNamedFunctions = ignoreNamedFunctions || false;
   if (n1 === null || typeof n1 === 'boolean' || typeof n1 === 'undefined' ||
       typeof n1 === 'number' || typeof n1 === 'string'){
     return n1 !== n2;
@@ -29,21 +30,27 @@ function diffIgnoringFunctionDeclarations(n1, n2){
   if (Object.keys(n1).length !== Object.keys(n2).length){ return true; }
   if (Array.isArray(n1)){
     for (var i=0; i<n1.length; i++){
-      if (diffIgnoringFunctionDeclarations(n1[i], n2[i])){ return true; }
+      if (diff(n1[i], n2[i], ignoreNamedFunctions)){ return true; }
     }
     return false;
   }
-  if (n1.type === 'FunctionDeclaration'){
+  if (ignoreNamedFunctions && n1.type === 'FunctionDeclaration'){
     // function declarations must only have the same name to be considered
     // identical for purposes of the outer function;
-    return n1.id.name !== n2.id.name;
+    return (n1.id.name !== n2.id.name || diff(n1.params, n2.params));
   } else {
     for (var prop in n1){
       if (prop === 'start' || prop === 'end'){ continue; }
-      if (diffIgnoringFunctionDeclarations(n1[prop], n2[prop])){ return true; }
+      if (diff(n1[prop], n2[prop], ignoreNamedFunctions)){ return true; }
     }
     return false;
   }
+}
+
+// returns whether two ASTs are identical ignoring named function definitions
+// but counting named function bodies
+function diffIgnoringFunctionDeclarations(n1, n2){
+  return diff(n1, n2, true);
 }
 
 function functionNameUsedMoreThanOnce(ast){
@@ -71,14 +78,18 @@ function namedFunctionsByName(ast){
 
 // Returns an object with names of updated (or new) functions
 // as properties and values being the new function objects,
-// to use for updating that function with parameters and bo
+// to use for updating that function body
+// If '*main*' is listed, something top level has changed.
 function changedNamedFunctions(a, b){
+  if (diffIgnoringFunctionDeclarations(a, b)){
+    return {'*main*': b};
+  }
   var funcs1 = namedFunctionsByName(a);
   var funcs2 = namedFunctionsByName(b);
   //var added = Object.keys(funcs2).filter(function(name){ return !funcs1.hasOwnProperty(name); });
   //var removed = Object.keys(funcs1).filter(function(name){ return !funcs2.hasOwnProperty(name); });
   var modified = Object.keys(funcs2).filter(function(name){
-    return diffIgnoringFunctionDeclarations(funcs1[name].body, funcs2[name].body);
+    return (diffIgnoringFunctionDeclarations(funcs1[name].body, funcs2[name].body));
   });
   var modifiedObjects = {};
   for (var name of modified){
@@ -144,3 +155,4 @@ test();
 
 exports.changedNamedFunctions = changedNamedFunctions;
 exports.diffIgnoringFunctionDeclarations = diffIgnoringFunctionDeclarations;
+exports.diff = diff;

@@ -69,21 +69,29 @@ describe('ast diff', function(){
     assert.isFalse(jsastdiff.diff(simple1, simple1));
     assert.isFalse(jsastdiff.diff(simple1, simple1WithSpace));
   });
+});
+describe('ast diff ignoring function declarations', function(){
   it('ignores function bodies', function(){
-    assert.isFalse(jsastdiff.diff(function1, function1));
-    assert.isFalse(jsastdiff.diff(function1, function2));
+    assert.isFalse(jsastdiff.diffIgnoringFunctionDeclarations(function1, function1));
+    assert.isFalse(jsastdiff.diffIgnoringFunctionDeclarations(function1, function2));
   });
 });
 
 describe('changed function names', function(){
-
   it('returns only functions whose bodies have changed', function(){
     var changed = jsastdiff.changedNamedFunctions(ast1, ast2);
     assert.notEqual(changed.foo, undefined);
     assert.equal(changed.bar, undefined);
     assert.equal(changed.baz, undefined);
+  });
 
-    changed = jsastdiff.changedNamedFunctions(ast1, ast3);
+    // TODO currently changing parameters makes the outer function
+    // different because only function bodies are swapped in. Eventually
+    // it might be nice if parameters were swapped in too, so they
+    // could trigger diff of the function they belong to instead of the
+    // outer one.
+  it('counts changes in parameters as changes to the containing function', function(){
+    var changed = jsastdiff.changedNamedFunctions(ast1, ast3);
     assert.notEqual(changed.foo, undefined);
     assert.equal(changed.bar, undefined);
     assert.equal(changed.baz, undefined);
