@@ -9,8 +9,10 @@ function Controls(obj){
 Controls.prototype.getEvent = function*(){
   var events = this.events;
   yield function(){
+    console.log('checking to see if getEvent is ready:', events.length > 0);
     return events.length > 0;
   };
+  console.log('running getEvent')
   while (this.events.length > 2 &&
       this.events[0].keyCode === this.events[1].keyCode &&
       this.events[0].type === 'keydown' &&

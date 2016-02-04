@@ -101,12 +101,26 @@ export class Updater{
                 console.log('resetting everything')
                 // start over totally, top level change
                 this.userFunctionBodies.reset();
-                this.lastValid = s;
-                this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies]);
+                this.world = this.worldBuilder([s, this.userFunctionBodies]);
                 this.player = this.world.getPlayer();
             } else {
                 for (var name of Object.keys(changed)){
                     this.userFunctionBodies.saveBody(name, changed[name]);
+                    console.log('swapping in new body for named function', name)
+                }
+                var save = this.userFunctionBodies.getEarliestSave(Object.keys(changed));
+                console.log("save we'll use:", save)
+                if (save === undefined){
+                    // NOP because the modified functions have never been called
+                } else if (save === null) {
+                    // Start over because modified functions have never been *defined*
+                    this.userFunctionBodies.reset();
+                    this.world = this.worldBuilder([s, this.userFunctionBodies]);
+                    this.player = this.world.getPlayer();
+                } else {
+                    console.log('doing a restore');
+                    this.world = save;
+                    this.player = this.world.getPlayer();
                 }
             }
             this.lastValid = s;
@@ -137,7 +151,8 @@ export class Updater{
 
         var world = this.world;
         var player = this.world.getPlayer();
-        world.tick(dt, this.setError);
+        //world.tick(dt, this.setError);
+        world.tick(dt, undefined);
         this.observers.map(function(obs){
             obs.update(player, world);
         })
@@ -146,10 +161,13 @@ export class Updater{
             this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies]);
             this.player = this.world.getPlayer();
         }
+        /*
         this.savedWorlds.push(this.world.copy());
         if (this.savedWorlds.length > 100){
             this.savedWorlds.shift();
         }
+        */
+        this.userFunctionBodies.save(this.world.copy());
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime

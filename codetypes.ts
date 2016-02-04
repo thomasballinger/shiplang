@@ -98,12 +98,17 @@ export class SLContext {
     }
 
     safelyStep(e:entity.Ship, onError: (e: string)=>void){
-        try{
+        if(onError){
+            try{
+                this.step(e);
+                return true;
+            } catch (e) {
+                onError(e)
+                return false;
+            }
+        } else {
             this.step(e);
             return true;
-        } catch (e) {
-            onError(e)
-            return false;
         }
     }
 }
