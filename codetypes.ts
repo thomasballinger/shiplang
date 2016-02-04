@@ -65,6 +65,7 @@ export class SLContext {
             copy.counterStack = deepcopy(this.counterStack, memo);
             copy.envStack = deepcopy(this.envStack, memo);
         }
+        copy.readyCallback = this.readyCallback;
     }
 
     step(e:entity.Ship){
