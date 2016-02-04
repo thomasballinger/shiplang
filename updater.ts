@@ -6,6 +6,7 @@ import scriptEnv = require('./scriptenv');
 import scenarios = require('./scenarios');
 import SLeval = require('./eval');
 import userfunctionbodies = require('./userfunctionbodies');
+var jsastdiff = require('./jsastdiff');
 
 interface Updateable {
     update(e: entity.Entity, w: space.SpaceWorld): void;
@@ -25,17 +26,17 @@ export class Updater{
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
         this.tickers = [];
-        this.lastValid = {};
-        this.world = this.worldBuilder(this.lastValid);
         console.log(this.worldBuilder.instructions);
         this.savedWorlds = [];
-        this.player = this.world.getPlayer();
         this.codeHasChanged = false;
         this.pleaseRewind = false;
         this.userFunctionBodies = new userfunctionbodies.UserFunctionBodies();
+        this.world = this.worldBuilder(['1', this.userFunctionBodies]);
+        this.player = this.world.getPlayer();
+        this.lastValid = '1';
     }
     world: space.SpaceWorld;
-    lastValid: any;
+    lastValid: string;
     codeHasChanged: boolean;
     controls: any;
     observers: Updateable[];
@@ -75,7 +76,7 @@ export class Updater{
                 var userScripts = undefined;
             }
             if (userScripts){
-                this.lastValid = userScripts;
+                this.lastValid = s;
                 this.world = this.worldBuilder(this.lastValid);
                 this.player = this.world.getPlayer();
             }
@@ -83,22 +84,32 @@ export class Updater{
     }
 
     loadJS(){
+        console.log('loadjs called');
         var s = this.getCode();
-        var userScripts = <any>undefined;
         try {
-            (<any>window).acorn.parse(s);
-            userScripts = {};
-            userScripts.ship = [s, this.userFunctionBodies];
+            var newAST = (<any>window).acorn.parse(s);
             this.clearError();
         } catch (e) {
             this.setError(e);
-            userScripts = undefined;
-        }
-        if (userScripts){
-            this.lastValid = userScripts;
-            console.log(userScripts);
-            this.world = this.worldBuilder(this.lastValid);
-            this.player = this.world.getPlayer();
+            s = undefined;
+        };
+        if (s){
+            var changed = jsastdiff.changedNamedFunctions(
+                (<any>window).acorn.parse(this.lastValid), newAST);
+            console.log('functions changed:', changed)
+            if (changed.hasOwnProperty('*main*')){
+                console.log('resetting everything')
+                // start over totally, top level change
+                this.userFunctionBodies.reset();
+                this.lastValid = s;
+                this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies]);
+                this.player = this.world.getPlayer();
+            } else {
+                for (var name of Object.keys(changed)){
+                    this.userFunctionBodies.saveBody(name, changed[name]);
+                }
+            }
+            this.lastValid = s;
         }
     }
 
@@ -132,7 +143,7 @@ export class Updater{
         })
 
         if (this.player.dead){
-            this.world = this.worldBuilder(this.lastValid);
+            this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies]);
             this.player = this.world.getPlayer();
         }
         this.savedWorlds.push(this.world.copy());

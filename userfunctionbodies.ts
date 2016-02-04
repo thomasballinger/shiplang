@@ -2,13 +2,16 @@ import space = require('./space');
 
 export class UserFunctionBodies{
     constructor(){
-        this.accessedThisTick = {};
-        this.bodies = {}
-        this.saves = {};
+        this.reset();
     }
     bodies: {[name: string]: any}
     accessedThisTick: {[name: string]: boolean};
     saves: {[name: string]: space.SpaceWorld};
+    reset(){
+        this.accessedThisTick = {};
+        this.bodies = {}
+        this.saves = {};
+    }
     getBody(name: string){
         console.log('retrieving named function:', name)
         this.accessedThisTick[name] = true;
@@ -20,6 +23,7 @@ export class UserFunctionBodies{
     saveBody(name: string, body: any){
         console.log('saving named function:', name)
         this.bodies[name] = body;
+        this.accessedThisTick[name] = true;
     }
     save(world: space.SpaceWorld){
         if (Object.keys(this.accessedThisTick).length === 0){ return; }

@@ -8,7 +8,11 @@ function comeBackIfOutOfBounds(){
     } else if (y() > 300 && dy() > 0){
         turnTo(270);
     }
-    thrustFor(1)
+    thrustFor(1);
+}
+
+function greet(){
+  1 + 1;
 }
 
 while (true){

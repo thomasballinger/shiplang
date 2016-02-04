@@ -7,6 +7,9 @@ module.exports = {
     filename: 'bundle.js'
   },
   devtool: 'source-map',
+  externals: {
+    'acorn': "acorn",
+  },
   resolve: {
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
   },

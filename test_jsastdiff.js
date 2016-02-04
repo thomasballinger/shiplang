@@ -96,4 +96,38 @@ describe('changed function names', function(){
     assert.equal(changed.bar, undefined);
     assert.equal(changed.baz, undefined);
   });
+  it('changes to inner function do not trigger full reset', function(){
+    var s1 = `
+function comeBackIfOutOfBounds(){
+    thrustFor(1);
+}
+
+function greet(){
+  1 + 1;
+}
+
+while (true){
+    comeBackIfOutOfBounds()
+    leftFor(1)
+}
+    `;
+    var s2 = `
+function comeBackIfOutOfBounds(){
+    thrustFor(1);
+}
+
+function greet(){
+  1 + 12;
+}
+
+while (true){
+    comeBackIfOutOfBounds()
+    leftFor(1)
+}
+    `;
+    var changed = jsastdiff.changedNamedFunctions(acorn.parse(s1), acorn.parse(s2));
+    assert.equal(changed['*main*'], undefined);
+    assert.notEqual(changed['greet'], undefined);
+  });
 });
+

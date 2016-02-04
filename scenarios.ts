@@ -17,7 +17,7 @@ export interface WorldBuilder {
 }
 
 export var scenario1 = function():any{
-    var NUMBOIDS = 20
+    var NUMBOIDS = 2
     var boidArgs = <number[][]>[];
     for (var i=0; i<NUMBOIDS; i++){
       boidArgs.push([Math.random()*1000-500,
@@ -28,18 +28,11 @@ export var scenario1 = function():any{
                      Math.random() * 100 - 50]);
     }
 
-    var reset = <WorldBuilder>function reset(userScripts: any): space.SpaceWorld {
+    var reset = <WorldBuilder>function reset(script: any): space.SpaceWorld {
 
-        var scriptNames = Object.keys(userScripts);
-        var boidScript = <entity.Script>undefined;
-        if (scriptNames.length === 1){
-            boidScript = userScripts[scriptNames[0]];
-        } else {
-            boidScript = builtinScripts.enemyScript;
-        }
-        var playerScript = userScripts.pilotScript || builtinScripts.pilotScript;
-        var enemyScript = userScripts.ship || builtinScripts.enemyScript;
-        //scriptEnv.SLFunctionFromString('1');
+        var boidScript = script;
+        var playerScript = builtinScripts.pilotScript;
+        var enemyScript = script;
 
         var world = new space.SpaceWorld();
 

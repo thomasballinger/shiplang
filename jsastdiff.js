@@ -151,7 +151,6 @@ function test(){
   //console.log(diffFunctionDeclarations(ast1, ast2)
   //findNamedFunctions(ast1);
 }
-test();
 
 exports.changedNamedFunctions = changedNamedFunctions;
 exports.diffIgnoringFunctionDeclarations = diffIgnoringFunctionDeclarations;
