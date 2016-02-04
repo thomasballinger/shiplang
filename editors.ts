@@ -33,6 +33,7 @@ export class AceJS {
         var self = this;
         this.editor.getSession().on('change', function(){self.onChange();});
         this.callbacks = []
+        this.editor.$blockScrolling = Infinity; // to avoid a console.warning
     }
     callbacks: any[];
     editor: any;

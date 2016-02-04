@@ -30,7 +30,7 @@ export var scenario1 = function():any{
 
     var reset = <WorldBuilder>function reset(script: any): space.SpaceWorld {
 
-        var boidScript = script;
+        var boidScript = builtinScripts.enemyScript;
         var playerScript = builtinScripts.pilotScript;
         var enemyScript = script;
 

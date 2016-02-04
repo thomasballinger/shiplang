@@ -84,7 +84,6 @@ export class Updater{
     }
 
     loadJS(){
-        console.log('loadjs called');
         var s = this.getCode();
         try {
             var newAST = (<any>window).acorn.parse(s);
@@ -96,7 +95,6 @@ export class Updater{
         if (s){
             var changed = jsastdiff.changedNamedFunctions(
                 (<any>window).acorn.parse(this.lastValid), newAST);
-            console.log('functions changed:', changed)
             if (changed.hasOwnProperty('*main*')){
                 console.log('resetting everything')
                 // start over totally, top level change
@@ -106,10 +104,8 @@ export class Updater{
             } else {
                 for (var name of Object.keys(changed)){
                     this.userFunctionBodies.saveBody(name, changed[name]);
-                    console.log('swapping in new body for named function', name)
                 }
                 var save = this.userFunctionBodies.getEarliestSave(Object.keys(changed));
-                console.log("save we'll use:", save)
                 if (save === undefined){
                     // NOP because the modified functions have never been called
                 } else if (save === null) {

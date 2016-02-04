@@ -15,7 +15,6 @@ export class UserFunctionBodies{
         this.tickNum = 0;
     }
     getBody(name: string){
-        console.log('retrieving named function:', name)
         this.accessedThisTick[name] = true;
         if (!this.bodies.hasOwnProperty(name)){
             throw Error("can't find function body "+name);
@@ -33,7 +32,6 @@ export class UserFunctionBodies{
         for (var funcName of Object.keys(this.accessedThisTick)){
             this.saves[funcName] = [this.tickNum, copy];
         }
-        console.log('during tick', this.tickNum, 'functions accessed were:', this.accessedThisTick)
         this.accessedThisTick = {};
     }
 
