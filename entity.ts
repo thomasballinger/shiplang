@@ -13,6 +13,11 @@ interface Interpreter {
     run(): boolean;
     isReady: ()=>boolean;
 }
+interface Selection {
+    start: number;
+    finish: number;
+}
+
 export type Script = ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject
 
 // These define a ship type but not its instantaneous properties
@@ -106,7 +111,7 @@ function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
 
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|[string, userfunctionbodies.UserFunctionBodies, (start: number, finish: number)=>void]|ev.CompiledFunctionObject|string){
+    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|[string, userfunctionbodies.UserFunctionBodies, (selections: Selection[])=>void]|ev.CompiledFunctionObject|string){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -116,7 +121,7 @@ export class Ship extends Entity{
         if (script === undefined){
             this.context = new codetypes.NOPContext();
         } else if (Array.isArray(script)){
-            var [source, bodies, highlight] = <[string, userfunctionbodies.UserFunctionBodies, (start: number, finish: number)=>void]>script;
+            var [source, bodies, highlight] = <[string, userfunctionbodies.UserFunctionBodies, (selections: Selection[])=>void]>script;
             this.context = new codetypes.JSContext(source, bodies, highlight);
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);

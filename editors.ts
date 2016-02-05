@@ -11,6 +11,11 @@ interface Editor {
     setListener(cb: ()=>void): void;
 }
 
+interface Selection {
+    start: number;
+    finish: number;
+}
+
 export class AceSL {
     constructor(){
         this.editor = ace.edit('editor');
@@ -36,11 +41,11 @@ export class AceJS {
         this.editor.getSession().on('change', function(){self.onChange();});
         this.callbacks = []
         this.editor.$blockScrolling = Infinity; // to avoid a console.warning
-        this.currentMarker = undefined;
+        this.markers = [];
     }
     callbacks: any[];
     editor: any;
-    currentMarker: any;
+    markers: any[];
     getCode(): string{ return this.editor.getSession().getValue(); }
     setCode(s: string){
         this.editor.getSession().setValue(s);
@@ -54,15 +59,19 @@ export class AceJS {
             this.callbacks[0]();
         }
     }
-    highlight(start: number, finish: number){
+    highlight(selections: Selection[]){
         var session = this.editor.getSession();
+        this.markers.map(function(x){
+            session.removeMarker(x);
+        });
         var code = session.getValue();
-        var s = acorn.getLineInfo(code, start);
-        var f = acorn.getLineInfo(code, finish);
-        if (this.currentMarker){
-            session.removeMarker(this.currentMarker);
-        }
-        this.currentMarker = this.editor.session.addMarker(new Range(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false);
+        this.markers = [];
+        var markers = this.markers;
+        selections.map(function(selection: Selection){
+            var s = acorn.getLineInfo(code, selection.start);
+            var f = acorn.getLineInfo(code, selection.finish);
+            markers.push(session.addMarker(new Range(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false));
+        });
     }
 }
 

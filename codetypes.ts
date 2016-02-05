@@ -3,6 +3,11 @@ import entity = require('./entity');
 import scriptEnv = require('./scriptenv');
 import userfunctionbodies = require('./userfunctionbodies');
 
+interface Selection {
+    start: number;
+    finish: number;
+}
+
 var Interpreter = (<any>window).Interpreter;
 
 interface Interpreter {
@@ -111,7 +116,7 @@ export class SLContext {
 
 var MAXSTEPS = 1000;
 export class JSContext {
-    constructor(public source: string, public userFunctionBodies?: userfunctionbodies.UserFunctionBodies, public highlight?: (start: number, end:number)=>void){}
+    constructor(public source: string, public userFunctionBodies?: userfunctionbodies.UserFunctionBodies, public highlight?: (selections: Selection[])=>void){}
     done: boolean;
     interpreter: Interpreter;
     step(e: entity.Ship){
@@ -144,9 +149,11 @@ export class JSContext {
             if (this.highlight){
                 if (this.interpreter.stateStack[0]) {
                     var node = this.interpreter.stateStack[0].node;
-                    this.highlight(node.start, node.end)
+                    this.highlight(this.interpreter.stateStack.slice(0, -1).map(function(state: any){
+                        return {start: state.node.start, finish: state.node.end};
+                    }));
                 } else {
-                    this.highlight(0, 0);
+                    this.highlight([]);
                 }
             }
 

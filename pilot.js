@@ -16,6 +16,8 @@ function greet(){
 }
 
 while (true){
-    comeBackIfOutOfBounds()
-    leftFor(1)
+    comeBackIfOutOfBounds();
+    leftFor(1);
+    comeBackIfOutOfBounds();
+    rightFor(1);
 }
