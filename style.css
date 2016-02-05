@@ -7,7 +7,6 @@ body {
     bottom: 0;
     left: 0;
     width: 450px;
-    color: white;
 }
 #canvas {
   position: absolute;
@@ -53,6 +52,11 @@ body {
   background-color: #ff99cc;
   text-align: center;
   font-size: 2em;
+}
+.running-code{
+  position:absolute;
+  background:rgba(10,100,200,0.5);
+  z-index:40
 }
 
 /* Styles for display backgrounds */

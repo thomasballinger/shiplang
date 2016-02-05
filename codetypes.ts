@@ -10,6 +10,7 @@ interface Interpreter {
     run(): boolean;
     isReady: ()=>boolean;
     paused_: boolean;
+    stateStack: any;
 }
 
 interface Generator {
@@ -98,24 +99,19 @@ export class SLContext {
     }
 
     safelyStep(e:entity.Ship, onError: (e: string)=>void){
-        if(onError){
-            try{
-                this.step(e);
-                return true;
-            } catch (e) {
-                onError(e)
-                return false;
-            }
-        } else {
+        try{
             this.step(e);
             return true;
+        } catch (e) {
+            onError(e)
+            return false;
         }
     }
 }
 
 var MAXSTEPS = 1000;
 export class JSContext {
-    constructor(public source: string, public userFunctionBodies?: userfunctionbodies.UserFunctionBodies){}
+    constructor(public source: string, public userFunctionBodies?: userfunctionbodies.UserFunctionBodies, public highlight?: (start: number, end:number)=>void){}
     done: boolean;
     interpreter: Interpreter;
     step(e: entity.Ship){
@@ -133,6 +129,7 @@ export class JSContext {
             if (unfinished && this.interpreter.paused_){ return true; }
             if (!unfinished){ return false; }
         }
+
         return true;
     }
     safelyStep(e:entity.Ship, onError: (e: string)=>void){
@@ -143,7 +140,18 @@ export class JSContext {
                 this.done = true;
                 console.log('finished JS script');
             }
+
+            if (this.highlight){
+                if (this.interpreter.stateStack[0]) {
+                    var node = this.interpreter.stateStack[0].node;
+                    this.highlight(node.start, node.end)
+                } else {
+                    this.highlight(0, 0);
+                }
+            }
+
             return true;
+
         } catch (e) {
             onError(e)
             return false;
@@ -157,6 +165,7 @@ export class JSContext {
         if (this.interpreter){
             copy.interpreter = (<any>this.interpreter).copy();
         }
+        copy.highlight = this.highlight;
     }
 }
 

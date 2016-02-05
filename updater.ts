@@ -19,7 +19,8 @@ export class Updater{
                 public getCode: ()=>string, // gets updated code
                 public keyHandlerId: string, // where to set key handlers
                 public worldBuilder: scenarios.WorldBuilder,
-                public language: string){
+                public language: string,
+                public highlight?: (start: number, finish: number)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
         this.controls = new manual.Controls(keyHandlerTarget);
@@ -31,7 +32,7 @@ export class Updater{
         this.codeHasChanged = false;
         this.pleaseRewind = false;
         this.userFunctionBodies = new userfunctionbodies.UserFunctionBodies();
-        this.world = this.worldBuilder(['1', this.userFunctionBodies]);
+        this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
         this.player = this.world.getPlayer();
         this.lastValid = '1';
     }
@@ -99,7 +100,7 @@ export class Updater{
                 console.log('resetting everything')
                 // start over totally, top level change
                 this.userFunctionBodies.reset();
-                this.world = this.worldBuilder([s, this.userFunctionBodies]);
+                this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                 this.player = this.world.getPlayer();
             } else {
                 for (var name of Object.keys(changed)){
@@ -111,7 +112,7 @@ export class Updater{
                 } else if (save === null) {
                     // Start over because modified functions have never been *defined*
                     this.userFunctionBodies.reset();
-                    this.world = this.worldBuilder([s, this.userFunctionBodies]);
+                    this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                     this.player = this.world.getPlayer();
                 } else {
                     console.log('doing a restore');
@@ -148,7 +149,7 @@ export class Updater{
         var world = this.world;
         var player = this.world.getPlayer();
         //world.tick(dt, this.setError);
-        world.tick(dt, undefined);
+        world.tick(dt, function(e){ throw e; });
         this.observers.map(function(obs){
             obs.update(player, world);
         })

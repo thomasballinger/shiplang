@@ -1,7 +1,9 @@
 var ace = require('brace');
+var Range = ace.acequire('ace/range').Range
 require('brace/mode/scheme');
 require('brace/mode/javascript');
-require('brace/theme/terminal');
+require('brace/theme/dawn');
+var acorn = require('acorn');
 
 interface Editor {
     getCode(): string;
@@ -13,7 +15,7 @@ export class AceSL {
     constructor(){
         this.editor = ace.edit('editor');
         this.editor.getSession().setMode('ace/mode/scheme');
-        this.editor.setTheme('ace/theme/terminal');
+        this.editor.setTheme('ace/theme/dawn');
     }
     editor: any;
     getCode(): string{ return this.editor.getSession().getValue(); }
@@ -29,14 +31,16 @@ export class AceJS {
     constructor(){
         this.editor = ace.edit('editor');
         this.editor.getSession().setMode('ace/mode/javascript');
-        this.editor.setTheme('ace/theme/terminal');
+        this.editor.setTheme('ace/theme/dawn');
         var self = this;
         this.editor.getSession().on('change', function(){self.onChange();});
         this.callbacks = []
         this.editor.$blockScrolling = Infinity; // to avoid a console.warning
+        this.currentMarker = undefined;
     }
     callbacks: any[];
     editor: any;
+    currentMarker: any;
     getCode(): string{ return this.editor.getSession().getValue(); }
     setCode(s: string){
         this.editor.getSession().setValue(s);
@@ -49,6 +53,16 @@ export class AceJS {
         for (var i=0; i<this.callbacks.length; i++){
             this.callbacks[0]();
         }
+    }
+    highlight(start: number, finish: number){
+        var session = this.editor.getSession();
+        var code = session.getValue();
+        var s = acorn.getLineInfo(code, start);
+        var f = acorn.getLineInfo(code, finish);
+        if (this.currentMarker){
+            session.removeMarker(this.currentMarker);
+        }
+        this.currentMarker = this.editor.session.addMarker(new Range(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false);
     }
 }
 
