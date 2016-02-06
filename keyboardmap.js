@@ -262,4 +262,10 @@ var keyboardMap = [
   "" // [255]
 ];
 
+var keyCodeFor = {};
+keyboardMap.map(function(name, index){
+  keyCodeFor[name] = index;
+});
+
 exports.keyboardMap = keyboardMap;
+exports.keyCodeFor = keyCodeFor;

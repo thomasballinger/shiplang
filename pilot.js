@@ -15,9 +15,15 @@ function greet(){
   1 + 1;
 }
 
+function manual(){
+
+}
+
 while (true){
-    comeBackIfOutOfBounds();
-    leftFor(1);
-    comeBackIfOutOfBounds();
-    rightFor(1);
+    waitFor(0.001);
+    cutThrust();
+    noTurn();
+    if (keyPressed('UP')){ fullThrust(); }
+    if (keyPressed('LEFT')){ fullLeft(); }
+    if (keyPressed('RIGHT')){ fullRight(); }
 }

@@ -1,9 +1,11 @@
 'use strict';
 
 var keyboardMap = require('./keyboardmap').keyboardMap;
+var keyCodeFor = require('./keyboardmap').keyCodeFor;
 
 function Controls(obj){
   this.events = [];
+  this.pressed = {};
   this.initialize(obj);
 }
 Controls.prototype.getEvent = function*(){
@@ -20,10 +22,20 @@ Controls.prototype.getEvent = function*(){
   }
   return this.events.shift();
 };
+Controls.prototype.getEventOrUndefined = function(){
+    if (this.events.length > 0){
+      return this.events.shift();
+    }
+};
+Controls.prototype.isPressed = function(key){
+  return !!this.pressed[keyCodeFor[key.toUpperCase()]];
+};
 Controls.prototype.initialize = function(obj){
   var events = this.events;
+  var pressed = this.pressed;
   obj.addEventListener('keydown', function(e){
     events.push(e);
+    pressed[e.keyCode] = true;
 
     if ([37, 38, 29, 40, // arrows
         32, // spacebar
@@ -39,6 +51,7 @@ Controls.prototype.initialize = function(obj){
   */
   obj.addEventListener('keyup', function(e){
     events.push(e);
+    pressed[e.keyCode] = false;
     return false;
   });
 };

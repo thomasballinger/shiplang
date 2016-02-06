@@ -47,9 +47,7 @@ function makeControls():MakeControlsReturnType{
     function setCurrentEntity(ent:any){ e = ent; }
     function setGameTime(time:GameTime){ t = time; }
     function setGameWorld(world: any){ w = world; }
-    function setKeyControls(keyControls: any){
-        keys = keyControls;
-    }
+    function setKeyControls(keyControls: any){ keys = keyControls; }
 
     // Functions available to scripts
     //
@@ -70,6 +68,10 @@ function makeControls():MakeControlsReturnType{
         var {value, done} = keygen.next()
         if (!done) { throw Error('expected done to be true'); }
         return value;
+    }
+
+    var keyPressed = function(name: string){
+        return keys.isPressed(name);
     }
 
     //TODO why do I have to annotate these with 'any'?
@@ -157,6 +159,12 @@ function makeControls():MakeControlsReturnType{
     thrustFor.requiresYield = true;
     thrustFor.finish = function(){ e.thrust = 0; }
 
+    var fullThrust = function(){ e.thrust = e.maxThrust; }
+    var cutThrust = function(){ e.thrust = 0; }
+    var fullLeft = function(){ e.dh = -e.maxDH; }
+    var fullRight = function(){ e.dh = e.maxDH; }
+    var noTurn = function(){ e.dh = 0; }
+
     var leftFor = <YieldFunction>function(n):any{
         e.dh = e.maxDH;
         var timeFinished = t + n;
@@ -187,6 +195,12 @@ function makeControls():MakeControlsReturnType{
         headingToClosestShip: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
         headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosest(e)); },
         keypress: keypress,
+        keyPressed: <YieldFunction>keyPressed,
+        fullThrust: <YieldFunction>fullThrust,
+        cutThrust: <YieldFunction>cutThrust,
+        fullLeft: <YieldFunction>fullLeft,
+        fullRight: <YieldFunction>fullRight,
+        noTurn: <YieldFunction>noTurn,
     }
 
     function makeAccessor(prop: string){ return function() { return e[prop]; }; }
@@ -247,6 +261,19 @@ export function initShipEnv(interpreter: any, scope: any){
     }
     interpreter.setProperty(scope, 'log',
         interpreter.createNativeFunction(function(x: any){ console.log('from jsinterp:', x); }));
+    interpreter.setProperty(scope, 'fullThrust', interpreter.createNativeFunction(function(){ controls['fullThrust'](); }));
+    interpreter.setProperty(scope, 'cutThrust', interpreter.createNativeFunction(function(){ controls['cutThrust'](); }));
+    interpreter.setProperty(scope, 'fullLeft', interpreter.createNativeFunction(function(){ controls['fullLeft'](); }));
+    interpreter.setProperty(scope, 'fullRight', interpreter.createNativeFunction(function(){ controls['fullRight'](); }));
+    interpreter.setProperty(scope, 'noTurn', interpreter.createNativeFunction(function(){ controls['noTurn'](); }));
+    interpreter.setProperty(scope, 'keyPressed',
+        interpreter.createNativeFunction(function(x: any){
+            if (!x.isPrimitive || x.type !== 'string' || typeof x.data !== 'string'){
+                throw Error('not a string');
+            }
+            var s = x.data;
+            return interpreter.createPrimitive(controls['keyPressed'](s));
+        }));
     for (var prop of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH', 'maxThrust', 'maxSpeed', 'speed', 'vHeading']){
         // these are properties hopefully?
         interpreter.setProperty(scope, prop,

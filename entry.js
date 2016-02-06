@@ -12,8 +12,6 @@ var editors = require('./editors');
 
 window.deepcopy = require('./deepcopy'); // needed by JS interpreter
 
-console.log(Interpreter);
-
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
 //  setup.makeFullscreen(document.body);

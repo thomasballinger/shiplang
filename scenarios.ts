@@ -31,14 +31,14 @@ export var scenario1 = function():any{
     var reset = <WorldBuilder>function reset(script: any): space.SpaceWorld {
 
         var boidScript = builtinScripts.enemyScript;
-        var playerScript = builtinScripts.pilotScript;
-        var enemyScript = script;
+        var playerScript = script;
+        var enemyScript = builtinScripts.enemyScript;
 
         var world = new space.SpaceWorld();
 
         var ship = space.makeShip(-200, 350, 270, playerScript);
-        ship.imtheplayer = true;
         var ship2 = space.makeShip(-300, 350, 270, enemyScript);
+        ship.imtheplayer = true
         world.addEntity(ship);
         world.addEntity(ship2);
         //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));

@@ -14,7 +14,7 @@ export var Ship = {
     type: 'ship',
     r: 10,
     maxThrust: 300,
-    maxDH: 300,
+    maxDH: 200,
     maxSpeed: 300,
     isMunition: false,
     explosionSize: 20,
