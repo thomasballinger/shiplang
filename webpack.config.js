@@ -18,9 +18,17 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.ts$/, loader: 'ts-loader' },
+      { test: /\.ts$/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['es2015-webpack']
+        }
+      },
       { test: /\.grammar$/, loader: 'raw-loader' },
       { test: /\.css$/, loader: "style!css" }
+    ],
+    preLoaders: [
+      { test: /\.ts$/, loader: 'ts-loader' },
     ]
   }
 };

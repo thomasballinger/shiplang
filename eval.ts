@@ -65,8 +65,8 @@ abstract class ASTNode {
 
 class NullNode extends ASTNode {
     constructor(location: Location){
-        this.content = null;
         super(location)
+        this.content = null;
     }
     eval(env: Environment):any { return null; }
     tree() { return 'NullLiteral: ' + this.content; }
@@ -608,8 +608,8 @@ export class CompilerSession extends Session{
 }
 export class TraceSession extends Session{
     constructor(){
-        this.envInterp = new Environment([Object.assign({}, funcs), {}]);
         super();
+        this.envInterp = new Environment([Object.assign({}, funcs), {}]);
     }
     envInterp: Environment;
     run(s: string){
