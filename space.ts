@@ -2,7 +2,7 @@ import { Entity, Ship } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
-var deepcopy = require('./deepcopy');
+import deepcopy from './deepcopy';
 
 import { GameTime, Script, ShipSpec } from './interfaces';
 
