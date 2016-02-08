@@ -1,4 +1,4 @@
-import * as space from './space';
+import { SpaceWorld } from './space';
 
 export class UserFunctionBodies{
     constructor(){
@@ -6,7 +6,7 @@ export class UserFunctionBodies{
     }
     bodies: {[name: string]: any}
     accessedThisTick: {[name: string]: boolean};
-    saves: {[name: string]: [number, space.SpaceWorld]};
+    saves: {[name: string]: [number, SpaceWorld]};
     tickNum: number;
     reset(){
         this.accessedThisTick = {};
@@ -25,7 +25,7 @@ export class UserFunctionBodies{
         this.bodies[name] = body;
         this.accessedThisTick[name] = true;
     }
-    save(world: space.SpaceWorld){
+    save(world: SpaceWorld){
         this.tickNum += 1;
         if (Object.keys(this.accessedThisTick).length === 0){ return; }
         var copy = world.copy();
@@ -47,7 +47,7 @@ export class UserFunctionBodies{
     // nothing to update.
     getEarliestSave(functions: string[]){
         var earliestTime = Number.MAX_VALUE;
-        var earliestSave = <space.SpaceWorld>undefined;
+        var earliestSave = <SpaceWorld>undefined;
         for (var funcName of functions){
             console.log(funcName, 'has changed...')
 

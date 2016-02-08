@@ -18,7 +18,7 @@ interface Scope {
   [key: string]: any;
 }
 
-import * as PEG from 'pegjs';
+import { buildParser } from 'pegjs';
 
 if (process.pid !== undefined){
     // when run from node (I hope?)
@@ -384,7 +384,7 @@ export class Environment {
 var emptyEnv = new Environment([]);
 
 
-export var parser = PEG.buildParser(grammar);
+export var parser = buildParser(grammar);
 parser.nodes = {}
 parser.nodes.NumberLiteralNode = NumberLiteralNode;
 parser.nodes.StringLiteralNode = StringLiteralNode;

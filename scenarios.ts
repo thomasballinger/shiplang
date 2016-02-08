@@ -1,12 +1,9 @@
-import * as ships from './ships';
-import * as entity from './entity';
-import * as space from './space';
-import * as scriptEnv from './scriptenv';
-
+import { SpaceWorld, makeShip, makeBoid } from './space';
+import { SLgetScripts } from './scriptenv';
 import { WorldBuilder } from './interfaces';
 
 var builtinSource = require("raw!./pilot.sl");
-var builtinScripts = scriptEnv.SLgetScripts(builtinSource);
+var builtinScripts = SLgetScripts(builtinSource);
 
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
@@ -26,24 +23,24 @@ export var scenario1 = function():any{
                      Math.random() * 100 - 50]);
     }
 
-    var reset = <WorldBuilder>function reset(script: any): space.SpaceWorld {
+    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
 
         var boidScript = builtinScripts.enemyScript;
         var playerScript = script;
         var enemyScript = builtinScripts.enemyScript;
 
-        var world = new space.SpaceWorld();
+        var world = new SpaceWorld();
 
-        var ship = space.makeShip(-200, 350, 270, playerScript);
-        var ship2 = space.makeShip(-300, 350, 270, enemyScript);
+        var ship = makeShip(-200, 350, 270, playerScript);
+        var ship2 = makeShip(-300, 350, 270, enemyScript);
         ship.imtheplayer = true
         world.addEntity(ship);
         world.addEntity(ship2);
-        //world.addEntity(space.makeShip(70, 190, 270, scripts.pilotScript));
+        //world.addEntity(makeShip(70, 190, 270, scripts.pilotScript));
         for (var i=0; i<boidArgs.length; i++){
-            world.addEntity(space.makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
-                                           boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
-                                           boidScript));
+            world.addEntity(makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
+                                     boidArgs[i][3], boidArgs[i][4], boidArgs[i][5],
+                                     boidScript));
         }
 
         return world;

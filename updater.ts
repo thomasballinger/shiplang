@@ -1,17 +1,16 @@
 //Orchestrates stuff
-import * as space from './space';
-import * as entity from './entity';
+import { SpaceWorld } from './space';
+import { Ship, Entity } from './entity';
 var manual = require('./manual');
 import * as scriptEnv from './scriptenv';
-import * as scenarios from './scenarios';
 import * as SLeval from './eval';
-import * as userfunctionbodies from './userfunctionbodies';
+import { UserFunctionBodies } from './userfunctionbodies';
 var jsastdiff = require('./jsastdiff');
 
 import { WorldBuilder } from './interfaces';
 
 interface Updateable {
-    update(e: entity.Entity, w: space.SpaceWorld): void;
+    update(e: Entity, w: SpaceWorld): void;
 }
 
 export class Updater{
@@ -32,20 +31,20 @@ export class Updater{
         console.log(this.worldBuilder.instructions);
         this.savedWorlds = [];
         this.codeHasChanged = false;
-        this.userFunctionBodies = new userfunctionbodies.UserFunctionBodies();
+        this.userFunctionBodies = new UserFunctionBodies();
         this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
         this.player = this.world.getPlayer();
         this.lastValid = '1';
     }
-    world: space.SpaceWorld;
+    world: SpaceWorld;
     lastValid: string;
     codeHasChanged: boolean;
     controls: any;
     observers: Updateable[];
     tickers: (()=>void)[];
-    savedWorlds: space.SpaceWorld[];
-    player: entity.Ship;
-    userFunctionBodies: userfunctionbodies.UserFunctionBodies;
+    savedWorlds: SpaceWorld[];
+    player: Ship;
+    userFunctionBodies: UserFunctionBodies;
 
     // objects to call .update() on ever tick
     registerObserver(obj: Updateable){

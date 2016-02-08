@@ -1,5 +1,5 @@
 import * as evaluation from './eval';
-import * as entity from './entity';
+import { Ship } from './entity';
 var manual = require('./manual');
 import * as ships from './ships';
 
@@ -40,7 +40,7 @@ type MakeControlsReturnType = [(e: any)=>void,
                                {[a:string]:any;}];
 
 function makeControls():MakeControlsReturnType{
-    var e = <entity.Ship>undefined;
+    var e = <Ship>undefined;
     var t = <GameTime>undefined;
     var w = <any>undefined;
     var keys = <any>undefined;

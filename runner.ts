@@ -10,9 +10,6 @@ export var TraceSession = ev.TraceSession
 export var Environment = ev.Environment
 export var parseOrShowError = ev.parseOrShowError
 
-
-
-
 type StandaloneContext = [string, ByteCode[][], number[], ev.Environment[], any[], ()=>boolean];
 
 // A Scheduler holds multiple running threads.

@@ -1,4 +1,4 @@
-import { Entity } from './entity';
+import { Entity, Ship } from './entity';
 import { CompiledFunctionObject, BC } from './eval';
 import { SpaceWorld } from './space';
 
@@ -50,4 +50,10 @@ export interface ShipSpec {type: string,
                     armorMax: number,
                     isInertialess: boolean,
                     lifespan: number,
+}
+
+export interface Context {
+    done: boolean;
+    step(e: Ship):void;
+    safelyStep(e: Ship, onError: (e: string)=>void):boolean; // returns whether step succeeded
 }

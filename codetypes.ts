@@ -1,37 +1,36 @@
-import * as ev from './eval';
-import * as entity from './entity';
-import * as scriptEnv from './scriptenv';
-import * as userfunctionbodies from './userfunctionbodies';
-
-import { Selection, Interpreter, Generator, ByteCode } from './interfaces'
+import { Environment, CompiledFunctionObject, initialize, runBytecodeOneStep } from './eval';
+import { Entity, Ship } from './entity';
+import { initShipEnv } from './scriptenv';
+import { UserFunctionBodies } from './userfunctionbodies';
+import { Selection, Interpreter, Generator, ByteCode, Context } from './interfaces'
 
 var Interpreter = (<any>window).Interpreter;
 
-export class NOPContext {
+export class NOPContext implements Context {
     contructor(){
         this.done = true;
     }
     done: boolean;
-    step(e:entity.Ship){}
-    safelyStep(e: entity.Ship){}
+    step(e: Ship){}
+    safelyStep(e: Ship, onError: (e: string)=>void){ return true; }
 }
 
-export class SLContext {
-    constructor(source: string, env: ev.Environment){
+export class SLContext implements Context {
+    constructor(source: string, env: Environment){
         this.source = source;
         this.done = false;
         this.initialEnv = env;
     }
     source: string;
-    initialEnv: ev.Environment;
+    initialEnv: Environment;
     bytecodeStack: ByteCode[][];
     counterStack: number[];
-    envStack: ev.Environment[];
+    envStack: Environment[];
     stack: any[];
     readyCallback: ()=>boolean;
     done: boolean;
 
-    static fromFunction(f: ev.CompiledFunctionObject):SLContext {
+    static fromFunction(f: CompiledFunctionObject):SLContext {
         if (f.params.length !== 0){ throw Error('Only functions that take no parameters can be scripts'); }
         var name = f.name || 'anonymous function';
         var context = new SLContext(name, undefined);
@@ -59,12 +58,12 @@ export class SLContext {
         copy.readyCallback = this.readyCallback;
     }
 
-    step(e:entity.Ship){
+    step(e: Ship){
         if (this.done){ return; }
         if (this.bytecodeStack === undefined){
             if (this.source === undefined){ throw Error('needs source!'); }
             if (this.initialEnv === undefined){ throw Error('needs initialEnv!'); }
-            [this.bytecodeStack, this.counterStack, this.envStack, this.stack] = ev.initialize(this.source, this.initialEnv);
+            [this.bytecodeStack, this.counterStack, this.envStack, this.stack] = initialize(this.source, this.initialEnv);
             this.initialEnv = undefined;
             // context is ready
         }
@@ -72,7 +71,7 @@ export class SLContext {
             return;
         }
         while (true) {
-            var result = ev.runBytecodeOneStep(this.counterStack,
+            var result = runBytecodeOneStep(this.counterStack,
                                                this.bytecodeStack,
                                                this.stack,
                                                this.envStack);
@@ -88,7 +87,7 @@ export class SLContext {
         }
     }
 
-    safelyStep(e:entity.Ship, onError: (e: string)=>void){
+    safelyStep(e: Ship, onError: (e: string)=>void){
         try{
             this.step(e);
             return true;
@@ -100,16 +99,16 @@ export class SLContext {
 }
 
 var MAXSTEPS = 1000;
-export class JSContext {
-    constructor(public source: string, public userFunctionBodies?: userfunctionbodies.UserFunctionBodies, public highlight?: (selections: Selection[])=>void){}
+export class JSContext implements Context {
+    constructor(public source: string, public userFunctionBodies?: UserFunctionBodies, public highlight?: (selections: Selection[])=>void){}
     done: boolean;
     interpreter: Interpreter;
-    step(e: entity.Ship){
+    step(e: Ship){
         if (this.interpreter === undefined){
             if (this.userFunctionBodies){
-                this.interpreter = new (<any>window).Interpreter(this.source, scriptEnv.initShipEnv, undefined, this.userFunctionBodies);
+                this.interpreter = new (<any>window).Interpreter(this.source, initShipEnv, undefined, this.userFunctionBodies);
             } else {
-                this.interpreter = new (<any>window).Interpreter(this.source, scriptEnv.initShipEnv);
+                this.interpreter = new (<any>window).Interpreter(this.source, initShipEnv);
             }
         }
 
@@ -122,7 +121,7 @@ export class JSContext {
 
         return true;
     }
-    safelyStep(e:entity.Ship, onError: (e: string)=>void){
+    safelyStep(e: Ship, onError: (e: string)=>void){
         if (this.done){ return; }
         try{
             var unfinished = this.step(e);
@@ -161,17 +160,20 @@ export class JSContext {
     }
 }
 
-export class JSGeneratorContext {
-    constructor(script: (e:entity.Entity)=>Generator){
+export class JSGeneratorContext implements Context {
+    constructor(script: (e: Entity)=>Generator){
         this.script = script
         this.done = false;
     }
-    script: (e:entity.Entity)=>Generator;
+    script: (e: Entity)=>Generator;
     generator: Generator;
     readyCallback: ()=>boolean;
     done: boolean;
 
-    step(e:entity.Ship){
+    safelyStep(e: Ship, onError: (e: string)=>void): boolean{
+        return this.step(e);
+    }
+    step(e: Ship): boolean{
         if (this.done){ return; }
         if (this.generator === undefined){
             if (this.script === undefined){

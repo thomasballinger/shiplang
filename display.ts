@@ -1,12 +1,12 @@
-import * as entity from './entity';
-import * as space from './space';
+import { Entity, Ship } from './entity';
+import { SpaceWorld } from './space';
 
 export class SpaceDisplay{
     constructor(id: string, public psf: number, public esf: number, public bgp: number){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);
         this.ctx = this.canvas.getContext('2d');
     }
-    renderCentered(centered: entity.Entity, entities: entity.Entity[],
+    renderCentered(centered: Entity, entities: Entity[],
                    positionScaleFactor:number, entityScaleFactor:number,
                    backgroundParallax:number){
         this.render(entities,
@@ -18,12 +18,12 @@ export class SpaceDisplay{
                     entityScaleFactor);
         this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
     }
-    update(center: entity.Entity, w: space.SpaceWorld){
+    update(center: Entity, w: SpaceWorld){
         this.renderCentered(center, w.entities, this.psf, this.esf, this.bgp);
     }
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
-    render(entities: entity.Entity[], left: number, top: number, right: number, bottom: number,
+    render(entities: Entity[], left: number, top: number, right: number, bottom: number,
            position_scale_factor: number, entity_scale_factor: number){
         var onscreen = this.visibleEntities(entities, left, top, right, bottom); //TODO profile: does this make a difference?
         //var onscreen = entities;
@@ -34,7 +34,7 @@ export class SpaceDisplay{
             // Given the world-space
         }
     };
-    visibleEntities(entities: entity.Entity[], left: number, top: number, right: number, bottom: number): entity.Entity[]{
+    visibleEntities(entities: Entity[], left: number, top: number, right: number, bottom: number): Entity[]{
         left -= 100;
         right += 100;
         top -= 100;
@@ -45,11 +45,11 @@ export class SpaceDisplay{
     }
 }
 
-function entityDraw(e:entity.Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number):void{
+function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number):void{
   //dx and dy are offsets in world space for panning
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions
-  if (e instanceof entity.Ship){
+  if (e instanceof Ship){
       shipDraws[e.type](e, ctx, dx, dy, psf, esf);
   } else {
       entityDraws[e.type](e, ctx, dx, dy, psf, esf);
@@ -80,8 +80,8 @@ function drawPoly(ctx:CanvasRenderingContext2D, x:number, y:number, points:numbe
   ctx.fill();
 }
 
-type EntityDrawFunc = (e:entity.Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number)=>void;
-type ShipDrawFunc = (e:entity.Ship, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number)=>void;
+type EntityDrawFunc = (e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number)=>void;
+type ShipDrawFunc = (e: Ship, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number)=>void;
 
 var entityDraws = <{[type:string]: EntityDrawFunc}>{
   'laser': function(e, ctx, dx, dy, psf, esf){
