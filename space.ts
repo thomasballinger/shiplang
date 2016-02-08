@@ -1,18 +1,15 @@
-import * as entity from './entity';
-import * as sm from './shipmath';
+import { Entity, Ship } from './entity';
+import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 var deepcopy = require('./deepcopy');
 
-import { GameTime } from './interfaces';
-
-var Entity = entity.Entity;
-var Ship = entity.Ship;
+import { GameTime, Script, ShipSpec } from './interfaces';
 
 
 var IMMUNITY_TIME_S = 1;
 
-export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:number, script:entity.Script){
+export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:number, script: Script){
     var boid = new Ship(ships.Boid, x, y, script);
     boid.dx = dx;
     boid.dy = dy;
@@ -21,13 +18,13 @@ export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:
     return boid;
 }
 
-export function makeShip(x: number, y: number, h: number, script:entity.Script){
+export function makeShip(x: number, y: number, h: number, script: Script){
     var ship = new Ship(ships.Ship, x, y, script);
     ship.h = h;
     return ship;
 }
 
-function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: entity.ShipSpec, script:entity.Script){
+function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: ShipSpec, script: Script){
     var missile = new Ship(ship, x, y, script);
     missile.dx = dx;
     missile.dy = dy;
@@ -36,23 +33,23 @@ function makeMissile(x: number, y: number, dx: number, dy: number, h: number, sh
     return missile;
 }
 
-function fireMissile(e:entity.Entity, ship: entity.ShipSpec, script:entity.Script, t:GameTime){
-    var missile = makeMissile(e.x + sm.x_comp(e.h)*e.r,
-                              e.y + sm.y_comp(e.h)*e.r,
-                              e.dx + sm.x_comp(e.h) * 10,
-                              e.dy + sm.y_comp(e.h) * 10,
+function fireMissile(e:Entity, ship: ShipSpec, script: Script, t:GameTime){
+    var missile = makeMissile(e.x + x_comp(e.h)*e.r,
+                              e.y + y_comp(e.h)*e.r,
+                              e.dx + x_comp(e.h) * 10,
+                              e.dy + y_comp(e.h) * 10,
                               e.h, ship, script);
     missile.firedBy = e;
     missile.firedAt = t;
     return missile;
 }
 
-function fireLaser(e:entity.Entity, gameTime:GameTime){
+function fireLaser(e:Entity, gameTime:GameTime){
     var laser = new Entity('laser',
-                           e.x + sm.x_comp(e.h)*e.r,
-    e.y + sm.y_comp(e.h)*e.r,
-    e.dx + sm.x_comp(e.h) * 600,
-    e.dy + sm.y_comp(e.h) * 600,
+                           e.x + x_comp(e.h)*e.r,
+    e.y + y_comp(e.h)*e.r,
+    e.dx + x_comp(e.h) * 600,
+    e.dy + y_comp(e.h) * 600,
     2);
     laser.firedBy = e;
     laser.firedAt = Number.MAX_VALUE;  // never damages owner
@@ -62,7 +59,7 @@ function fireLaser(e:entity.Entity, gameTime:GameTime){
 }
 
 
-function beingLaunchedByCollider(pair:[entity.Entity, entity.Entity], gameTime:GameTime):boolean{
+function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boolean{
     var e1 = pair[0]; var e2 = pair[1];
     if (e1.firedBy === e2 && gameTime < e1.firedAt + IMMUNITY_TIME_S &&
         e1.type !== 'explosion'){ return true; }
@@ -77,7 +74,7 @@ export class SpaceWorld{
         this.gameTime = 0;
         this.inTick = false;
     }
-    entities: entity.Entity[];
+    entities: Entity[];
     gameTime: GameTime;
     inTick: boolean;
     copy():SpaceWorld{
@@ -86,27 +83,27 @@ export class SpaceWorld{
         //console.log(window.performance.now() - t0);
         return world;
     }
-    fireMissile(entity:entity.Entity, ship: entity.ShipSpec, script: entity.Script, color:string){
+    fireMissile(entity:Entity, ship: ShipSpec, script: Script, color:string){
         var missile = fireMissile(entity, ship, script, this.gameTime);
         missile.drawStatus['color'] = color;
         this.addEntity(missile);
     }
-    fireLaser = function(entity: entity.Entity, script:entity.Script, color:string){
+    fireLaser = function(entity: Entity, script: Script, color:string){
         var missile = fireLaser(entity, this.gameTime);
         missile.drawStatus['color'] = color;
         this.addEntity(missile);
     }
-    addEntity(entity:entity.Entity){
+    addEntity(entity: Entity){
         this.entities.push(entity);
     }
-    ships():entity.Ship[]{
-        return <entity.Ship[]>this.entities.filter(function(x){return !x.isMunition;});
+    ships():Ship[]{
+        return <Ship[]>this.entities.filter(function(x){return !x.isMunition;});
     };
-    munitions():entity.Entity[]{
+    munitions(): Entity[]{
         return this.entities.filter(function(x){return x.isMunition;});
     };
-    getCollisionPairs(entities:entity.Entity[]){
-        var collisions = <[entity.Entity, entity.Entity][]>[];
+    getCollisionPairs(entities: Entity[]){
+        var collisions = <[Entity, Entity][]>[];
         for (var i=0; i<entities.length; i++){
             var e1 = entities[i];
             for (var j=i+1; j<entities.length; j++){
@@ -192,15 +189,15 @@ export class SpaceWorld{
 
         this.entities = this.entities.filter(function(x){return x.dead !== true;});
     }
-    findClosestShip = function(e1:entity.Entity){
+    findClosestShip = function(e1: Entity){
         return this.findClosest(e1, this.ships());
     };
-    findClosest = function(e1:entity.Entity, candidates?:entity.Entity[]){
+    findClosest = function(e1: Entity, candidates?: Entity[]){
         if (candidates === undefined){
             candidates = this.entities;
         }
         var minDist = Number.MAX_VALUE;
-        var other = <entity.Entity>undefined;
+        var other = <Entity>undefined;
         for (var i=0; i<candidates.length; i++){
             var e2 = candidates[i];
             if (e1 === e2){ continue; }
@@ -212,19 +209,19 @@ export class SpaceWorld{
         }
         return other;
     };
-    distToClosest(e: entity.Entity):number{
+    distToClosest(e: Entity):number{
         var closest = this.findClosest(e);
         if (closest === undefined){
             return Number.MAX_VALUE;
         }
-        return sm.dist(closest.x, closest.y, e.x, e.y);
+        return dist(closest.x, closest.y, e.x, e.y);
     };
-    distToClosestShip(e: entity.Entity):number{
+    distToClosestShip(e: Entity):number{
         var closest = this.findClosestShip(e);
         if (closest === undefined){
             return Number.MAX_VALUE;
         }
-        return sm.dist(closest.x, closest.y, e.x, e.y);
+        return dist(closest.x, closest.y, e.x, e.y);
     };
     tick = function(dt:GameTime, setError:(msg: string)=>void){
         this.inTick = true;
@@ -248,8 +245,8 @@ export class SpaceWorld{
         }
         this.inTick = false;
     };
-    getPlayer():entity.Ship{
-        return <entity.Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
+    getPlayer():Ship{
+        return <Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
     }
 
     deepCopyCreate():SpaceWorld{

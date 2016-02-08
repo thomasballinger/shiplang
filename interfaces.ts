@@ -27,11 +27,27 @@ export interface Editor {
 
 export type GameTime = number;
 
-export type Script = ((e: Entity)=>Generator)|string|CompiledFunctionObject
+export type Script = ((e: Entity)=>Generator)|
+                     string|
+                     CompiledFunctionObject
+
 
 export type ByteCode = [BC, any];
 
 export interface WorldBuilder {
     (scripts: any): SpaceWorld;
     instructions: string
+}
+
+// These define a ship type but not its instantaneous properties
+export interface ShipSpec {type: string,
+                    r: number,
+                    maxThrust: number,
+                    maxDH: number,
+                    maxSpeed: number,
+                    explosionSize: number,
+                    isMunition: boolean,
+                    armorMax: number,
+                    isInertialess: boolean,
+                    lifespan: number,
 }

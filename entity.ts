@@ -4,22 +4,8 @@ import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import * as userfunctionbodies from './userfunctionbodies';
 
-import { GameTime, Generator, Interpreter, Selection } from './interfaces';
+import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec } from './interfaces';
 
-export type Script = ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject
-
-// These define a ship type but not its instantaneous properties
-export interface ShipSpec {type: string,
-                    r: number,
-                    maxThrust: number,
-                    maxDH: number,
-                    maxSpeed: number,
-                    explosionSize: number,
-                    isMunition: boolean,
-                    armorMax: number,
-                    isInertialess: boolean,
-                    lifespan: number,
-}
 
 // Asteroids, missiles, ships, planets, projectiles.
 // If a projectile wouldn't need it, doesn't belong here
