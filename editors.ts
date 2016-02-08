@@ -2,16 +2,7 @@ var acorn = (<any>window).acorn;
 var ace = (<any>window).ace;
 var Range = ace.require('ace/range').Range
 
-interface Editor {
-    getCode(): string;
-    setCode(s: any): void;
-    setListener(cb: ()=>void): void;
-}
-
-interface Selection {
-    start: number;
-    finish: number;
-}
+import { Editor, Selection } from './interfaces';
 
 export class AceSL {
     constructor(){

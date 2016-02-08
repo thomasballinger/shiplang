@@ -2,20 +2,18 @@ import * as ev from './eval';
 import * as entity from './entity';
 import * as codetypes from './codetypes';
 
+import { Generator, ByteCode } from './interfaces';
+
 export var InterpreterSession = ev.InterpreterSession
 export var CompilerSession = ev.CompilerSession
 export var TraceSession = ev.TraceSession
 export var Environment = ev.Environment
 export var parseOrShowError = ev.parseOrShowError
 
-interface Generator {
-    next(): {value: any, done: boolean}
-}
 
 
 
-
-type StandaloneContext = [string, ev.ByteCode[][], number[], ev.Environment[], any[], ()=>boolean];
+type StandaloneContext = [string, ByteCode[][], number[], ev.Environment[], any[], ()=>boolean];
 
 // A Scheduler holds multiple running threads.
 // It can run all scripts to the next tick.
@@ -32,7 +30,7 @@ export class StandaloneScheduler{
         var ast = ev.parser.parse(code);
         var bytecode = ast.compile()
         bytecode.push([ev.BC.Return, null]) // last thing to do: return result
-        var bytecodeStack = <ev.ByteCode[][]>[bytecode];
+        var bytecodeStack = <ByteCode[][]>[bytecode];
         this.contexts.push([code, bytecodeStack, counterStack, envStack, stack, undefined])
     }
     addJS(generator:Generator){

@@ -12,6 +12,7 @@
     "webpack-dev-server": "^1.14.1"
   },
   "devDependencies": {
+    "babel-preset-es2015-webpack": "^6.3.14",
     "webpack": "^2.0.7-beta"
   }
 }

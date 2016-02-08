@@ -27,7 +27,7 @@ function stealBacktick(onQ){
       e.stopPropagation();
       e.preventDefault();
     }
-    if (e.keyCode === 81){
+    if (onQ && e.keyCode === 81){
       onQ();
       e.stopPropagation();
       e.preventDefault();

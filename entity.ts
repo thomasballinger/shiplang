@@ -4,19 +4,7 @@ import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import * as userfunctionbodies from './userfunctionbodies';
 
-type GameTime = number
-interface Generator {
-    next(): {value: any, done: boolean}
-}
-interface Interpreter {
-    step(): boolean;
-    run(): boolean;
-    isReady: ()=>boolean;
-}
-interface Selection {
-    start: number;
-    finish: number;
-}
+import { GameTime, Generator, Interpreter, Selection } from './interfaces';
 
 export type Script = ((e: Entity)=>Generator)|string|ev.CompiledFunctionObject
 

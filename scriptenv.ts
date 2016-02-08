@@ -3,7 +3,7 @@ import * as entity from './entity';
 var manual = require('./manual');
 import * as ships from './ships';
 
-type GameTime = number;
+import { GameTime } from './interfaces';
 
 interface YieldFunction {
     (...args:any[]): ()=>(boolean|string);

@@ -4,7 +4,8 @@ import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 var deepcopy = require('./deepcopy');
 
-type GameTime = number
+import { GameTime } from './interfaces';
+
 var Entity = entity.Entity;
 var Ship = entity.Ship;
 

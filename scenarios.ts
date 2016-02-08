@@ -3,6 +3,8 @@ import * as entity from './entity';
 import * as space from './space';
 import * as scriptEnv from './scriptenv';
 
+import { WorldBuilder } from './interfaces';
+
 var builtinSource = require("raw!./pilot.sl");
 var builtinScripts = scriptEnv.SLgetScripts(builtinSource);
 
@@ -10,10 +12,6 @@ var builtinScripts = scriptEnv.SLgetScripts(builtinSource);
 // a dictionary of user-provided SL scripts
 interface Scenario {
     (): WorldBuilder;
-}
-export interface WorldBuilder {
-    (scripts: any): space.SpaceWorld;
-    instructions: string
 }
 
 export var scenario1 = function():any{

@@ -8,6 +8,8 @@ import * as SLeval from './eval';
 import * as userfunctionbodies from './userfunctionbodies';
 var jsastdiff = require('./jsastdiff');
 
+import { WorldBuilder } from './interfaces';
+
 interface Updateable {
     update(e: entity.Entity, w: space.SpaceWorld): void;
 }
@@ -18,7 +20,7 @@ export class Updater{
                 public queueWarning: (msg: string)=>void,
                 public getCode: ()=>string, // gets updated code
                 public keyHandlerId: string, // where to set key handlers
-                public worldBuilder: scenarios.WorldBuilder,
+                public worldBuilder: WorldBuilder,
                 public language: string,
                 public highlight?: (start: number, finish: number)=>void){
 
@@ -30,7 +32,6 @@ export class Updater{
         console.log(this.worldBuilder.instructions);
         this.savedWorlds = [];
         this.codeHasChanged = false;
-        this.pleaseRewind = false;
         this.userFunctionBodies = new userfunctionbodies.UserFunctionBodies();
         this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
         this.player = this.world.getPlayer();
@@ -44,7 +45,6 @@ export class Updater{
     tickers: (()=>void)[];
     savedWorlds: space.SpaceWorld[];
     player: entity.Ship;
-    pleaseRewind: boolean;
     userFunctionBodies: userfunctionbodies.UserFunctionBodies;
 
     // objects to call .update() on ever tick
@@ -61,9 +61,6 @@ export class Updater{
     notifyOfCodeChange(){
         this.codeHasChanged = true;
     }
-
-    // restore an old state
-    rewind(){ this.pleaseRewind = true; }
 
     loadSL(){
         var s = this.getCode();
@@ -137,15 +134,7 @@ export class Updater{
                 throw Error("don't know language "+this.language)
             }
             this.codeHasChanged = false;
-        } else if (this.pleaseRewind){
-            this.world = this.savedWorlds[0];
-            this.savedWorlds.length = 0 // this clears the array, who knew
-            this.player = this.world.getPlayer();
-            this.pleaseRewind = false;
-            this.player.dh = 0;
-            this.player.thrust = 0;
         }
-
         var world = this.world;
         var player = this.world.getPlayer();
         //world.tick(dt, this.setError);

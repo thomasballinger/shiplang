@@ -1,4 +1,4 @@
-
+import { ByteCode } from 'interfaces';
 export enum BC {
     LoadConstant,
     FunctionLookup,
@@ -14,7 +14,6 @@ export enum BC {
     Return,        // done with this bytecode
     Yield,         // done for now, please continue when callback is true
 }
-export type ByteCode = [BC, any];
 interface Scope {
   [key: string]: any;
 }

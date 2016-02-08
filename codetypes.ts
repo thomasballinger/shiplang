@@ -3,24 +3,9 @@ import * as entity from './entity';
 import * as scriptEnv from './scriptenv';
 import * as userfunctionbodies from './userfunctionbodies';
 
-interface Selection {
-    start: number;
-    finish: number;
-}
+import { Selection, Interpreter, Generator, ByteCode } from './interfaces'
 
 var Interpreter = (<any>window).Interpreter;
-
-interface Interpreter {
-    step(): boolean;
-    run(): boolean;
-    isReady: ()=>boolean;
-    paused_: boolean;
-    stateStack: any;
-}
-
-interface Generator {
-    next(): {value: any, done: boolean}
-}
 
 export class NOPContext {
     contructor(){
@@ -39,7 +24,7 @@ export class SLContext {
     }
     source: string;
     initialEnv: ev.Environment;
-    bytecodeStack: ev.ByteCode[][];
+    bytecodeStack: ByteCode[][];
     counterStack: number[];
     envStack: ev.Environment[];
     stack: any[];
@@ -50,7 +35,7 @@ export class SLContext {
         if (f.params.length !== 0){ throw Error('Only functions that take no parameters can be scripts'); }
         var name = f.name || 'anonymous function';
         var context = new SLContext(name, undefined);
-        context.bytecodeStack = <ev.ByteCode[][]>[f.code];
+        context.bytecodeStack = <ByteCode[][]>[f.code];
         context.stack = <any[]>[];
         context.counterStack = [0];
         context.envStack = [f.env];

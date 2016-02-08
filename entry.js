@@ -26,7 +26,7 @@ var canvas = document.getElementById('canvas');
 errorbar.clearError();
 canvas.focus();
 
-setup.stealBacktick(function(){ updater.rewind(); });
+setup.stealBacktick();
 
 var editor = new editors.AceJS('editor');
 
