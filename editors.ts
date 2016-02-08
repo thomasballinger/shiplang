@@ -1,9 +1,6 @@
-var ace = require('brace');
-var Range = ace.acequire('ace/range').Range
-require('brace/mode/scheme');
-require('brace/mode/javascript');
-require('brace/theme/dawn');
-var acorn = require('acorn');
+var acorn = (<any>window).acorn;
+var ace = (<any>window).ace;
+var Range = ace.require('ace/range').Range
 
 interface Editor {
     getCode(): string;

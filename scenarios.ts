@@ -1,7 +1,7 @@
-import ships = require('./ships');
-import entity = require('./entity');
-import space = require('./space');
-import scriptEnv = require('./scriptenv');
+import * as ships from './ships';
+import * as entity from './entity';
+import * as space from './space';
+import * as scriptEnv from './scriptenv';
 
 var builtinSource = require("raw!./pilot.sl");
 var builtinScripts = scriptEnv.SLgetScripts(builtinSource);

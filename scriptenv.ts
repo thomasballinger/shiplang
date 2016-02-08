@@ -1,7 +1,7 @@
-import evaluation = require('./eval');
-import entity = require('./entity');
+import * as evaluation from './eval';
+import * as entity from './entity';
 var manual = require('./manual');
-import ships = require('./ships');
+import * as ships from './ships';
 
 type GameTime = number;
 

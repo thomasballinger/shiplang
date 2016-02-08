@@ -1,11 +1,11 @@
 //Orchestrates stuff
-import space = require('./space');
-import entity = require('./entity');
+import * as space from './space';
+import * as entity from './entity';
 var manual = require('./manual');
-import scriptEnv = require('./scriptenv');
-import scenarios = require('./scenarios');
-import SLeval = require('./eval');
-import userfunctionbodies = require('./userfunctionbodies');
+import * as scriptEnv from './scriptenv';
+import * as scenarios from './scenarios';
+import * as SLeval from './eval';
+import * as userfunctionbodies from './userfunctionbodies';
 var jsastdiff = require('./jsastdiff');
 
 interface Updateable {

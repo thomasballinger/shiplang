@@ -1,5 +1,5 @@
-import entity = require('./entity');
-import space = require('./space');
+import * as entity from './entity';
+import * as space from './space';
 
 export class SpaceDisplay{
     constructor(id: string, public psf: number, public esf: number, public bgp: number){

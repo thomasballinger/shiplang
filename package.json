@@ -11,5 +11,7 @@
     "devpack": "0.0.0",
     "webpack-dev-server": "^1.14.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "webpack": "^2.0.7-beta"
+  }
 }

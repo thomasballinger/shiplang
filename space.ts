@@ -1,7 +1,7 @@
-import entity = require('./entity');
-import sm = require('./shipmath');
-import ships = require('./ships');
-import scriptEnv = require('./scriptenv');
+import * as entity from './entity';
+import * as sm from './shipmath';
+import * as ships from './ships';
+import * as scriptEnv from './scriptenv';
 var deepcopy = require('./deepcopy');
 
 type GameTime = number

@@ -1,6 +1,6 @@
-import ev = require('./eval');
-import entity = require('./entity');
-import codetypes = require('./codetypes');
+import * as ev from './eval';
+import * as entity from './entity';
+import * as codetypes from './codetypes';
 
 export var InterpreterSession = ev.InterpreterSession
 export var CompilerSession = ev.CompilerSession

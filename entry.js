@@ -1,4 +1,8 @@
 require("./style.css");
+require('brace/mode/scheme');
+require('brace/mode/javascript');
+require('brace/theme/dawn');
+
 var pilotScriptSource = require("raw!./pilot.js");
 var builtinSLScripts = require("raw!./pilot.sl");
 

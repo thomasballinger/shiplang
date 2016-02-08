@@ -1,4 +1,4 @@
-import space = require('./space');
+import * as space from './space';
 
 export class UserFunctionBodies{
     constructor(){

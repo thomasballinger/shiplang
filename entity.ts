@@ -1,8 +1,8 @@
-import sm = require('./shipmath');
-import ev = require('./eval');
-import codetypes = require('./codetypes');
-import scriptEnv = require('./scriptenv');
-import userfunctionbodies = require('./userfunctionbodies');
+import * as sm from './shipmath';
+import * as ev from './eval';
+import * as codetypes from './codetypes';
+import * as scriptEnv from './scriptenv';
+import * as userfunctionbodies from './userfunctionbodies';
 
 type GameTime = number
 interface Generator {

@@ -19,7 +19,7 @@ interface Scope {
   [key: string]: any;
 }
 
-import PEG = require('pegjs');
+import * as PEG from 'pegjs';
 
 if (process.pid !== undefined){
     // when run from node (I hope?)

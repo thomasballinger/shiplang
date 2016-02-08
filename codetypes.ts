@@ -1,7 +1,7 @@
-import ev = require('./eval');
-import entity = require('./entity');
-import scriptEnv = require('./scriptenv');
-import userfunctionbodies = require('./userfunctionbodies');
+import * as ev from './eval';
+import * as entity from './entity';
+import * as scriptEnv from './scriptenv';
+import * as userfunctionbodies from './userfunctionbodies';
 
 interface Selection {
     start: number;
