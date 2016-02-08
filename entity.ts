@@ -4,7 +4,7 @@ import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 
-import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context } from './interfaces';
+import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context, JSInterpFunction } from './interfaces';
 
 
 // Asteroids, missiles, ships, planets, projectiles.
@@ -97,6 +97,10 @@ export class Ship extends Entity{
         } else if (Array.isArray(script)){
             var [source, bodies, highlight] = <[string, UserFunctionBodies, (selections: Selection[])=>void]><any>script;
             this.context = new codetypes.JSContext(source, bodies, highlight);
+        } else if (Array.isArray(script) && (<any[]>script).length === 2){
+            // this one is a "please fork" request: we ought to copy the context
+            var [context, func] = <[codetypes.JSContext, JSInterpFunction]>script;
+            this.context = new codetypes.JSContext(source, bodies, highlight); //TODO copy JSContext and invoke function
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);
         } else if (probablyReturnsGenerators(script)) {

@@ -103,13 +103,24 @@ function makeControls():MakeControlsReturnType{
     turnTo.finish = function(){}
 
     var fireMissile = <YieldFunction>function(script, color):any{
+        console.log('asdf')
         var startTime = t;
         var missileFired = false;
         return function(){
             if (t < startTime + .1){
                 return false;
             } else if (!missileFired){
-                w.fireMissile(e, ships.DroneMissile, script, color);
+                // TODO fork the interpreter here
+                // If the script passed in is a JS-Interpreter function,
+                // fork the interpreter and pass a script tuple
+                // with that forked interpreter.
+                // TODO dispatch on context maybe?
+                if (script instanceof evaluation.CompiledFunctionObject){
+                    w.fireMissile(e, ships.DroneMissile, script, color);
+                } else {
+                    var plsFork = [e.context, script]
+                    w.fireMissile(e, ships.DroneMissile, plsFork, color);
+                }
                 missileFired = true;
             } else if (t < startTime + .2){
                 return false;
@@ -276,6 +287,20 @@ export function initShipEnv(interpreter: any, scope: any){
             }
             var s = x.data;
             return interpreter.createPrimitive(controls['keyPressed'](s));
+        }));
+    interpreter.setProperty(scope, 'fireMissile',
+        interpreter.createNativeFunction(function(script: any, color?: any){
+            if (script === undefined){ throw Error('Firing a missile requires a script'); }
+            if (!script.isPrimitive || script.type !== 'string' || typeof script.data !== 'string'){
+                throw Error('provided color not a string');
+            }
+            if (color === undefined){
+                color = {data: undefined};
+            } else if (color.isPrimitive !== false || color.type !== 'function' || typeof color.data !== 'string'){
+                throw Error('provided color not a string');
+            }
+            var color = color.data;
+            return interpreter.createPrimitive(controls['fireMissile'](script, color));
         }));
     for (var prop of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH', 'maxThrust', 'maxSpeed', 'speed', 'vHeading']){
         // these are properties hopefully?

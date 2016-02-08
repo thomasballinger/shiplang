@@ -2,6 +2,7 @@ import { Entity, Ship } from './entity';
 import { CompiledFunctionObject, BC } from './eval';
 import { SpaceWorld } from './space';
 import { UserFunctionBodies } from './userfunctionbodies';
+import { JSContext } from './codetypes';
 
 export interface Selection {
     start: number;
@@ -14,6 +15,8 @@ export interface Interpreter {
     isReady: ()=>boolean;
     paused_: boolean;
     stateStack: any;
+    copy(): Interpreter;
+    runFunctionNow(func: any): void;
 }
 
 export interface Generator {
@@ -28,8 +31,14 @@ export interface Editor {
 
 export type GameTime = number;
 
+export interface JSInterpFunction {
+    isPrimitive: boolean;
+    type: string;
+}
+
 export type Script = ((e: Entity)=>Generator) |
                      [string, UserFunctionBodies, (selections: Selection[])=>void] |
+                     [JSContext, JSInterpFunction] |
                      CompiledFunctionObject |
                      string;
 

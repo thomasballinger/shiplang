@@ -3,6 +3,7 @@ import { Entity, Ship } from './entity';
 import { initShipEnv } from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Selection, Interpreter, Generator, ByteCode, Context } from './interfaces'
+import deepcopy from './deepcopy';
 
 var Interpreter = (<any>window).Interpreter;
 
@@ -147,6 +148,15 @@ export class JSContext implements Context {
             onError(e)
             return false;
         }
+    }
+    forkWithFunction(func: CompiledFunctionObject):JSContext{
+        var copy = deepcopy(this);
+        console.log('need to invoke a function in this:', copy);
+        copy.interpreter.paused_ = false;
+        copy.interpreter.isReady = function(){ return true; }
+        // TODO write this code -> copy.runFunctionNow(func);
+        // this will involve munging copy.interpreter.stateStack
+        return copy;
     }
     deepCopyCreate():JSContext{
         return new JSContext(undefined);

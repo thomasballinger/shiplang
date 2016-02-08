@@ -22,6 +22,7 @@ function manual(){
   if (keyPressed('UP')){ fullThrust(); }
   if (keyPressed('LEFT')){ fullLeft(); }
   if (keyPressed('RIGHT')){ fullRight(); }
+  if (keyPressed(' ')){ fireMissile(comeBackIfOutOfBounds, '#aa1144'); }
 }
 
 while (true){
