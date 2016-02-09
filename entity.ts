@@ -2,7 +2,7 @@ import * as sm from './shipmath';
 import * as ev from './eval';
 import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
-import * as userfunctionbodies from './userfunctionbodies';
+import { UserFunctionBodies } from './userfunctionbodies';
 
 import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context } from './interfaces';
 
@@ -95,7 +95,7 @@ export class Ship extends Entity{
         if (script === undefined){
             this.context = new codetypes.NOPContext();
         } else if (Array.isArray(script)){
-            var [source, bodies, highlight] = <[string, userfunctionbodies.UserFunctionBodies, (selections: Selection[])=>void]>script;
+            var [source, bodies, highlight] = <[string, UserFunctionBodies, (selections: Selection[])=>void]><any>script;
             this.context = new codetypes.JSContext(source, bodies, highlight);
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);

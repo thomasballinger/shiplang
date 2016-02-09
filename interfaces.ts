@@ -33,7 +33,6 @@ export type Script = ((e: Entity)=>Generator) |
                      CompiledFunctionObject |
                      string;
 
-
 export type ByteCode = [BC, any];
 
 export interface WorldBuilder {
