@@ -16,14 +16,14 @@ function greet(){
 }
 
 function manual(){
-
+  while (true){
+      waitFor(0.001);
+      cutThrust();
+      noTurn();
+      if (keyPressed('UP')){ fullThrust(); }
+      if (keyPressed('LEFT')){ fullLeft(); }
+      if (keyPressed('RIGHT')){ fullRight(); }
+  }
 }
 
-while (true){
-    waitFor(0.001);
-    cutThrust();
-    noTurn();
-    if (keyPressed('UP')){ fullThrust(); }
-    if (keyPressed('LEFT')){ fullLeft(); }
-    if (keyPressed('RIGHT')){ fullRight(); }
-}
+manual();
