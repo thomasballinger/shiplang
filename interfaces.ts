@@ -1,6 +1,7 @@
 import { Entity, Ship } from './entity';
 import { CompiledFunctionObject, BC } from './eval';
 import { SpaceWorld } from './space';
+import { UserFunctionBodies } from './userfunctionbodies';
 
 export interface Selection {
     start: number;
@@ -27,9 +28,10 @@ export interface Editor {
 
 export type GameTime = number;
 
-export type Script = ((e: Entity)=>Generator)|
-                     string|
-                     CompiledFunctionObject
+export type Script = ((e: Entity)=>Generator) |
+                     [string, UserFunctionBodies, (selections: Selection[])=>void] |
+                     CompiledFunctionObject |
+                     string;
 
 
 export type ByteCode = [BC, any];

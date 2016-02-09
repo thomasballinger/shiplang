@@ -4,7 +4,7 @@ import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import * as userfunctionbodies from './userfunctionbodies';
 
-import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec } from './interfaces';
+import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context } from './interfaces';
 
 
 // Asteroids, missiles, ships, planets, projectiles.
@@ -85,7 +85,7 @@ function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
 
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script: ((e: Entity)=>Generator)|[string, userfunctionbodies.UserFunctionBodies, (selections: Selection[])=>void]|ev.CompiledFunctionObject|string){
+    constructor(spec: ShipSpec, x: number, y: number, script: Script){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -125,7 +125,7 @@ export class Ship extends Entity{
     hTarget: number;
     isInertialess: boolean;
 
-    context: codetypes.SLContext | codetypes.JSGeneratorContext | codetypes.NOPContext | codetypes.JSContext;
+    context: Context;
     scriptDone: boolean;
 
     move(dt: GameTime){
