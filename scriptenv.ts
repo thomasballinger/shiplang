@@ -76,8 +76,12 @@ function makeControls():MakeControlsReturnType{
 
     //TODO why do I have to annotate these with 'any'?
     var waitFor = <YieldFunction>function(n):any{
+        if (n.isPrimitive){ n = n.data; }
         var timeFinished = t + n;
-        return function(){ return t > timeFinished; }
+        return function(){
+            console.log(t, timeFinished, t > timeFinished);
+            return t > timeFinished;
+        }
     }
     waitFor.requiresYield = true;
     waitFor.finish = function(){}

@@ -11,14 +11,14 @@ module.exports = {
     'acorn': "acorn",
   },
   resolve: {
-    extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
+    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   node: {
     fs: "empty"
   },
   module: {
     loaders: [
-      { test: /\.ts$/,
+      { test: /\.tsx?$/,
         loader: 'babel-loader',
         query: {
           presets: ['es2015-webpack']
@@ -28,7 +28,7 @@ module.exports = {
       { test: /\.css$/, loader: "style!css" }
     ],
     preLoaders: [
-      { test: /\.ts$/, loader: 'ts-loader' },
+      { test: /\.tsx?$/, loader: 'ts-loader' },
     ]
   }
 };

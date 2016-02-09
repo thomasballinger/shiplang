@@ -9,9 +9,9 @@ function makeFullscreen(element){
 }
 
 function stealBacktick(onQ){
-  var editor = document.getElementById('editor');
   var canvas = document.getElementById('canvas');
   function toggleEditor(){
+      var editor = document.getElementById('editor');
       if(editor.hidden){
           editor.hidden = false;
           editor.focus();

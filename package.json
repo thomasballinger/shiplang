@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "devpack": "0.0.0",
+    "react": "^0.14.7",
+    "react-ace": "^3.1.0",
     "webpack-dev-server": "^1.14.1"
   },
   "devDependencies": {

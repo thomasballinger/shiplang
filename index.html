@@ -6,7 +6,8 @@
 <body>
   <!-- Order important for z-index -->
   <canvas id="canvas" tabindex="1" width="1" height="1" class="grid-background"></canvas> <!-- Canvas width and height determined based on window.innerWidth and window.innerHeight -->
-  <div id="editor"></div>
+  <div id="editor-container">
+  </div>
   <canvas id="minimap" width="200" height="200"></canvas>
   <canvas id="player-armor" width="200" height="20"></canvas>
   <div id="fps">fps goes here</div>
@@ -19,9 +20,6 @@
   <script src="blocklyshiplanggen.js"></script>
   <script src="blockly-master/javascript_compressed.js"></script>
   <script src="shiplangblocks.js"></script>
-
-  <!-- makes window.ace available -->
-  <script src="node_modules/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
   <script src="hotswapping-js-interp/interpreter.js"></script>
   <script src="hotswapping-js-interp/acorn.js"></script>

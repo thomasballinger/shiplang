@@ -1,8 +1,11 @@
 var acorn = (<any>window).acorn;
-var ace = (<any>window).ace;
-var Range = ace.require('ace/range').Range
 
 import { Editor, Selection } from './interfaces';
+import { makeReactEditor } from './reacteditor';
+
+var brace = require('brace');
+var Range = <any>(<any>brace).acequire('ace/range').Range
+
 
 export class AceSL {
     constructor(){
@@ -20,34 +23,71 @@ export class AceSL {
     }
 }
 
+
 export class AceJS {
     constructor(){
-        this.editor = ace.edit('editor');
-        this.editor.getSession().setMode('ace/mode/javascript');
-        this.editor.setTheme('ace/theme/dawn');
+        this.callbacks = [];
+        this.lastContent = '';
+
         var self = this;
-        this.editor.getSession().on('change', function(){self.onChange();});
-        this.callbacks = []
-        this.editor.$blockScrolling = Infinity; // to avoid a console.warning
-        this.markers = [];
+        function delayedInit(editor: any){
+            self.editor = editor;
+            self.editor.getSession().on('change', function(){self.onChange;});
+            self.editor.$blockScrolling = Infinity; // to avoid a console.warning
+            self.editor.getSession().setUseSoftTabs(true);
+            self.markers = [];
+
+            self.loaded = true;
+
+            if (self.codeToLoad){
+                self.setCode(self.codeToLoad);
+                self.codeToLoad = undefined;
+            }
+        }
+        makeReactEditor(delayedInit, function(s: string){ self.onChange(); });
     }
     callbacks: any[];
     editor: any;
     markers: any[];
-    getCode(): string{ return this.editor.getSession().getValue(); }
+    lastContent: string;
+
+    loaded: boolean;
+    codeToLoad: string;
+
+    refresh(): boolean{
+        var s = this.editor.getSession().getValue();
+        if (s === this.lastContent){
+            return false;
+        } else {
+            this.lastContent = s;
+            return true;
+        }
+    }
+    getCode(): string{
+        return this.lastContent;
+    }
     setCode(s: string){
-        this.editor.getSession().setValue(s);
-        this.onChange();
+        if (this.loaded){
+            this.editor.getSession().setValue(s);
+            this.onChange();
+        } else {
+            this.codeToLoad = s;
+        }
     }
     setListener(cb: ()=>void){
         this.callbacks.push(cb);
     }
     onChange(){
+        if (!this.refresh()){
+            //TODO this extra indirection is unnecessary
+            return;
+        }
         for (var i=0; i<this.callbacks.length; i++){
             this.callbacks[0]();
         }
     }
     highlight(selections: Selection[]){
+        if (!this.loaded){ return; }
         var session = this.editor.getSession();
         this.markers.map(function(x){
             session.removeMarker(x);
@@ -58,7 +98,7 @@ export class AceJS {
         selections.map(function(selection: Selection){
             var s = acorn.getLineInfo(code, selection.start);
             var f = acorn.getLineInfo(code, selection.finish);
-            markers.push(session.addMarker(new Range(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false));
+            markers.push(session.addMarker(new (<any>Range)(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false));
         });
     }
 }
