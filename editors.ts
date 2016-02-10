@@ -6,7 +6,6 @@ import { makeReactEditor } from './reacteditor';
 var brace = require('brace');
 var Range = <any>(<any>brace).acequire('ace/range').Range
 
-
 export class AceSL {
     constructor(){
         this.editor = ace.edit('editor');
