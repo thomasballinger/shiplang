@@ -100,18 +100,21 @@ export class Updater{
                 this.player = this.world.getPlayer();
             } else {
                 for (var name of Object.keys(changed)){
+                    console.log('saving body for', name, changed[name])
                     this.userFunctionBodies.saveBody(name, changed[name]);
                 }
                 var save = this.userFunctionBodies.getEarliestSave(Object.keys(changed));
                 if (save === undefined){
                     // NOP because the modified functions have never been called
+                    console.log('not restoring because modified function never called');
                 } else if (save === null) {
                     // Start over because modified functions have never been *defined*
+                    console.log('starting over, function not yet defined');
                     this.userFunctionBodies.reset();
                     this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                     this.player = this.world.getPlayer();
                 } else {
-                    console.log('doing a restore');
+                    console.log('restoring from game time', save.gameTime)
                     this.world = save;
                     this.player = this.world.getPlayer();
                 }
@@ -134,10 +137,11 @@ export class Updater{
             }
             this.codeHasChanged = false;
         }
+        var preTickSnapshot = this.world.copy();
         var world = this.world;
         var player = this.world.getPlayer();
-        //world.tick(dt, this.setError);
-        world.tick(dt, function(e){ throw e; });
+        world.tick(dt, this.setError);
+        //world.tick(dt, function(e){ throw e; });
         this.observers.map(function(obs){
             obs.update(player, world);
         })
@@ -152,7 +156,7 @@ export class Updater{
             this.savedWorlds.shift();
         }
         */
-        this.userFunctionBodies.save(this.world.copy());
+        this.userFunctionBodies.save(preTickSnapshot);
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime

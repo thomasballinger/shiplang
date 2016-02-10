@@ -34,6 +34,8 @@ export class AceJS {
             self.editor = editor;
             self.editor.getSession().on('change', function(){self.onChange;});
             self.editor.$blockScrolling = Infinity; // to avoid a console.warning
+            self.editor.commands.removeCommand('gotoline') // bound to command-L which selects the url in osx chrome
+            self.editor.getSession().setTabSize(2);
             self.editor.getSession().setUseSoftTabs(true);
             self.markers = [];
 

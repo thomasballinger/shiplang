@@ -4,6 +4,7 @@ import { render } from 'react-dom'
 import AceEditor from 'react-ace';
 
 // this seems to be expected by the solarize_light mode?
+console.log('is this code even running?');
 (window as any).ace = require('brace');
 console.log('ace:', (window as any).ace);
 

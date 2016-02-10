@@ -25,15 +25,16 @@ export class UserFunctionBodies{
         this.bodies[name] = body;
         this.accessedThisTick[name] = true;
     }
+    // Ought to be called after a tick with pre-tick world state
     save(world: SpaceWorld){
         this.tickNum += 1;
         if (Object.keys(this.accessedThisTick).length === 0){ return; }
-        var copy = world.copy();
         for (var funcName of Object.keys(this.accessedThisTick)){
-            this.saves[funcName] = [this.tickNum, copy];
+            this.saves[funcName] = [this.tickNum, world];
         }
         this.accessedThisTick = {};
     }
+    // Should be called with a *copy* of the world.
 
     // Given a list of function names, return the state of the world
     // from the earliest of the worlds saved the last time each of these

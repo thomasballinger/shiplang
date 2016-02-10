@@ -156,7 +156,9 @@ export class JSContext implements Context {
         if (this.interpreter){
             copy.interpreter = (<any>this.interpreter).copy();
         }
-        copy.highlight = this.highlight;
+        copy.highlight = this.highlight; // function
+        copy.source = this.source; // immutable string
+        copy.userFunctionBodies = this.userFunctionBodies; // global
     }
 }
 

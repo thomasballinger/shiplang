@@ -79,7 +79,6 @@ function makeControls():MakeControlsReturnType{
         if (n.isPrimitive){ n = n.data; }
         var timeFinished = t + n;
         return function(){
-            console.log(t, timeFinished, t > timeFinished);
             return t > timeFinished;
         }
     }
