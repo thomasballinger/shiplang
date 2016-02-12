@@ -105,6 +105,21 @@ function makeControls():MakeControlsReturnType{
     detonate.requiresYield = true;
     detonate.finish = function(){}
 
+    var land = <YieldFunction>function():any{
+        var closest = w.findClosestBackgroundEntity(e);
+        if (!closest) { return function(){ return true; }; }
+        console.log(closest, e.speed(), closest.landOn);
+        if (e.distFrom(closest) < closest.r &&
+            e.speed() < 30 && closest.onLand){
+            closest.onLand();
+            return 'done';
+        } else {
+            return function(){ return true; };
+        }
+    }
+    land.requiresYield = true;
+    land.finish = function(){};
+
     var fireMissile = <YieldFunction>function(script, color):any{
         var startTime = t;
         var missileFired = false;
@@ -217,6 +232,7 @@ function makeControls():MakeControlsReturnType{
         fullLeft: <YieldFunction>fullLeft,
         fullRight: <YieldFunction>fullRight,
         noTurn: <YieldFunction>noTurn,
+        land: <YieldFunction>land,
     }
 
     function makeAccessor(prop: string){ return function() { return e[prop]; }; }

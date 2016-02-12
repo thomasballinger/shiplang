@@ -80,6 +80,10 @@ export class Entity{
     }
 }
 
+export class Spob extends Entity{ // Spob stands for "space object" as per the EV Bible
+    onLand: ()=>void;
+}
+
 function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
     return typeof g === 'function';
 }

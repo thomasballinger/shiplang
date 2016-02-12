@@ -27,6 +27,7 @@ function manual(){
   if (keyPressed('RIGHT')){ fullRight(); }
   if (keyPressed(' ')){ fireMissile(stayInBounds, '#aa1144'); }
   if (keyPressed('w')){ waitFor(1); }
+  if (keyPressed('l')){ land(); }
 }
 
 while (true){

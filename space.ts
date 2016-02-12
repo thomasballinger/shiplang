@@ -1,4 +1,4 @@
-import { Entity, Ship } from './entity';
+import { Entity, Ship, Spob } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
@@ -59,7 +59,7 @@ function fireLaser(e:Entity, gameTime:GameTime){
 }
 
 export function makePlanet(x: number, y: number, r: number, color?: string){
-    var planet = new Entity('planet', x, y, 0, 0, r);
+    var planet = new Spob('planet', x, y, 0, 0, r);
     planet.drawStatus['color'] = color
     return planet
 }
@@ -210,6 +210,9 @@ export class SpaceWorld{
     findClosestShip = function(e1: Entity){
         return this.findClosest(e1, this.ships());
     };
+    findClosestBackgroundEntity = function(e1: Entity){
+        return this.findClosest(e1, this.bgEntities);
+    }
     findClosest = function(e1: Entity, candidates?: Entity[]){
         if (candidates === undefined){
             candidates = this.entities;

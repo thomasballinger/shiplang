@@ -56,9 +56,16 @@ export var sol = function():any{
         var world = new SpaceWorld();
         var ship = makeShip(0, 0, 270, script);
         ship.imtheplayer = true;
-        world.addBackgroundEntity(makePlanet(100, 100, 50));
-        world.addBackgroundEntity(makePlanet(300, 200, 30));
-        world.addBackgroundEntity(makePlanet(-200, 1300, 45, '#ee3333'));
+        var earth = makePlanet(100, 100, 50);
+        var luna = makePlanet(300, 200, 30, '#eeeebb');
+        var mars = makePlanet(-200, 1300, 45, '#ee3333');
+        mars.onLand = function(){
+            console.log('landed on mars');
+            (<any>window).location.href = '/#simulator';
+            (<any>window).location.reload(); }
+        world.addBackgroundEntity(earth);
+        world.addBackgroundEntity(luna);
+        world.addBackgroundEntity(mars);
         world.addEntity(makeShip(-300, 350, 270, builtinScripts.enemyScript));
         world.addEntity(makeShip(-500, 250, 270, builtinScripts.enemyScript));
         world.addEntity(ship); // adding the ship last means it goes in front
