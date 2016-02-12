@@ -7,11 +7,7 @@ import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
 var jsastdiff = require('./jsastdiff');
 
-import { WorldBuilder } from './interfaces';
-
-interface Updateable {
-    update(e: Entity, w: SpaceWorld): void;
-}
+import { WorldBuilder, Updateable, Selection } from './interfaces';
 
 export class Updater{
     constructor(public setError: (msg: string)=>void,
@@ -22,7 +18,7 @@ export class Updater{
                 public worldBuilder: WorldBuilder,
                 public language: string,
                 public onReset?: ()=>void,
-                public highlight?: (start: number, finish: number)=>void){
+                public highlight?: (id: string, selections: Selection[])=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
         this.controls = new manual.Controls(keyHandlerTarget);

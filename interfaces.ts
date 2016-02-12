@@ -69,3 +69,8 @@ export interface Context {
     safelyStep(e: Ship, onError: (e: string)=>void):boolean; // returns whether step succeeded
     cleanup():void;
 }
+
+export interface Updateable {
+    update(e: Entity, w: SpaceWorld): void;
+}
+
