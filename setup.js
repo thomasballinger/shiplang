@@ -27,7 +27,6 @@ function stealKeys(updater){
       e.preventDefault();
     }
     if (e.keyCode === 220){
-      console.log('toggled');
       updater.toggleView();
       e.stopPropagation();
       e.preventDefault();

@@ -269,10 +269,8 @@ export function buildShipEnv():evaluation.Environment{
 
 export function initShipEnv(interpreter: any, scope: any){
     for (var prop of Object.keys(controls)){
-        console.log('adding', prop);
         if (controls[prop].requiresYield){
             if (!controls[prop].finish){ continue; }
-            console.log('readdly adding!');
             interpreter.setProperty(scope, prop,
                 interpreter.createAsyncFunction(controls[prop]));
         }

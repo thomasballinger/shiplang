@@ -167,6 +167,7 @@ export class Updater{
         var viewedEntity = this.viewedEntity;
         world.tick(dt, this.setError);
         //world.tick(dt, function(e){ throw e; });
+        this.ensureView()
         this.observers.map(function(obs){
             obs.update(viewedEntity, world);
         })
