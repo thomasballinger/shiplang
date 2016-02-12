@@ -44,7 +44,8 @@ body {
   background-color: #001900;
   color: yellow;
 }
-#keys {
+#simulatormessage,
+#spacemessage {
   position: absolute;
   top: 250;
   right: 0;

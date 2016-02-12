@@ -5,15 +5,18 @@
 </head>
 <body>
   <!-- Order important for z-index -->
-  <canvas id="canvas" tabindex="1" width="1" height="1" class="grid-background"></canvas> <!-- Canvas width and height determined based on window.innerWidth and window.innerHeight -->
+  <canvas id="canvas" tabindex="1" width="1" height="1" ></canvas> <!-- Canvas width and height determined based on window.innerWidth and window.innerHeight -->
   <div id="editor-container">
   </div>
   <canvas id="minimap" width="200" height="200"></canvas>
   <canvas id="player-armor" width="200" height="20"></canvas>
   <div id="fps">fps goes here</div>
-  <div id='keys'>
+  <div id='simulatormessage' hidden="true">
     \ toggles view<br/>
     ` toggles editor
+  </div>
+  <div id='spacemessage' hidden="true">
+    hang out in space!
   </div>
   <div id="errorbar"></div>
 

@@ -18,7 +18,8 @@ export class Updater{
                 public worldBuilder: WorldBuilder,
                 public language: string,
                 public onReset?: ()=>void,
-                public highlight?: (id: string, selections: Selection[])=>void){
+                public highlight?: (id: string, selections: Selection[])=>void,
+                public doSnapshots?: boolean){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
         this.controls = new manual.Controls(keyHandlerTarget);
@@ -158,7 +159,9 @@ export class Updater{
             }
             this.codeHasChanged = false;
         }
-        var preTickSnapshot = this.world.copy();
+        if (this.doSnapshots){
+            var preTickSnapshot = this.world.copy();
+        }
         var world = this.world;
         var viewedEntity = this.viewedEntity;
         world.tick(dt, this.setError);
@@ -168,6 +171,7 @@ export class Updater{
             obs.update(viewedEntity, world);
         })
 
+        //TODO factor out reset behavior
         if (this.player.dead){
             this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies, this.highlight]);
             this.player = this.world.getPlayer();
@@ -179,7 +183,9 @@ export class Updater{
             this.savedWorlds.shift();
         }
         */
-        this.userFunctionBodies.save(preTickSnapshot);
+       if (this.doSnapshots){
+            this.userFunctionBodies.save(preTickSnapshot);
+       }
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime

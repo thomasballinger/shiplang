@@ -1,12 +1,14 @@
 require("./style.css");
 
 import { simulator } from './simulator';
+import { outerspace } from './outerspace';
 
 window.deepcopy = require('./deepcopy'); // needed by JS interpreter
 
 routes = {
   'simulator': simulator,
-  'space': function(){'nop';},
+  'space': outerspace,
+  'outfitter?': function(){'nop';}
 };
 
 function getLocation(){
