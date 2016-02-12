@@ -103,7 +103,7 @@ function makeControls():MakeControlsReturnType{
       return 'done';
     }
     detonate.requiresYield = true;
-    turnTo.finish = function(){}
+    detonate.finish = function(){}
 
     var fireMissile = <YieldFunction>function(script, color):any{
         var startTime = t;
@@ -269,8 +269,10 @@ export function buildShipEnv():evaluation.Environment{
 
 export function initShipEnv(interpreter: any, scope: any){
     for (var prop of Object.keys(controls)){
+        console.log('adding', prop);
         if (controls[prop].requiresYield){
             if (!controls[prop].finish){ continue; }
+            console.log('readdly adding!');
             interpreter.setProperty(scope, prop,
                 interpreter.createAsyncFunction(controls[prop]));
         }

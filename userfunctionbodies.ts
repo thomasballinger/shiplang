@@ -23,7 +23,6 @@ export class UserFunctionBodies{
     }
     saveBody(name: string, body: any){
         this.bodies[name] = body;
-        this.accessedThisTick[name] = true;
     }
     // Ought to be called after a tick with pre-tick world state
     save(world: SpaceWorld){
@@ -50,17 +49,15 @@ export class UserFunctionBodies{
         var earliestTime = Number.MAX_VALUE;
         var earliestSave = <SpaceWorld>undefined;
         for (var funcName of functions){
-            console.log(funcName, 'has changed...')
 
             // if function was never *stored* then start over
-            if (!this.saves.hasOwnProperty(funcName)){
+            if (!this.bodies.hasOwnProperty(funcName)){
                 return null;
             }
 
             var [tick, save] = (this.saves[funcName] ||
                                 // if a function was never called, no need to rewind.
                                 [Number.MAX_VALUE, undefined]);
-            console.log(tick, save)
             if (earliestTime >= tick){
                 earliestTime = tick;
                 earliestSave = save;

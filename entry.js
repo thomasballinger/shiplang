@@ -23,7 +23,6 @@ var canvas = document.getElementById('canvas');
 errorbar.clearError();
 canvas.focus();
 
-setup.stealBacktick();
 
 var editor = new editors.AceJS('editor');
 
@@ -58,6 +57,8 @@ updater.registerObserver({
   hud: new hud.FPS('fps'),
   update: function(player, world){ this.hud.tick('ships: '+world.entities.length); }
 });
+
+setup.stealKeys(updater);
 
 editor.setCode(pilotScriptSource);
 

@@ -45,7 +45,8 @@ export class Entity{
     // some bookkeeping props for SpaceWorld
     dead: boolean;     // will be cleaned up this tick
     inactive: boolean; // sticking around for a bit to look pretty
-    imtheplayer: boolean;
+    imtheplayer: boolean; // world resets on player's death
+    viewable: boolean;
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
@@ -98,11 +99,13 @@ export class Ship extends Entity{
                    typeof script[0] === 'string' && script[1] instanceof UserFunctionBodies){
             var [source, bodies, highlight] = <[string, UserFunctionBodies, (id: string, selections: Selection[])=>void]><any>script;
             this.context = new codetypes.JSContext(source, bodies, highlight);
+            this.viewable = true;
         } else if (Array.isArray(script) && (<any[]>script).length === 2 &&
                    (<any>script)[1].type === 'function'){
             // this one is a "please fork" request: we ought to copy the context
             var [context, func] = <[codetypes.JSContext, JSInterpFunction]>script;
             this.context = context.forkWithFunction(func);
+            this.viewable = true;
         } else if (script instanceof ev.CompiledFunctionObject){
             this.context = codetypes.SLContext.fromFunction(script);
         } else if (probablyReturnsGenerators(script)) {
@@ -130,6 +133,7 @@ export class Ship extends Entity{
     dh: number;
     hTarget: number;
     isInertialess: boolean;
+    viewable: boolean;
 
     context: Context;
     scriptDone: boolean;

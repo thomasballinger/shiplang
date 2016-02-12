@@ -35,6 +35,7 @@ export class Updater{
         this.userFunctionBodies = new UserFunctionBodies();
         this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
         this.player = this.world.getPlayer();
+        this.viewedEntity = this.player;
         this.lastValid = '1';
     }
     world: SpaceWorld;
@@ -45,7 +46,24 @@ export class Updater{
     tickers: (()=>void)[];
     savedWorlds: SpaceWorld[];
     player: Ship;
+    viewedEntity: Entity;
     userFunctionBodies: UserFunctionBodies;
+
+    toggleView(){
+        var viewable = this.world.entities.filter(function(x){ return x.viewable })
+        var currentIndex = viewable.indexOf(this.viewedEntity);
+        if (currentIndex === -1){
+            this.ensureView()
+        }
+        this.viewedEntity = viewable[(currentIndex + 1) % viewable.length]
+    }
+    // if currently viewed entity doesn't exist, use the player instead;
+    ensureView(){
+        var viewable = this.world.entities.filter(function(x){ return x.viewable })
+        if (viewable.indexOf(this.viewedEntity) === -1){
+            this.viewedEntity = this.player;
+        }
+    }
 
     // objects to call .update() on ever tick
     registerObserver(obj: Updateable){
@@ -77,6 +95,7 @@ export class Updater{
                 this.lastValid = s;
                 this.world = this.worldBuilder(this.lastValid);
                 this.player = this.world.getPlayer();
+                this.viewedEntity = this.player;
             }
         }
     }
@@ -98,27 +117,30 @@ export class Updater{
                 this.userFunctionBodies.reset();
                 this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                 this.player = this.world.getPlayer();
+                this.viewedEntity = this.player;
                 this.onReset();
             } else {
                 for (var name of Object.keys(changed)){
-                    console.log('saving body for', name, changed[name])
+                    //console.log('saving body for', name, changed[name])
                     this.userFunctionBodies.saveBody(name, changed[name]);
                 }
                 var save = this.userFunctionBodies.getEarliestSave(Object.keys(changed));
                 if (save === undefined){
                     // NOP because the modified functions have never been called
-                    console.log('not restoring because modified function never called');
+                    //console.log('not restoring because modified function never called');
                 } else if (save === null) {
                     // Start over because modified functions have never been *defined*
-                    console.log('starting over, function not yet defined');
+                    //console.log('starting over, function not yet defined');
                     this.userFunctionBodies.reset();
                     this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                     this.player = this.world.getPlayer();
+                    this.viewedEntity = this.player;
                     this.onReset();
                 } else {
-                    console.log('restoring from game time', save.gameTime)
+                    //console.log('restoring from game time', save.gameTime)
                     this.world = save;
                     this.player = this.world.getPlayer();
+                    this.viewedEntity = this.player;
                     this.onReset();
                 }
             }
@@ -142,16 +164,17 @@ export class Updater{
         }
         var preTickSnapshot = this.world.copy();
         var world = this.world;
-        var player = this.world.getPlayer();
+        var viewedEntity = this.viewedEntity;
         world.tick(dt, this.setError);
         //world.tick(dt, function(e){ throw e; });
         this.observers.map(function(obs){
-            obs.update(player, world);
+            obs.update(viewedEntity, world);
         })
 
         if (this.player.dead){
             this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies, this.highlight]);
             this.player = this.world.getPlayer();
+            this.viewedEntity = this.player;
         }
         /*
         this.savedWorlds.push(this.world.copy());

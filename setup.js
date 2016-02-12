@@ -8,7 +8,7 @@ function makeFullscreen(element){
   }
 }
 
-function stealBacktick(onQ){
+function stealKeys(updater){
   var canvas = document.getElementById('canvas');
   function toggleEditor(){
       var editor = document.getElementById('editor');
@@ -21,14 +21,14 @@ function stealBacktick(onQ){
       }
   }
   window.addEventListener('keydown', function(e){
-    if ([192  // back tick
-        ].indexOf(e.keyCode) !== -1){
+    if (e.keyCode === 192){  // back tick
       toggleEditor();
       e.stopPropagation();
       e.preventDefault();
     }
-    if (onQ && e.keyCode === 81){
-      onQ();
+    if (e.keyCode === 220){
+      console.log('toggled');
+      updater.toggleView();
       e.stopPropagation();
       e.preventDefault();
     }
@@ -57,5 +57,5 @@ function resizeCanvas(id){
 
 exports.resizeCanvas = resizeCanvas;
 exports.waitForWindow = waitForWindow;
-exports.stealBacktick = stealBacktick;
+exports.stealKeys = stealKeys;
 exports.makeFullscreen = makeFullscreen;
