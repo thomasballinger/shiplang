@@ -21,6 +21,7 @@ export class Updater{
                 public keyHandlerId: string, // where to set key handlers
                 public worldBuilder: WorldBuilder,
                 public language: string,
+                public onReset?: ()=>void,
                 public highlight?: (start: number, finish: number)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
@@ -97,6 +98,7 @@ export class Updater{
                 this.userFunctionBodies.reset();
                 this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                 this.player = this.world.getPlayer();
+                this.onReset();
             } else {
                 for (var name of Object.keys(changed)){
                     console.log('saving body for', name, changed[name])
@@ -112,10 +114,12 @@ export class Updater{
                     this.userFunctionBodies.reset();
                     this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
                     this.player = this.world.getPlayer();
+                    this.onReset();
                 } else {
                     console.log('restoring from game time', save.gameTime)
                     this.world = save;
                     this.player = this.world.getPlayer();
+                    this.onReset();
                 }
             }
             this.lastValid = s;

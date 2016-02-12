@@ -67,4 +67,5 @@ export interface Context {
     done: boolean;
     step(e: Ship):void;
     safelyStep(e: Ship, onError: (e: string)=>void):boolean; // returns whether step succeeded
+    cleanup():void;
 }

@@ -37,6 +37,7 @@ export class AceJS {
             self.editor.getSession().setTabSize(2);
             self.editor.getSession().setUseSoftTabs(true);
             self.markers = [];
+            self.highlighter = new Highlighter(self.editor.getSession());
 
             self.loaded = true;
 
@@ -51,6 +52,7 @@ export class AceJS {
     editor: any;
     markers: any[];
     lastContent: string;
+    highlighter: Highlighter;
 
     loaded: boolean;
     codeToLoad: string;
@@ -87,29 +89,68 @@ export class AceJS {
             this.callbacks[0]();
         }
     }
-    highlight(selections: Selection[]){
+    // interface used by Contexts
+    setHighlight(id: string, selections: Selection[]){
         if (!this.loaded){ return; }
-        var session = this.editor.getSession();
-        this.markers.map(function(x){
-            session.removeMarker(x);
-        });
-        var code = session.getValue();
-        this.markers = [];
-        var markers = this.markers;
+        if (selections.length === 0){
+            this.highlighter.clear(id);
+        }
+        this.highlighter.set(id, selections, '#aabbcc');
+    }
+    clearAllHighlights(){
+        if (!this.loaded){ return; }
+        this.highlighter.clearAll();
+    }
+}
+
+class Highlighter{
+    constructor(session: any){
+        this.session = session;
+        this.highlights = {};
+    }
+    session: any;
+    highlights: {[id: string]: Selection[]};
+    // replace previous highlights for id with these
+    set(id: string, selections: Selection[], color: string){
+        this.clear(id);
+        this.highlights[id]
+
+        var code = this.session.getValue();
+        var session = this.session;
+        var markers = <any[]>[];
+        this.highlights[id] = markers;
         selections.map(function(selection: Selection){
             var s = acorn.getLineInfo(code, selection.start);
             var f = acorn.getLineInfo(code, selection.finish);
             markers.push(session.addMarker(new (<any>Range)(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false));
         });
     }
-    //TODO highlight should have:
-    //* a clear-all
-    //* choose highlight color per-entity
-    //* remove all highlights of somethign if dead
+    // clears all annotations on e.g. world reset
+    clear(id: string){
+        if (!this.highlights.hasOwnProperty(id)){ return; }
+        var session = this.session;
+        this.highlights[id].map(function(x){
+            session.removeMarker(x);
+        });
+        delete this.highlights[id];
+    }
+    // clears annotations for an id e.g. on entity death
+    clearAll(){
+        for (var key of Object.keys(this.highlights)){
+            this.clear(key);
+        }
+    }
 }
 
 //editor.setValue(pilotScriptSource);
 
+
+// highlight
+// called with an entity and a range.
+// on death, clear
+// highlighter.set
+// highlighter.clear
+// highlighter
 
 export class BlocklySL {
     constructor(id: string){

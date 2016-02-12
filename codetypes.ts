@@ -12,6 +12,7 @@ export class NOPContext implements Context {
         this.done = true;
     }
     done: boolean;
+    cleanup(){};
     step(e: Ship){}
     safelyStep(e: Ship, onError: (e: string)=>void){ return true; }
 }
@@ -43,6 +44,7 @@ export class SLContext implements Context {
         return context
     }
 
+    cleanup(){};
     deepCopyCreate():SLContext{
         return new SLContext(undefined, undefined);
     }
@@ -101,9 +103,17 @@ export class SLContext implements Context {
 
 var MAXSTEPS = 1000;
 export class JSContext implements Context {
-    constructor(public source: string, public userFunctionBodies?: UserFunctionBodies, public highlight?: (selections: Selection[])=>void){}
+    constructor(public source: string, public userFunctionBodies?: UserFunctionBodies, public highlight?: (id: string, selections: Selection[])=>void){
+        this.highlightId = Math.random().toString(36).substring(1); // id currently just used for highlighting
+    }
     done: boolean;
     interpreter: Interpreter;
+    highlightId: string;
+    cleanup(){ // TODO call cleanup somewhere
+        if (this.highlight){
+            this.highlight(this.highlightId, []);
+        }
+    }
     step(e: Ship){
         if (this.interpreter === undefined){
             if (this.userFunctionBodies){
@@ -134,11 +144,11 @@ export class JSContext implements Context {
             if (this.highlight){
                 if (this.interpreter.stateStack[0]) {
                     var node = this.interpreter.stateStack[0].node;
-                    this.highlight(this.interpreter.stateStack.slice(0, -1).map(function(state: any){
+                    this.highlight(this.highlightId, this.interpreter.stateStack.slice(0, -1).map(function(state: any){
                         return {start: state.node.start, finish: state.node.end};
                     }));
                 } else {
-                    this.highlight([]);
+                    this.highlight(this.highlightId, []);
                 }
             }
 
@@ -180,6 +190,7 @@ export class JSGeneratorContext implements Context {
     readyCallback: ()=>boolean;
     done: boolean;
 
+    cleanup(){};
     safelyStep(e: Ship, onError: (e: string)=>void): boolean{
         return this.step(e);
     }

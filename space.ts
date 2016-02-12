@@ -187,7 +187,12 @@ export class SpaceWorld{
             return (x.timeToDie !== undefined && !x.inactive && x.timeToDie < gameTime);
         }).map(function(x){ x.dead = true; });
 
-        this.entities = this.entities.filter(function(x){return x.dead !== true;});
+        this.entities = this.entities.filter(function(x){
+            if (x.dead && (x instanceof Ship)){
+                x.context.cleanup();
+            }
+            return x.dead !== true;
+        });
     }
     findClosestShip = function(e1: Entity){
         return this.findClosest(e1, this.ships());

@@ -36,7 +36,8 @@ var updater = new updater.Updater(
   'canvas', // where to put key handlers
   scenarios.scenario1(), // how to contruct a new world
   'JavaScript',
-  function(start, finish){ return editor.highlight(start, finish); }
+  function(){ editor.clearAllHighlights(); },
+  function(start, finish){ return editor.setHighlight(start, finish); }
 );
 
 editor.setListener(function(){ updater.notifyOfCodeChange(); });

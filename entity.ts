@@ -96,7 +96,7 @@ export class Ship extends Entity{
             this.context = new codetypes.NOPContext();
         } else if (Array.isArray(script) && (<any[]>script).length === 3 &&
                    typeof script[0] === 'string' && script[1] instanceof UserFunctionBodies){
-            var [source, bodies, highlight] = <[string, UserFunctionBodies, (selections: Selection[])=>void]><any>script;
+            var [source, bodies, highlight] = <[string, UserFunctionBodies, (id: string, selections: Selection[])=>void]><any>script;
             this.context = new codetypes.JSContext(source, bodies, highlight);
         } else if (Array.isArray(script) && (<any[]>script).length === 2 &&
                    (<any>script)[1].type === 'function'){
