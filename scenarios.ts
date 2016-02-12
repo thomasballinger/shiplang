@@ -1,4 +1,4 @@
-import { SpaceWorld, makeShip, makeBoid } from './space';
+import { SpaceWorld, makeShip, makeBoid, makePlanet } from './space';
 import { SLgetScripts } from './scriptenv';
 import { WorldBuilder } from './interfaces';
 
@@ -34,7 +34,7 @@ export var scenario1 = function():any{
         var ship = makeShip(-200, 350, 270, playerScript);
         (<any>window).ship = ship;
         var ship2 = makeShip(-300, 350, 270, enemyScript);
-        ship.imtheplayer = true
+        ship.imtheplayer = true;
         world.addEntity(ship);
         world.addEntity(ship2);
         //world.addEntity(makeShip(70, 190, 270, scripts.pilotScript));
@@ -49,4 +49,22 @@ export var scenario1 = function():any{
     reset.instructions = `
     `
     return reset;
+}
+
+export var sol = function():any{
+    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
+        var world = new SpaceWorld();
+        var ship = makeShip(0, 0, 270, script);
+        ship.imtheplayer = true;
+        world.addBackgroundEntity(makePlanet(100, 100, 50));
+        world.addBackgroundEntity(makePlanet(300, 200, 30));
+        world.addBackgroundEntity(makePlanet(-200, 1300, 45, '#ee3333'));
+        world.addEntity(makeShip(-300, 350, 270, builtinScripts.enemyScript));
+        world.addEntity(makeShip(-500, 250, 270, builtinScripts.enemyScript));
+        world.addEntity(ship); // adding the ship last means it goes in front
+        (<any>window).world = world;
+        return world;
+    }
+    reset.instructions = "i"
+    return reset
 }

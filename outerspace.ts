@@ -32,7 +32,7 @@ export function outerspace(){
     function(msg){}, // queue warning
     function(){ return pilotScriptSource; },
     'canvas', // where to put key handlers
-    scenarios.scenario1(), // how to contruct a new world
+    scenarios.sol(), // how to contruct a new world
     'JavaScript',
     function(){"cleanup";},
     undefined,

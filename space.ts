@@ -58,6 +58,11 @@ function fireLaser(e:Entity, gameTime:GameTime){
     return laser;
 }
 
+export function makePlanet(x: number, y: number, r: number, color?: string){
+    var planet = new Entity('planet', x, y, 0, 0, r);
+    planet.drawStatus['color'] = color
+    return planet
+}
 
 function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boolean{
     var e1 = pair[0]; var e2 = pair[1];
@@ -71,12 +76,17 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 export class SpaceWorld{
     constructor(){
         this.entities = [];
+        this.bgEntities = [];
         this.gameTime = 0;
         this.inTick = false;
     }
     entities: Entity[];
+    bgEntities: Entity[];
     gameTime: GameTime;
     inTick: boolean;
+    entitiesToDraw(): Entity[]{
+        return [].concat(this.bgEntities, this.entities);
+    }
     copy():SpaceWorld{
         //var t0 = window.performance.now();
         var world = deepcopy(this);
@@ -95,6 +105,9 @@ export class SpaceWorld{
     }
     addEntity(entity: Entity){
         this.entities.push(entity);
+    }
+    addBackgroundEntity(entity: Entity){
+        this.bgEntities.push(entity);
     }
     ships():Ship[]{
         return <Ship[]>this.entities.filter(function(x){return !x.isMunition;});

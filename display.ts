@@ -19,7 +19,7 @@ export class SpaceDisplay{
         this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
     }
     update(center: Entity, w: SpaceWorld){
-        this.renderCentered(center, w.entities, this.psf, this.esf, this.bgp);
+        this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp);
     }
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -89,6 +89,12 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
     ctx.beginPath();
     ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
     ctx.fill(); //TODO prettier lasers
+  },
+  'planet': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle = e.drawStatus['color'] || "#11ff55";
+    ctx.beginPath();
+    ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
+    ctx.fill();
   }
 };
 var shipDraws = <{[type:string]: ShipDrawFunc}>{
