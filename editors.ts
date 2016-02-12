@@ -102,6 +102,10 @@ export class AceJS {
             markers.push(session.addMarker(new (<any>Range)(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false));
         });
     }
+    //TODO highlight should have:
+    //* a clear-all
+    //* choose highlight color per-entity
+    //* remove all highlights of somethign if dead
 }
 
 //editor.setValue(pilotScriptSource);

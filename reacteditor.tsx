@@ -18,6 +18,8 @@ export function makeReactEditor(delayedInit: (editor: any)=>void,
         mode="javascript"
         theme="github"
         name="editor"
+        width="void"
+        height="void"
         onChange={onChange}
         onLoad={delayedInit}
       />,

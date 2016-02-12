@@ -106,15 +106,12 @@ function makeControls():MakeControlsReturnType{
     turnTo.finish = function(){}
 
     var fireMissile = <YieldFunction>function(script, color):any{
-        console.log('fireMissile called')
         var startTime = t;
         var missileFired = false;
         return function(){
-            console.log('checking time:', t, startTime + 1);
-            if (t < startTime + 1){
+            if (t < startTime + .1){
                 return false;
             } else if (!missileFired){
-                console.log('doing it');
                 // TODO fork the interpreter here
                 // If the script passed in is a JS-Interpreter function,
                 // fork the interpreter and pass a script tuple
@@ -127,7 +124,7 @@ function makeControls():MakeControlsReturnType{
                     w.fireMissile(e, ships.DroneMissile, plsFork, color);
                 }
                 missileFired = true;
-            } else if (t < startTime + .2){
+            } else if (t < startTime + .3){
                 return false;
             } else {
                 return true;

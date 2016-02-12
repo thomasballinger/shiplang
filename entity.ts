@@ -94,10 +94,12 @@ export class Ship extends Entity{
         this.explosionSize = spec.explosionSize;
         if (script === undefined){
             this.context = new codetypes.NOPContext();
-        } else if (Array.isArray(script) && (<any>script).length === 3){
+        } else if (Array.isArray(script) && (<any[]>script).length === 3 &&
+                   typeof script[0] === 'string' && script[1] instanceof UserFunctionBodies){
             var [source, bodies, highlight] = <[string, UserFunctionBodies, (selections: Selection[])=>void]><any>script;
             this.context = new codetypes.JSContext(source, bodies, highlight);
-        } else if (Array.isArray(script) && (<any[]>script).length === 2){
+        } else if (Array.isArray(script) && (<any[]>script).length === 2 &&
+                   (<any>script)[1].type === 'function'){
             // this one is a "please fork" request: we ought to copy the context
             var [context, func] = <[codetypes.JSContext, JSInterpFunction]>script;
             this.context = context.forkWithFunction(func);

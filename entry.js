@@ -55,7 +55,7 @@ updater.registerObserver({
 });
 updater.registerObserver({
   hud: new hud.FPS('fps'),
-  update: function(player, world){ this.hud.tick(world.entities.length); }
+  update: function(player, world){ this.hud.tick('ships: '+world.entities.length); }
 });
 
 editor.setCode(pilotScriptSource);

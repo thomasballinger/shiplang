@@ -28,7 +28,7 @@ export class Updater{
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
         this.tickers = [];
-        console.log(this.worldBuilder.instructions);
+        //console.log(this.worldBuilder.instructions);
         this.savedWorlds = [];
         this.codeHasChanged = false;
         this.userFunctionBodies = new UserFunctionBodies();
@@ -93,7 +93,6 @@ export class Updater{
             var changed = jsastdiff.changedNamedFunctions(
                 (<any>window).acorn.parse(this.lastValid), newAST);
             if (changed.hasOwnProperty('*main*')){
-                console.log('resetting everything')
                 // start over totally, top level change
                 this.userFunctionBodies.reset();
                 this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
@@ -147,7 +146,7 @@ export class Updater{
         })
 
         if (this.player.dead){
-            this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies]);
+            this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies, this.highlight]);
             this.player = this.world.getPlayer();
         }
         /*

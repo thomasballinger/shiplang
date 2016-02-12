@@ -18,10 +18,6 @@ function stayInBounds(){
   }
 }
 
-function greet(){
-  1 + 1;
-}
-
 function manual(){
   waitFor(0.001);
   cutThrust();

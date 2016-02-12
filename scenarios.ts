@@ -12,7 +12,7 @@ interface Scenario {
 }
 
 export var scenario1 = function():any{
-    var NUMBOIDS = 0
+    var NUMBOIDS = 3
     var boidArgs = <number[][]>[];
     for (var i=0; i<NUMBOIDS; i++){
       boidArgs.push([Math.random()*1000-500,
@@ -33,10 +33,10 @@ export var scenario1 = function():any{
 
         var ship = makeShip(-200, 350, 270, playerScript);
         (<any>window).ship = ship;
-        //var ship2 = makeShip(-300, 350, 270, enemyScript);
+        var ship2 = makeShip(-300, 350, 270, enemyScript);
         ship.imtheplayer = true
         world.addEntity(ship);
-        //world.addEntity(ship2);
+        world.addEntity(ship2);
         //world.addEntity(makeShip(70, 190, 270, scripts.pilotScript));
         for (var i=0; i<boidArgs.length; i++){
             world.addEntity(makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
@@ -47,12 +47,6 @@ export var scenario1 = function():any{
         return world;
     }
     reset.instructions = `
-    field of boids shooting missiles, or uses user script for boids
-    if it defines one function. If more than one function is defined,
-    looks for
-    * a function called "boid" to use for boids,
-    * a function called "ship" to use for an enemy ship, and
-    * a function called "pilot" to use for player's ship
     `
     return reset;
 }
