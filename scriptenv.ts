@@ -11,6 +11,9 @@ interface YieldFunction {
     requiresYield: boolean;
 }
 
+//TODO redesign this module to manufacture functions for either
+//     style, JSInterpreter or SL
+
 var funcs = {
     '+': function(){
       return Array.prototype.slice.call(arguments).reduce(function(a:number, b:number){
@@ -103,13 +106,15 @@ function makeControls():MakeControlsReturnType{
     turnTo.finish = function(){}
 
     var fireMissile = <YieldFunction>function(script, color):any{
-        console.log('asdf')
+        console.log('fireMissile called')
         var startTime = t;
         var missileFired = false;
         return function(){
-            if (t < startTime + .1){
+            console.log('checking time:', t, startTime + 1);
+            if (t < startTime + 1){
                 return false;
             } else if (!missileFired){
+                console.log('doing it');
                 // TODO fork the interpreter here
                 // If the script passed in is a JS-Interpreter function,
                 // fork the interpreter and pass a script tuple
@@ -288,20 +293,22 @@ export function initShipEnv(interpreter: any, scope: any){
             var s = x.data;
             return interpreter.createPrimitive(controls['keyPressed'](s));
         }));
+    function fireMissileAsync(script: any, color?: any){
+        if (script === undefined){ throw Error('Firing a missile requires a script'); }
+        if (script.type !== 'function'){
+            throw Error('provided script is supicious...');
+        }
+        if (color === undefined){
+            color = {data: undefined, isPrimitive: true};
+        } else if (!color.isPrimitive || color.type !== 'string' || typeof color.data !== 'string'){
+            throw Error('provided color not a string');
+        }
+        var color = color.data;
+        return controls['fireMissile'](script, color);
+    }
+    (<any>fireMissileAsync).finish = (<any>controls['fireMissile']).finish;
     interpreter.setProperty(scope, 'fireMissile',
-        interpreter.createNativeFunction(function(script: any, color?: any){
-            if (script === undefined){ throw Error('Firing a missile requires a script'); }
-            if (!script.isPrimitive || script.type !== 'string' || typeof script.data !== 'string'){
-                throw Error('provided color not a string');
-            }
-            if (color === undefined){
-                color = {data: undefined};
-            } else if (color.isPrimitive !== false || color.type !== 'function' || typeof color.data !== 'string'){
-                throw Error('provided color not a string');
-            }
-            var color = color.data;
-            return interpreter.createPrimitive(controls['fireMissile'](script, color));
-        }));
+        interpreter.createAsyncFunction(fireMissileAsync));
     for (var prop of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH', 'maxThrust', 'maxSpeed', 'speed', 'vHeading']){
         // these are properties hopefully?
         interpreter.setProperty(scope, prop,

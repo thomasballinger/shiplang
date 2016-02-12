@@ -2,7 +2,7 @@ import { Environment, CompiledFunctionObject, initialize, runBytecodeOneStep } f
 import { Entity, Ship } from './entity';
 import { initShipEnv } from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
-import { Selection, Interpreter, Generator, ByteCode, Context } from './interfaces'
+import { Selection, Interpreter, Generator, ByteCode, Context, JSInterpFunction } from './interfaces'
 import deepcopy from './deepcopy';
 
 var Interpreter = (<any>window).Interpreter;
@@ -106,6 +106,8 @@ export class JSContext implements Context {
     interpreter: Interpreter;
     step(e: Ship){
         if (this.interpreter === undefined){
+            console.log("interpreter was undefined! how did that happen?");
+            console.log("source:", this.source);
             if (this.userFunctionBodies){
                 this.interpreter = new (<any>window).Interpreter(this.source, initShipEnv, undefined, this.userFunctionBodies);
             } else {
@@ -149,13 +151,13 @@ export class JSContext implements Context {
             return false;
         }
     }
-    forkWithFunction(func: CompiledFunctionObject):JSContext{
+    forkWithFunction(func: JSInterpFunction):JSContext{
         var copy = deepcopy(this);
         console.log('need to invoke a function in this:', copy);
         copy.interpreter.paused_ = false;
         copy.interpreter.isReady = function(){ return true; }
-        // TODO write this code -> copy.runFunctionNow(func);
-        // this will involve munging copy.interpreter.stateStack
+        console.log('execing...')
+        copy.interpreter.exec(func) //TODO need to get this function from the copy instead!
         return copy;
     }
     deepCopyCreate():JSContext{

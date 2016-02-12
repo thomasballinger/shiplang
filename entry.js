@@ -28,7 +28,8 @@ setup.stealBacktick();
 var editor = new editors.AceJS('editor');
 
 var updater = new updater.Updater(
-  errorbar.setError, // alerts user that current code is very wrong
+  //errorbar.setError, // alerts user that current code is very wrong
+  function(e){ throw e; },
   errorbar.clearError,
   function(msg){}, // queue warning
   function(){ return editor.getCode(); },

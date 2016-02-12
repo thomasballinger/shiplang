@@ -11,6 +11,13 @@ function comeBackIfOutOfBounds(){
   thrustFor(1);
 }
 
+function stayInBounds(){
+  while (true){
+    comeBackIfOutOfBounds();
+    leftFor(3);
+  }
+}
+
 function greet(){
   1 + 1;
 }
@@ -22,7 +29,8 @@ function manual(){
   if (keyPressed('UP')){ fullThrust(); }
   if (keyPressed('LEFT')){ fullLeft(); }
   if (keyPressed('RIGHT')){ fullRight(); }
-  if (keyPressed(' ')){ fireMissile(comeBackIfOutOfBounds, '#aa1144'); }
+  if (keyPressed(' ')){ fireMissile(stayInBounds, '#aa1144'); }
+  if (keyPressed('w')){ waitFor(1); }
 }
 
 while (true){

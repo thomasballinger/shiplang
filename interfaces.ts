@@ -16,6 +16,7 @@ export interface Interpreter {
     paused_: boolean;
     stateStack: any;
     copy(): Interpreter;
+    exec(func: JSInterpFunction): void;
     runFunctionNow(func: any): void;
 }
 

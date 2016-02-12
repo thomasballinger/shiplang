@@ -12,7 +12,7 @@ interface Scenario {
 }
 
 export var scenario1 = function():any{
-    var NUMBOIDS = 2
+    var NUMBOIDS = 0
     var boidArgs = <number[][]>[];
     for (var i=0; i<NUMBOIDS; i++){
       boidArgs.push([Math.random()*1000-500,
@@ -32,10 +32,11 @@ export var scenario1 = function():any{
         var world = new SpaceWorld();
 
         var ship = makeShip(-200, 350, 270, playerScript);
-        var ship2 = makeShip(-300, 350, 270, enemyScript);
+        (<any>window).ship = ship;
+        //var ship2 = makeShip(-300, 350, 270, enemyScript);
         ship.imtheplayer = true
         world.addEntity(ship);
-        world.addEntity(ship2);
+        //world.addEntity(ship2);
         //world.addEntity(makeShip(70, 190, 270, scripts.pilotScript));
         for (var i=0; i<boidArgs.length; i++){
             world.addEntity(makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
