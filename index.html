@@ -13,10 +13,16 @@
   <div id="fps">fps goes here</div>
   <div id='simulatormessage' hidden="true">
     \ toggles view<br/>
-    ` toggles editor
+    ` toggles editor<br/>
+    <a href="/#space" onclick="toSpace()">leave this simulation</a>
   </div>
+  <script>function toSpace(){
+    window.location.href='/#space';
+    window.location.reload()
+  }</script>
   <div id='spacemessage' hidden="true">
-    hang out in space!
+    Hang out in space!<br />
+    Or land on a planet.
   </div>
   <div id="errorbar"></div>
 
