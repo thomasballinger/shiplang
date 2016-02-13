@@ -1,9 +1,10 @@
 require("./style.css");
 
 import { simulator } from './simulator';
-import { outerspace } from './outerspace';
+import { outerspace, level1 } from './outerspace';
 import { Player } from './player';
 import { earth } from './story';
+import * as scenarios from './scenarios';
 
 window.deepcopy = require('./deepcopy'); // needed by JS interpreter
 window.Player = Player; // for convenience in onClicks of links
@@ -12,9 +13,10 @@ window.DEBUGMODE = true;
 
 routes = {
   'simulator': simulator,
-  'Sol': outerspace,
+  'Sol': function(){outerspace(scenarios.sol);},
   'earth': earth,
-  'outfitter?': function(){'nop';}
+  'outfitter?': function(){'nop';},
+  'level1': function(){outerspace(scenarios.gunner);},
 };
 
 function getHash(){

@@ -6,10 +6,10 @@ import * as scenarios from './scenarios';
 import { Updater } from './updater';
 import * as errorbar from './errorbar';
 
-import { Updateable, Selection } from './interfaces';
+import { Updateable, Selection, Scenario } from './interfaces';
 
 
-export function outerspace(message?: string){
+export function outerspace(scenario: Scenario){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -28,7 +28,7 @@ export function outerspace(message?: string){
     function(msg){}, // queue warning
     function(){ return Player.fromStorage().script; },
     'canvas', // where to put key handlers
-    scenarios.sol(), // how to contruct a new world
+    scenario(), // how to contruct a new world
     'JavaScript',
     function(){"cleanup";},
     undefined,
@@ -58,6 +58,5 @@ export function outerspace(message?: string){
     var tickTime = updater.tick(0.032); // 30fps
     setTimeout(tick, Math.max(5, 33.5-tickTime));
   }
-  if (message){ alert(message); }
   tick();
 }

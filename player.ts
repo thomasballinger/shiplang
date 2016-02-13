@@ -3,7 +3,6 @@ var pilotScriptSource = require("raw!./scripts/pilot.js");
 export class Player{
     constructor(data: any){
         for (var prop of Object.keys(data)){
-            console.log("setting", prop, 'to', data[prop]);
             (<any>this)[prop] = data[prop];
         }
     }
@@ -32,7 +31,6 @@ export class Player{
         localStorage.removeItem('player');
     }
     set(prop: string, value: any): Player{
-        console.log("setting", prop, 'to', value);
         (<any>this)[prop] = value;
         return this.save()
     }

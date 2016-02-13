@@ -74,3 +74,6 @@ export interface Updateable {
     update(e: Entity, w: SpaceWorld): void;
 }
 
+export interface Scenario {
+    (): WorldBuilder;
+}

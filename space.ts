@@ -1,4 +1,4 @@
-import { Entity, Ship, Spob } from './entity';
+import { Entity, Ship, Spob, Component } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
@@ -18,10 +18,16 @@ export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:
     return boid;
 }
 
-export function makeShip(x: number, y: number, h: number, script: Script){
-    var ship = new Ship(ships.Ship, x, y, script);
+export function makeShip(kind: ShipSpec, x: number, y: number, h: number, script: Script){
+    var ship = new Ship(kind, x, y, script);
     ship.h = h;
     return ship;
+}
+
+export function makeComponent(kind: ShipSpec, x: number, y: number, h: number, script: Script): Ship{
+    var ship = new Component(kind, x, y, script);
+    ship.h = h;
+    return <Ship>ship;
 }
 
 function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: ShipSpec, script: Script){

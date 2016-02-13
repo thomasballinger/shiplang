@@ -191,3 +191,23 @@ export class Ship extends Entity{
         return new Ship(<ShipSpec>{}, undefined, undefined, undefined);
     }
 }
+
+// scripts can run on these, but movement matches that of another ship
+export class Component extends Ship{
+    constructor(spec: ShipSpec, x: number, y: number, script: Script){
+        super(spec, x, y, script);
+    }
+    attachedTo: Entity;
+    xOffset: number;
+    yOffset: number;
+    move(dt: GameTime){
+        if (this.attachedTo){
+            this.x = this.attachedTo.x + sm.x_comp(this.attachedTo.h) * this.xOffset;
+            this.y = this.attachedTo.y + sm.y_comp(this.attachedTo.h) * this.yOffset;
+            this.h = this.attachedTo.h;
+        }
+    }
+    deepCopyCreate():Ship{
+        return new Ship(<ShipSpec>{}, undefined, undefined, undefined);
+    } //TODO figure out the typescript way to use the correct constructor in the superclass
+}

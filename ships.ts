@@ -10,14 +10,27 @@ export var Boid = {
     isInertialess: false,
     lifespan: <number>undefined,
 }
-export var Ship = {
-    type: 'ship',
+export var Triangle = {
+    type: 'triangle',
     r: 10,
     maxThrust: 300,
     maxDH: 200,
     maxSpeed: 300,
     isMunition: false,
     explosionSize: 20,
+    armorMax: 20,
+    isInertialess: false,
+    lifespan: <number>undefined,
+}
+
+export var Gunship = {
+    type: 'gunship',
+    r: 3,
+    maxThrust: 0,
+    maxDH: 0,
+    maxSpeed: 0,
+    isMunition: false,
+    explosionSize: 12,
     armorMax: 20,
     isInertialess: false,
     lifespan: <number>undefined,

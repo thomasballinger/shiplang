@@ -32,7 +32,7 @@
     (leftFor .1)))
 ;    (forever
 ;        (if (and (> y 400) (> e.dy 0))
-;	        (do (turnTo 270)
+;            (do (turnTo 270)
 ;                (thrustFor .2))
 ;            (if (and (< y 200) (< dy 0))
 ;                (do (turnTo 90)
@@ -40,6 +40,16 @@
 ;        (define spot scanForEnemy)
 ;        (ping spot)
 ;        (fireMissile)))
+
+(defn citizenScript ()
+  (forever
+    (thrustFor .1)
+    (if (and (> y 400) (> dy 0))
+        (do (turnTo 270)
+            (thrustFor .2))
+        (if (and (< y 400) (< dy 0))
+            (do (turnTo 90)
+                (thrustFor .2))))))
 
 ; when syntax checking: x, y, dx, dy, and others
 ; are all dynamic scope. Assigning to them is an error.

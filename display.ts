@@ -98,7 +98,7 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
   }
 };
 var shipDraws = <{[type:string]: ShipDrawFunc}>{
-  'ship': function(e, ctx, dx, dy, psf, esf){
+  'triangle': function(e, ctx, dx, dy, psf, esf){
     ctx.fillStyle="#eeaa22";
     if (e.thrust > 0){
     drawPoly(ctx,
@@ -124,6 +124,17 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              [[15, 0],
               [-10, -12],
               [-10, 12]],
+             e.h,
+             esf);
+  },
+  'gunship': function(e, ctx, dx, dy, psf, esf){
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[10, 3],
+              [-10, 4],
+              [-10, -4],
+              [10, -3]],
              e.h,
              esf);
   },

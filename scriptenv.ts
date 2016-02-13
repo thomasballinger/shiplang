@@ -30,6 +30,8 @@ var funcs = {
         }
         return a === b;
     },
+    'and': function(a: boolean, b: boolean){ return a && b; },
+    'or': function(a: boolean, b: boolean){ return a || b; },
 }
 // Even though it wouldn't hurt to copy this object, all the functions would
 // be deepCopy passthroughs anyway. If a way to *modify* this array were added,
