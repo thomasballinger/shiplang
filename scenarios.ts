@@ -61,15 +61,13 @@ export var sol = function():any{
         var earth = makePlanet(100, 100, 50);
         earth.onLand = function(){
             console.log('landed on earth');
-            Player.fromStorage().location = 'earth';
-            Player.go();
+            Player.fromStorage().set('location', 'earth').go();
         }
         var luna = makePlanet(300, 200, 30, '#eeeebb');
         var mars = makePlanet(-200, 1300, 45, '#ee3333');
         mars.onLand = function(){
             console.log('landed on mars');
-            Player.fromStorage().location = 'simulator';
-            Player.go();
+            Player.fromStorage().set('location', 'simulator').go();
         }
         world.addBackgroundEntity(earth);
         world.addBackgroundEntity(luna);

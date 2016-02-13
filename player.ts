@@ -1,3 +1,5 @@
+var pilotScriptSource = require("raw!./scripts/pilot.js");
+
 export class Player{
     constructor(data: any){
         for (var prop of Object.keys(data)){
@@ -18,43 +20,36 @@ export class Player{
     toJson(): string{
         return JSON.stringify(this);
     }
-    static newPlayer(): Player{
-        return new Player({
-            _spaceLocation: [100, 100],
-            _location: '',
-            _name: 'Slippy',
-        })
-    }
-    static go(){
+    go(){
         (<any>window).location.reload();
     }
-    save(){
+    save(): Player{
         var data = localStorage.setItem('player', this.toJson());
         localStorage.setItem('player', this.toJson());
+        return this;
     }
     static clear(){
         localStorage.removeItem('player');
     }
-    //TODO fancy proxy stuff? Use function?
-    //Every access should cause a save.
-    get location(){
-        return this._location;
-    }
-    set location(value: string){
-        this._location = value;
-        this.save();
-    }
-    get spaceLocation(){
-        return this._spaceLocation
-    }
-    set spaceLocation(value: [number, number]){
-        this._spaceLocation = value;
-        this.save();
+    set(prop: string, value: any): Player{
+        console.log("setting", prop, 'to', value);
+        (<any>this)[prop] = value;
+        return this.save()
     }
 
+    static newPlayer(): Player{
+        return new Player({
+            spaceLocation: [100, 100],
+            location: 'Sol',
+            name: 'Slippy',
+            script: pilotScriptSource,
+            //script: 'while (true){ thrustFor(.1); leftFor(.1); }'
+        })
+    }
     // schema for objects:
-    _spaceLocation: [number, number];
-    _name: string;
-    _location: string;
+    spaceLocation: [number, number];
+    name: string;
+    location: string;
+    script: string;
 }
 

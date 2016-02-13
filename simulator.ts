@@ -1,7 +1,6 @@
-var pilotScriptSource = require("raw!./pilot.js");
-
 var setup = require('./setup');
 import { SpaceDisplay } from './display';
+import { Player } from './player';
 import { Lerper, FPS } from './hud';
 import * as scenarios from './scenarios';
 import { Updater } from './updater';
@@ -12,7 +11,7 @@ import { Updateable, Selection } from './interfaces';
 
 
 
-export function simulator(message?: string){
+export function simulator(){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -28,8 +27,7 @@ export function simulator(message?: string){
   var editor = new AceJS();
 
   var updater = new Updater(
-    //errorbar.setError, // alerts user that current code is very wrong
-    function(e){ throw e; },
+    (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
     function(){ return editor.getCode(); },
@@ -69,6 +67,6 @@ export function simulator(message?: string){
     setTimeout(tick, Math.max(5, 33.5-tickTime));
   }
 
-  if (message){ alert(message); }
+  editor.setCode(Player.fromStorage().script);
   tick();
 }

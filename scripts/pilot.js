@@ -1,3 +1,15 @@
+function manual(){
+  waitFor(0.001);
+  cutThrust();
+  noTurn();
+  if (keyPressed('UP')){ fullThrust(); }
+  if (keyPressed('LEFT')){ fullLeft(); }
+  if (keyPressed('RIGHT')){ fullRight(); }
+  if (keyPressed(' ')){ fireMissile(stayInBounds, '#aa1144'); }
+  if (keyPressed('w')){ waitFor(1); }
+  if (keyPressed('l')){ land(); }
+}
+
 function comeBackIfOutOfBounds(){
   if (x() < -100 && dx() < 0){
     turnTo(0);
@@ -18,17 +30,6 @@ function stayInBounds(){
   }
 }
 
-function manual(){
-  waitFor(0.001);
-  cutThrust();
-  noTurn();
-  if (keyPressed('UP')){ fullThrust(); }
-  if (keyPressed('LEFT')){ fullLeft(); }
-  if (keyPressed('RIGHT')){ fullRight(); }
-  if (keyPressed(' ')){ fireMissile(stayInBounds, '#aa1144'); }
-  if (keyPressed('w')){ waitFor(1); }
-  if (keyPressed('l')){ land(); }
-}
 
 while (true){
   manual();

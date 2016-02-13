@@ -15,10 +15,9 @@ export function earth(){
     bar.addEventListener('click', function(){
         index += 1;
         if (index > earthtexts.length-1){
-            Player.fromStorage().location = 'Sol'
-            Player.go();
+            Player.fromStorage().set('location', 'Sol').go();
         } else {
             bar.innerHTML = style(earthtexts[index]);
         }
-    }
+    });
 }

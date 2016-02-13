@@ -17,10 +17,7 @@
     ` toggles editor<br/>
     <a href="/#space" onclick="toSpace()">leave this simulation</a>
   </div>
-  <script>function toSpace(){
-    Player.fromStorage().location = 'Sol';
-    Player.go();
-  }</script>
+  <script>function toSpace(){ Player.fromStorage().set('location', 'Sol').go(); }</script>
   <div id='spacemessage' hidden="true">
     Hang out in space!<br />
     Or land on a planet.<br/>

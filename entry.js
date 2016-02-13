@@ -8,11 +8,12 @@ import { earth } from './story';
 window.deepcopy = require('./deepcopy'); // needed by JS interpreter
 window.Player = Player; // for convenience in onClicks of links
 
+window.DEBUGMODE = true;
+
 routes = {
   'simulator': simulator,
   'Sol': outerspace,
   'earth': earth,
-  '': function(){ return outerspace('You are a gunner. A space gunner. Press space to gun.'); },
   'outfitter?': function(){'nop';}
 };
 

@@ -5,6 +5,7 @@ var manual = require('./manual');
 import * as scriptEnv from './scriptenv';
 import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
+import { Player } from './player';
 var jsastdiff = require('./jsastdiff');
 
 import { WorldBuilder, Updateable, Selection } from './interfaces';
@@ -107,6 +108,7 @@ export class Updater{
             s = undefined;
         };
         if (s){
+            Player.fromStorage().set('script', s);
             var changed = jsastdiff.changedNamedFunctions(
                 (<any>window).acorn.parse(this.lastValid), newAST);
             if (changed.hasOwnProperty('*main*')){

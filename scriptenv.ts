@@ -112,7 +112,7 @@ function makeControls():MakeControlsReturnType{
         console.log(closest, e.speed(), closest.landOn);
         if (e.distFrom(closest) < closest.r &&
             e.speed() < 30 && closest.onLand){
-            Player.fromStorage().spaceLocation = [e.x, e.y];
+            Player.fromStorage().set('spaceLocation', [e.x, e.y]);
             closest.onLand();
             return 'done';
         } else {

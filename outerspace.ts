@@ -1,8 +1,6 @@
-var pilotScriptSource = require("raw!./pilot.js");
-var builtinSLScripts = require("raw!./pilot.sl");
-
 var setup = require('./setup');
 import { SpaceDisplay } from './display';
+import { Player } from './player';
 import { Lerper, FPS } from './hud';
 import * as scenarios from './scenarios';
 import { Updater } from './updater';
@@ -25,11 +23,10 @@ export function outerspace(message?: string){
   canvas.focus();
 
   var updater = new Updater(
-    errorbar.setError, // alerts user that current code is very wrong
-    //function(e){ throw e; },
+    (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
-    function(){ return pilotScriptSource; },
+    function(){ return Player.fromStorage().script; },
     'canvas', // where to put key handlers
     scenarios.sol(), // how to contruct a new world
     'JavaScript',
