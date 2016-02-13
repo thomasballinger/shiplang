@@ -1,6 +1,7 @@
 import { SpaceWorld, makeShip, makeBoid, makePlanet } from './space';
 import { SLgetScripts } from './scriptenv';
 import { WorldBuilder } from './interfaces';
+import { Player } from './player';
 
 var builtinSource = require("raw!./pilot.sl");
 var builtinScripts = SLgetScripts(builtinSource);
@@ -54,15 +55,22 @@ export var scenario1 = function():any{
 export var sol = function():any{
     var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
         var world = new SpaceWorld();
-        var ship = makeShip(0, 0, 270, script);
+        var p = Player.fromStorage().spaceLocation;
+        var ship = makeShip(p[0], p[1], 270, script);
         ship.imtheplayer = true;
         var earth = makePlanet(100, 100, 50);
+        earth.onLand = function(){
+            console.log('landed on earth');
+            Player.fromStorage().location = 'earth';
+            Player.go();
+        }
         var luna = makePlanet(300, 200, 30, '#eeeebb');
         var mars = makePlanet(-200, 1300, 45, '#ee3333');
         mars.onLand = function(){
             console.log('landed on mars');
-            (<any>window).location.href = '/#simulator';
-            (<any>window).location.reload(); }
+            Player.fromStorage().location = 'simulator';
+            Player.go();
+        }
         world.addBackgroundEntity(earth);
         world.addBackgroundEntity(luna);
         world.addBackgroundEntity(mars);

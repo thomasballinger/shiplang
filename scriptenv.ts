@@ -1,5 +1,6 @@
 import * as evaluation from './eval';
 import { Ship } from './entity';
+import { Player } from './player';
 var manual = require('./manual');
 import * as ships from './ships';
 
@@ -111,6 +112,7 @@ function makeControls():MakeControlsReturnType{
         console.log(closest, e.speed(), closest.landOn);
         if (e.distFrom(closest) < closest.r &&
             e.speed() < 30 && closest.onLand){
+            Player.fromStorage().spaceLocation = [e.x, e.y];
             closest.onLand();
             return 'done';
         } else {

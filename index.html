@@ -18,8 +18,8 @@
     <a href="/#space" onclick="toSpace()">leave this simulation</a>
   </div>
   <script>function toSpace(){
-    window.location.href='/#space';
-    window.location.reload()
+    Player.fromStorage().location = 'Sol';
+    Player.go();
   }</script>
   <div id='spacemessage' hidden="true">
     Hang out in space!<br />
