@@ -54,15 +54,21 @@ body {
   background-color: #001900;
   color: yellow;
 }
-#errorbar {
+#errorbar, #modalbar {
   position: absolute;
   top: 100;
   left: 660px;
   bottom: 100;
   right: 30;
-  background-color: #ff99cc;
   text-align: center;
   font-size: 2em;
+}
+#errorbar {
+  background-color: #ff99cc;
+}
+#modalbar {
+  background-color: #ddff99;
+  color: #2222aa;
 }
 .running-code{
   position:absolute;

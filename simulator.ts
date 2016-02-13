@@ -12,7 +12,7 @@ import { Updateable, Selection } from './interfaces';
 
 
 
-export function simulator(){
+export function simulator(message?: string){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -23,7 +23,6 @@ export function simulator(){
   var canvas = <HTMLCanvasElement>document.getElementById('canvas');
   canvas.classList.toggle('grid-background');
 
-  errorbar.clearError();
   canvas.focus();
 
   var editor = new AceJS();
@@ -65,11 +64,11 @@ export function simulator(){
 
   setup.stealKeys(updater);
 
-  editor.setCode(pilotScriptSource);
-
   function tick(){
     var tickTime = updater.tick(0.032); // 30fps
     setTimeout(tick, Math.max(5, 33.5-tickTime));
   }
+
+  if (message){ alert(message); }
   tick();
 }

@@ -23,27 +23,16 @@
   }</script>
   <div id='spacemessage' hidden="true">
     Hang out in space!<br />
-    Or land on a planet.
+    Or land on a planet.<br/>
+    Specifically, mars.
   </div>
-  <div id="errorbar"></div>
-
-  <!-- makes window.Blockly available -->
-  <script src="blockly-master/blockly_compressed.js"></script>
-  <script src="blockly-master/blocks_compressed.js"></script>
-  <script src="blockly-master/msg/js/en.js"></script>
-  <script src="blocklyshiplanggen.js"></script>
-  <script src="blockly-master/javascript_compressed.js"></script>
-  <script src="shiplangblocks.js"></script>
-
-  <!-- makes window.ace available; hack for autoreloading to work-->
-  <!--<script src="node_modules/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>-->
+  <div id="errorbar" hidden="true"></div>
+  <div id="modalbar" hidden="true"></div>
 
   <script src="hotswapping-js-interp/interpreter.js"></script>
   <script src="hotswapping-js-interp/acorn.js"></script>
   <script src="hotswapping-js-interp/deepcopy.js"></script>
 
   <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
-  <script>
-  </script>
 </body>
 </html>

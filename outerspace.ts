@@ -11,7 +11,7 @@ import * as errorbar from './errorbar';
 import { Updateable, Selection } from './interfaces';
 
 
-export function outerspace(){
+export function outerspace(message?: string){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -22,7 +22,6 @@ export function outerspace(){
   canvas.classList.toggle('space-background');
 
   document.getElementById('spacemessage').hidden = false;
-  errorbar.clearError();
   canvas.focus();
 
   var updater = new Updater(
@@ -62,5 +61,6 @@ export function outerspace(){
     var tickTime = updater.tick(0.032); // 30fps
     setTimeout(tick, Math.max(5, 33.5-tickTime));
   }
+  if (message){ alert(message); }
   tick();
 }
