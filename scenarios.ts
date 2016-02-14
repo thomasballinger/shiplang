@@ -88,12 +88,12 @@ export var sol = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
-        var earth = makePlanet(100, 100, 50);
+        var earth = makePlanet(100, 100, 50, '#004000');
         earth.onLand = function(){
             console.log('landed on earth');
             Player.fromStorage().set('location', 'earth').go();
         }
-        var luna = makePlanet(300, 200, 30, '#eeeebb');
+        var luna = makePlanet(300, 200, 30, '#aa9922');
         luna.onLand = function(){
             Player.fromStorage().set('location', 'level1').go();
         }
