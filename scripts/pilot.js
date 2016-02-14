@@ -9,6 +9,9 @@ function manual(){
   if (keyPressed('w')){ waitFor(1); }
   if (keyPressed('l')){ land(); }
 }
+// Try adding laser firing!
+// Your ship has a laser gun installed,
+// just call fireLaser() wherever you want.
 
 function comeBackIfOutOfBounds(){
   if (x() < -100 && dx() < 0){
