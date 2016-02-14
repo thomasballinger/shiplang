@@ -19,7 +19,6 @@ export function outerspace(scenario: Scenario){
   var canvas = <HTMLCanvasElement>document.getElementById('canvas');
   canvas.classList.toggle('space-background');
 
-  document.getElementById('spacemessage').hidden = false;
   canvas.focus();
 
   var updater = new Updater(

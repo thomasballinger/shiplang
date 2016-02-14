@@ -44,8 +44,7 @@ body {
   background-color: #001900;
   color: yellow;
 }
-#simulatormessage,
-#spacemessage {
+#objectivebar {
   position: absolute;
   top: 250;
   right: 0;

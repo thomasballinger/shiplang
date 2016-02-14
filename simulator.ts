@@ -17,7 +17,6 @@ export function simulator(){
 //document.body.addEventListener('click', function(e){
 //  setup.makeFullscreen(document.body);
 //});
-  document.getElementById('simulatormessage').hidden = false;
 
   var canvas = <HTMLCanvasElement>document.getElementById('canvas');
   canvas.classList.toggle('grid-background');

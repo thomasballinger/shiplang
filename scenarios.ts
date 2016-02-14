@@ -1,6 +1,7 @@
 import { SpaceWorld, makeShip, makeBoid, makePlanet, makeComponent } from './space';
 import { SLgetScripts } from './scriptenv';
 import { WorldBuilder } from './interfaces';
+import * as objectivebar from './objectivebar';
 import { Player } from './player';
 import * as ships from './ships';
 
@@ -9,6 +10,9 @@ var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
 export var gunner = function():any{
+    objectivebar.set(`
+    You're a gunner.<br/>
+    Use space and f to fire.<br/>`);
     var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
         var world = new SpaceWorld();
         var p = Player.fromStorage().spaceLocation;
@@ -28,6 +32,11 @@ export var gunner = function():any{
 }
 
 export var scenario1 = function():any{
+
+    objectivebar.set(`
+    \ toggles view<br/>
+    \` toggles editor<br/>
+    <a href="/#space" onclick="Player.fromStorage().set('location', 'Sol').go();">leave this simulation</a>`);
     var NUMBOIDS = 3
     var boidArgs = <number[][]>[];
     for (var i=0; i<NUMBOIDS; i++){
@@ -68,6 +77,10 @@ export var scenario1 = function():any{
 }
 
 export var sol = function():any{
+    objectivebar.set(`
+    Hang out in space!<br />
+    Or land on a planet.`);
+
     var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
         var world = new SpaceWorld();
         var p = Player.fromStorage().spaceLocation;

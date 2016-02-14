@@ -12,16 +12,8 @@
   <canvas id="minimap" width="200" height="200"></canvas>
   <canvas id="player-armor" width="200" height="20"></canvas>
   <div id="fps">fps goes here</div>
-  <div id='simulatormessage' hidden="true">
-    \ toggles view<br/>
-    ` toggles editor<br/>
-    <a href="/#space" onclick="toSpace()">leave this simulation</a>
-  </div>
-  <script>function toSpace(){ Player.fromStorage().set('location', 'Sol').go(); }</script>
-  <div id='spacemessage' hidden="true">
-    Hang out in space!<br />
-    Or land on a planet.
-  </div>
+  <div id='simulatormessage' hidden="true"></div>
+  <div id='objectivebar' hidden="true"></div>
   <div id="errorbar" hidden="true"></div>
   <div id="modalbar" hidden="true"></div>
 
