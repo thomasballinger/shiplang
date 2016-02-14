@@ -127,6 +127,32 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              e.h,
              esf);
   },
+  'holder': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle="#eeaa22";
+    if (e.thrust > 0){
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[-13, -10],
+              [-9, -10],
+              [-9, 10],
+              [-13, 10]],
+             e.h,
+             esf);
+    }
+    ctx.fillStyle="#153765";
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[15, -10],
+              [15, 0],
+              [-5, 0],
+              [-5, 10],
+              [-10, 12],
+              [-10, -12]],
+             e.h,
+             esf);
+  },
   'gunship': function(e, ctx, dx, dy, psf, esf){
     drawPoly(ctx,
              (e.x-dx)*psf,

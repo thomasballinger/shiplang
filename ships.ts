@@ -36,6 +36,19 @@ export var Gunship = {
     lifespan: <number>undefined,
 }
 
+export var Holder = {
+    type: 'holder',
+    r: 10,
+    maxThrust: 300,
+    maxDH: 200,
+    maxSpeed: 300,
+    isMunition: false,
+    explosionSize: 20,
+    armorMax: 20,
+    isInertialess: false,
+    lifespan: <number>undefined,
+}
+
 export var DroneMissile = {
     type: 'dronemissile',
     r: 10,

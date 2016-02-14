@@ -1,7 +1,7 @@
 function manual(){
   waitFor(0.001);
-  if (keyPressed(' ')){ fireMissile(stayInBounds, '#aa1144'); }
-  if (keyPressed('f')){ fireLaser(); }
+  if (keyPressed(' ')){ fireMissile(goAndExplode, '#aa1144'); }
+  if (keyPressed('f')){ fireLaser('#aabbcc'); }
 }
 
 function goAndExplode(){

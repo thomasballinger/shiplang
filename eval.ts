@@ -488,7 +488,6 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
                     stack.push(result);
                 }
             } else {
-                console.log(func);
                 if (func.params.length !== arg){
                     throw Error('Function called with wrong arity! Takes ' +
                                 func.params.length + ' args, given ' + args.length);
@@ -741,6 +740,6 @@ function main(){
 //       (a 1 2)`)
 //trace(`(define a (lambda (x y) 1 2 (+ x y)))
 //      (a 2 3)`);
-trace(`(define a 0)
-       (while (< a 10)
-              (define a (+ a 1)))`);
+//trace(`(define a 0)
+//       (while (< a 10)
+//              (define a (+ a 1)))`);

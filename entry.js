@@ -11,12 +11,16 @@ window.Player = Player; // for convenience in onClicks of links
 
 window.DEBUGMODE = true;
 
+var gunnerScript = require("raw!./scripts/gunner.js");
+
 routes = {
   'simulator': simulator,
   'Sol': function(){outerspace(scenarios.sol);},
   'earth': earth,
   'outfitter?': function(){'nop';},
-  'level1': function(){outerspace(scenarios.gunner);},
+  'level1': function(){
+    Player.fromStorage().set('script', gunnerScript);
+    outerspace(scenarios.gunner);},
 };
 
 function getHash(){

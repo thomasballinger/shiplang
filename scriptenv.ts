@@ -22,6 +22,7 @@ var funcs = {
       }, 0);
     },
     '*': function(a:number, b:number){ return a * b; },
+    '/': function(a:number, b:number){ return a / b; },
     '>': function(a:number, b:number){ return a > b; },
     '<': function(a:number, b:number){ return a < b; },
     '=': function(a:any, b:any){
@@ -124,6 +125,23 @@ function makeControls():MakeControlsReturnType{
     land.requiresYield = true;
     land.finish = function(){};
 
+    var attach = <YieldFunction>function():any{
+        return function(){ return true; }
+    }
+    attach.requiresYield = true;
+    attach.finish = function(){
+        var closest = w.findClosestComponent(e);
+        if (!closest) { return function(){ return true; }; }
+        if (e.distFrom(closest) < closest.r*2 + e.r &&
+                e.speed() < 30){
+            closest.attachedTo = e;
+            closest.yOffset = 5;
+            closest.xOffset = 5;
+            return true;
+        }
+        return false;
+    };
+
     var fireMissile = <YieldFunction>function(script, color):any{
         var startTime = t;
         var missileFired = false;
@@ -172,7 +190,7 @@ function makeControls():MakeControlsReturnType{
     fireNeedleMissile.requiresYield = true;
     fireNeedleMissile.finish = function(){}
 
-    var fireLaser = <YieldFunction>function(script, color):any{
+    var fireLaser = <YieldFunction>function(color):any{
         var startTime = t;
         w.fireLaser(e, color);
         return function(){
@@ -229,6 +247,8 @@ function makeControls():MakeControlsReturnType{
         distToClosestShip: <YieldFunction>function(){ return w.distToClosestShip(e); },
         headingToClosestShip: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
         headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosest(e)); },
+        headingToClosestComponent: <YieldFunction>function():any{ return e.towards(w.findClosestComponent(e)); },
+        distToClosestComponent: <YieldFunction>function():any{ return e.distFrom(w.findClosestComponent(e)); },
         keypress: keypress,
         keyPressed: <YieldFunction>keyPressed,
         fullThrust: <YieldFunction>fullThrust,
@@ -237,6 +257,7 @@ function makeControls():MakeControlsReturnType{
         fullRight: <YieldFunction>fullRight,
         noTurn: <YieldFunction>noTurn,
         land: <YieldFunction>land,
+        attach: <YieldFunction>attach,
     }
 
     function makeAccessor(prop: string){ return function() { return e[prop]; }; }

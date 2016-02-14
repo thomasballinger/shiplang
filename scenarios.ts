@@ -17,6 +17,7 @@ export var gunner = function():any{
         world.addBackgroundEntity(makePlanet(400, 300, 40, '#ab43af'));
         world.addEntity(makeShip(ships.Triangle, -300, 350, 270, builtinScripts.citizenScript));
         world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
+        world.addEntity(makeShip(ships.Holder, 0, 200, 270, builtinScripts.holderScript));
         world.addEntity(makeShip(ships.Triangle, 200, 250, 90, builtinScripts.citizenScript));
         world.addEntity(ship); // adding the ship last means it goes in front
         (<any>window).world = world;

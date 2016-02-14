@@ -41,12 +41,15 @@ export class Entity{
     armor: number;
     armorMax: number;
     explosionSize: number;
+    isComponent: boolean;
 
     // some bookkeeping props for SpaceWorld
     dead: boolean;     // will be cleaned up this tick
     inactive: boolean; // sticking around for a bit to look pretty
     imtheplayer: boolean; // world resets on player's death
     viewable: boolean;
+
+    attachedTo: Entity;
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
@@ -196,15 +199,22 @@ export class Ship extends Entity{
 export class Component extends Ship{
     constructor(spec: ShipSpec, x: number, y: number, script: Script){
         super(spec, x, y, script);
+        this.isComponent = true;
     }
-    attachedTo: Entity;
     xOffset: number;
     yOffset: number;
     move(dt: GameTime){
         if (this.attachedTo){
-            this.x = this.attachedTo.x + sm.x_comp(this.attachedTo.h) * this.xOffset;
-            this.y = this.attachedTo.y + sm.y_comp(this.attachedTo.h) * this.yOffset;
+            var h = this.attachedTo.h
+            this.x = (this.attachedTo.x +
+                      this.xOffset * Math.cos(h * Math.PI / 180) -
+                      this.yOffset * Math.sin(h * Math.PI / 180))
+            this.y = (this.attachedTo.y +
+                      this.xOffset * Math.sin(h * Math.PI / 180) +
+                      this.yOffset * Math.cos(h * Math.PI / 180));
             this.h = this.attachedTo.h;
+            this.dx = this.attachedTo.dx // not used to move, but
+            this.dy = this.attachedTo.dy // needed for projectiles
         }
     }
     deepCopyCreate():Ship{

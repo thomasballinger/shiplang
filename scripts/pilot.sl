@@ -51,6 +51,28 @@
             (do (turnTo 90)
                 (thrustFor .2))))))
 
+(defn holderScript ()
+  (seekGun)
+  (citizenScript))
+
+(defn reverseTime () (/ 180 maxDH ))
+(defn stopTime () (/ speed maxThrust))
+
+(defn stop ()
+   (leftFor (reverseTime))
+   (thrustFor (stopTime)))
+
+(defn seekGun ()
+  (define gun 0)
+  (while (< gun 1)
+    (turnTo (headingToClosestComponent))
+    (thrustFor (if (< (distToClosestComponent) 50) .02 .1))
+    (if (< (distToClosestComponent)
+           (* speed (+ (stopTime) (reverseTime))))
+        (do
+          (leftFor (reverseTime))
+          (thrustFor (stopTime))
+          (define gun (attach))))))
 ; when syntax checking: x, y, dx, dy, and others
 ; are all dynamic scope. Assigning to them is an error.
 ;

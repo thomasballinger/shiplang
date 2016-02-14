@@ -72,10 +72,16 @@ export function makePlanet(x: number, y: number, r: number, color?: string){
 
 function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boolean{
     var e1 = pair[0]; var e2 = pair[1];
-    if (e1.firedBy === e2 && gameTime < e1.firedAt + IMMUNITY_TIME_S &&
-        e1.type !== 'explosion'){ return true; }
-    if (e2.firedBy === e1 && gameTime < e2.firedAt + IMMUNITY_TIME_S &&
-        e2.type !== 'explosion'){ return true; }
+    if ((e1.firedBy === e2 || (e1.firedBy && e1.firedBy.attachedTo === e2)) &&
+        gameTime < e1.firedAt + IMMUNITY_TIME_S &&
+        e1.type !== 'explosion'){
+            return true;
+    }
+    if ((e2.firedBy === e1 || (e2.firedBy && e2.firedBy.attachedTo === e1)) &&
+         gameTime < e2.firedAt + IMMUNITY_TIME_S &&
+         e2.type !== 'explosion'){
+        return true;
+    }
 }
 
 
@@ -218,7 +224,11 @@ export class SpaceWorld{
     };
     findClosestBackgroundEntity = function(e1: Entity){
         return this.findClosest(e1, this.bgEntities);
-    }
+    };
+    findClosestComponent = function(e1: Entity){
+        return this.findClosest(e1, this.entities.filter(
+            function(x:Entity){ return x.isComponent; }));
+    };
     findClosest = function(e1: Entity, candidates?: Entity[]){
         if (candidates === undefined){
             candidates = this.entities;
