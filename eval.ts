@@ -1,4 +1,4 @@
-import { ByteCode } from 'interfaces';
+type ByteCode = [BC, any];
 export enum BC {
     LoadConstant,
     FunctionLookup,
@@ -13,6 +13,7 @@ export enum BC {
     Store,         // arg is variable name, saves TOS
     Return,        // done with this bytecode
     Yield,         // done for now, please continue when callback is true
+    CloneTop,      // push on another of the top of the stack
 }
 interface Scope {
   [key: string]: any;
@@ -149,7 +150,7 @@ class DefineNode extends ASTNode {
         return v;
     }
     tree(){
-        return 'define\n '+this.value+' to be\n'+indent(this.value.tree(), 1);
+        return 'define\n '+this.value+' to be\n '+indent(this.value.tree(), 1);
     }
     compile(){
         return [].concat(this.value.compile(), [[BC.StoreNew, this.name]]);
@@ -245,6 +246,47 @@ class ForeverNode extends ASTNode {
         code.push([BC.Pop, null]);
         code.push([BC.Jump, -(code.length+1)])
         return code;
+    }
+}
+
+// while nodes return the first false value the condition evaluates to
+class WhileNode extends ASTNode {
+    constructor(location: Location,
+                public condition: ASTNode,
+                public body: ASTNode){
+                    super(location);
+               }
+    eval(env: Environment){
+        while (true){
+            var a = this.condition.eval(env)
+            if (!a){ break; }
+            this.body.eval(env);
+        }
+        return a;
+    }
+    tree() { return 'while '+this.condition.tree()+'\n' + indent(this.body.tree()); }
+    compile():ByteCode[]{
+        //TODO
+        var condition = this.condition.compile();
+        var body = this.body.compile();
+        var popTop = [[BC.Pop, null]];
+        var goBack = [[BC.Jump, -(1 + // this instruction
+                                  1 + // popTop
+                                  body.length + popTop.length +
+                                  1 + // jumpIfNot
+                                  1 + // cloneTop
+                                  condition.length)]]
+        return [].concat(condition,
+                         [[BC.CloneTop, null]],
+                         [[BC.JumpIfNot, (popTop.length +
+                                          body.length +
+                                          popTop.length +
+                                          goBack.length)]],
+                         popTop,
+                         body,
+                         popTop, // discard the result of the body since while loops
+                                 //   return the falsy condition value
+                         goBack);
     }
 }
 
@@ -398,6 +440,7 @@ parser.nodes.DefineNode = DefineNode;
 parser.nodes.YieldNode = YieldNode;
 parser.nodes.DefnNode = DefnNode;
 parser.nodes.ForeverNode = ForeverNode;
+parser.nodes.WhileNode = WhileNode;
 parser.nodes.NullNode = NullNode;
 
 export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCode[][],
@@ -445,6 +488,7 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
                     stack.push(result);
                 }
             } else {
+                console.log(func);
                 if (func.params.length !== arg){
                     throw Error('Function called with wrong arity! Takes ' +
                                 func.params.length + ' args, given ' + args.length);
@@ -507,6 +551,9 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
         case BC.StoreNew:
             env.define(arg, stack[stack.length-1]);
             break;
+        case BC.CloneTop:
+            stack.push(stack[stack.length-1]);
+            break;
         default:
             throw Error('unrecognized bytecode: '+bc+' enumLookup:'+enumLookup(BC, bc));
     }
@@ -554,6 +601,7 @@ var funcs = {
       }, 0);
     },
     '*': function(a:number, b:number){ return a * b; },
+    '<': function(a:number, b:number){ return a < b; },
 }
 
 export function dis(bytecode: ByteCode[], indent=0){
@@ -693,3 +741,6 @@ function main(){
 //       (a 1 2)`)
 //trace(`(define a (lambda (x y) 1 2 (+ x y)))
 //      (a 2 3)`);
+trace(`(define a 0)
+       (while (< a 10)
+              (define a (+ a 1)))`);
