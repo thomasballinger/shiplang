@@ -216,6 +216,9 @@ export class Component extends Ship{
             this.dx = this.attachedTo.dx // not used to move, but
             this.dy = this.attachedTo.dy // needed for projectiles
         }
+        if (this.type === 'explosion'){ //TODO factor this out, it's repeated code
+            this.r = Math.max(this.r - 10*dt*this.r, 1);
+        }
     }
     deepCopyCreate():Ship{
         return new Ship(<ShipSpec>{}, undefined, undefined, undefined);

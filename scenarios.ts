@@ -6,13 +6,15 @@ import { Player } from './player';
 import * as ships from './ships';
 
 var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
+(<any>window).normalScript = require("raw!./scripts/pilot.js");
 
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
 export var gunner = function():any{
     objectivebar.set(`
     You're a gunner.<br/>
-    Use space and f to fire.<br/>`);
+    Use space and f to fire.<br/>
+    <a href="/#space" onclick="Player.fromStorage().set('location', 'Sol').set('script', window.normalScript).go();">quit this job, it sucks</a>`);
     var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
         var world = new SpaceWorld();
         var p = Player.fromStorage().spaceLocation;
@@ -34,7 +36,7 @@ export var gunner = function():any{
 export var scenario1 = function():any{
 
     objectivebar.set(`
-    \ toggles view<br/>
+    \\ toggles view<br/>
     \` toggles editor<br/>
     <a href="/#space" onclick="Player.fromStorage().set('location', 'Sol').go();">leave this simulation</a>`);
     var NUMBOIDS = 3
@@ -79,7 +81,7 @@ export var scenario1 = function():any{
 export var sol = function():any{
     objectivebar.set(`
     Hang out in space!<br />
-    Or land on a planet.`);
+    Or land on a planet with L.`);
 
     var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
         var world = new SpaceWorld();
