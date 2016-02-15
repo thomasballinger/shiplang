@@ -8,6 +8,7 @@ import * as errorbar from './errorbar';
 import { AceJS } from './editors';
 
 import { Updateable, Selection } from './interfaces';
+import { Ship } from './entity';
 
 
 
@@ -37,7 +38,9 @@ export function simulator(){
     function(id: string, selections: Selection[]){
         return editor.setHighlight(id, selections);
     },
-    true
+    true,
+    function(e: Ship){ editor.setHighlightedEntity((<any>e).context.highlightId); }
+                                  // should be ok
   );
 
   editor.setListener(function(){ updater.notifyOfCodeChange(); });

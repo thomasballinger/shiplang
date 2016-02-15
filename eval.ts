@@ -266,7 +266,6 @@ class WhileNode extends ASTNode {
     }
     tree() { return 'while '+this.condition.tree()+'\n' + indent(this.body.tree()); }
     compile():ByteCode[]{
-        //TODO
         var condition = this.condition.compile();
         var body = this.body.compile();
         var popTop = [[BC.Pop, null]];

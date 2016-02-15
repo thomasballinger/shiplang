@@ -90,12 +90,15 @@ export class AceJS {
         }
     }
     // interface used by Contexts
+    setHighlightedEntity(id: string){
+        this.highlighter.setActive(id);
+    }
     setHighlight(id: string, selections: Selection[]){
         if (!this.loaded){ return; }
         if (selections.length === 0){
             this.highlighter.clear(id);
         }
-        this.highlighter.set(id, selections, '#aabbcc');
+        this.highlighter.set(id, selections);
     }
     clearAllHighlights(){
         if (!this.loaded){ return; }
@@ -107,22 +110,43 @@ class Highlighter{
     constructor(session: any){
         this.session = session;
         this.highlights = {};
+        var stylesheet = document.createElement('style');
+        stylesheet.type = 'text/css';
+        stylesheet.innerHTML = `.active-entity-highlight { background: rgba(100,150,100,.2);
+                                                           z-index: 41;
+                                                           position: absolute;}
+                                .other-entity-highlight { background: rgba(100,100,150,.2);
+                                                          z-index: 40;
+                                                          position: absolute;}`;
+        document.getElementsByTagName('head')[0].appendChild(stylesheet);
     }
+
     session: any;
+    active: string;
     highlights: {[id: string]: Selection[]};
-    // replace previous highlights for id with these
-    set(id: string, selections: Selection[], color: string){
+
+    setActive(id: string){
+        this.active = id;
+    }
+    set(id: string, selections: Selection[]){
+
         this.clear(id);
         this.highlights[id]
-
+        if (!this.active){
+            this.active = id;
+        }
         var code = this.session.getValue();
         var session = this.session;
         var markers = <any[]>[];
         this.highlights[id] = markers;
+
+        var active = this.active;
         selections.map(function(selection: Selection){
             var s = acorn.getLineInfo(code, selection.start);
             var f = acorn.getLineInfo(code, selection.finish);
-            markers.push(session.addMarker(new (<any>Range)(s.line-1, s.column, f.line-1, f.column), "running-code", "text", false));
+            var cls = active === id ? "active-entity-highlight" : "other-entity-highlight";
+            markers.push(session.addMarker(new (<any>Range)(s.line-1, s.column, f.line-1, f.column),
+                                           cls, "text", false));
         });
     }
     // clears all annotations on e.g. world reset

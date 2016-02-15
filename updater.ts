@@ -20,7 +20,8 @@ export class Updater{
                 public language: string,
                 public onReset?: ()=>void,
                 public highlight?: (id: string, selections: Selection[])=>void,
-                public doSnapshots?: boolean){
+                public doSnapshots?: boolean,
+                public onChangeViewedEntity?: (e: Ship)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
         this.controls = new manual.Controls(keyHandlerTarget);
@@ -44,8 +45,18 @@ export class Updater{
     tickers: (()=>void)[];
     savedWorlds: SpaceWorld[];
     player: Ship;
-    viewedEntity: Entity;
+    _viewedEntity: Ship;
     userFunctionBodies: UserFunctionBodies;
+
+    get viewedEntity(): Ship{
+        return this._viewedEntity;
+    }
+    set viewedEntity(value: Ship){
+        if (this.onChangeViewedEntity) {
+            this.onChangeViewedEntity(value);
+        }
+        this._viewedEntity = value;
+    }
 
     toggleView(){
         var viewable = this.world.entities.filter(function(x){ return x.viewable })
@@ -53,7 +64,7 @@ export class Updater{
         if (currentIndex === -1){
             this.ensureView()
         }
-        this.viewedEntity = viewable[(currentIndex + 1) % viewable.length]
+        this.viewedEntity = <Ship>(viewable[(currentIndex + 1) % viewable.length]);
     }
     // if currently viewed entity doesn't exist, use the player instead;
     ensureView(){
