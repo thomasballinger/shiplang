@@ -191,6 +191,7 @@ export class Updater{
             this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies, this.highlight]);
             this.player = this.world.getPlayer();
             this.viewedEntity = this.player;
+            this.onReset()
         }
         /*
         this.savedWorlds.push(this.world.copy());
