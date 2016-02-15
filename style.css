@@ -53,6 +53,15 @@ body {
   background-color: #001900;
   color: yellow;
 }
+#messagelog {
+  position: absolute;
+  top: 20;
+  left: 660;
+  bottom: 0;
+  right: 30;
+  font-size: 1em;
+  color: white;
+}
 #errorbar, #modalbar {
   position: absolute;
   top: 100;

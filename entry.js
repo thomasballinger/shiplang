@@ -40,7 +40,7 @@ function main(){
   if (cmd === 'simulator'){
     Player.clear();
     window.location.hash = '';
-    Player.fromStorage().set('location', 'simulator');
+    Player.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]);
   }
   var player = Player.fromStorage();
   routes[player.location]();

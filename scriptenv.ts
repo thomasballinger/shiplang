@@ -3,6 +3,7 @@ import { Ship } from './entity';
 import { Player } from './player';
 var manual = require('./manual');
 import * as ships from './ships';
+import { putMessage } from './messagelog';
 
 import { GameTime } from './interfaces';
 
@@ -113,14 +114,21 @@ function makeControls():MakeControlsReturnType{
         var closest = w.findClosestBackgroundEntity(e);
         if (!closest) { return function(){ return true; }; }
         console.log(closest, e.speed(), closest.landOn);
-        if (e.distFrom(closest) < closest.r &&
-            e.speed() < 30 && closest.onLand){
-            Player.fromStorage().set('spaceLocation', [e.x, e.y]);
-            closest.onLand();
-            return 'done';
-        } else {
+        if (e.distFrom(closest) > closest.r){
+            putMessage('Not close enough to a planet to land');
             return function(){ return true; };
         }
+        if (e.speed() > 30){
+            putMessage('Moving too quickly to land on this planet');
+            return function(){ return true; };
+        }
+        if (!closest.onLand){
+            putMessage("Can't land on this planet yet, sorry!");
+            return function(){ return true; };
+        }
+        Player.fromStorage().set('spaceLocation', [e.x, e.y]);
+        closest.onLand();
+        return 'done';
     }
     land.requiresYield = true;
     land.finish = function(){};
