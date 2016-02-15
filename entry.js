@@ -37,6 +37,11 @@ function main(){
     Player.clear();
     window.location.hash = '';
   }
+  if (cmd === 'simulator'){
+    Player.clear();
+    window.location.hash = '';
+    Player.fromStorage().set('location', 'simulator');
+  }
   var player = Player.fromStorage();
   routes[player.location]();
 }

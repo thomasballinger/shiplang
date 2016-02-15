@@ -129,6 +129,8 @@ export class Updater{
                 this.player = this.world.getPlayer();
                 this.viewedEntity = this.player;
                 this.onReset();
+            } else if (Object.keys(changed).length === 0) {
+                //console.log('no function asts changed');
             } else {
                 for (var name of Object.keys(changed)){
                     //console.log('saving body for', name, changed[name])

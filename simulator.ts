@@ -39,8 +39,12 @@ export function simulator(){
         return editor.setHighlight(id, selections);
     },
     true,
-    function(e: Ship){ editor.setHighlightedEntity((<any>e).context.highlightId); }
-                                  // should be ok
+    function(e: Ship){
+        if (e !== undefined && e.context !== undefined &&
+            (<any>e).context.highlightId !== undefined){
+            editor.setHighlightedEntity((<any>e).context.highlightId);
+        }
+    }
   );
 
   editor.setListener(function(){ updater.notifyOfCodeChange(); });
