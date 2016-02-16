@@ -260,6 +260,10 @@ export class SpaceWorld{
         }
         return dist(closest.x, closest.y, e.x, e.y);
     };
+    findSpobWithIndex(n: number){
+        var index = n % this.bgEntities.length;
+        return this.bgEntities[index];
+    }
     tick = function(dt:GameTime, setError:(msg: string)=>void){
         this.inTick = true;
 

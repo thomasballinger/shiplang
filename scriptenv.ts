@@ -34,6 +34,7 @@ var funcs = {
     },
     'and': function(a: boolean, b: boolean){ return a && b; },
     'or': function(a: boolean, b: boolean){ return a || b; },
+    'opp': function(degrees: number){ return (degrees + 180) % 360; },
 }
 // Even though it wouldn't hurt to copy this object, all the functions would
 // be deepCopy passthroughs anyway. If a way to *modify* this array were added,
@@ -257,6 +258,8 @@ function makeControls():MakeControlsReturnType{
         headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosest(e)); },
         headingToClosestComponent: <YieldFunction>function():any{ return e.towards(w.findClosestComponent(e)); },
         distToClosestComponent: <YieldFunction>function():any{ return e.distFrom(w.findClosestComponent(e)); },
+        headingToClosestPlanet: <YieldFunction>function():any{ return e.towards(w.findClosestBackgroundEntity(e)); },
+        distToClosestPlanet: <YieldFunction>function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); },
         keypress: keypress,
         keyPressed: <YieldFunction>keyPressed,
         fullThrust: <YieldFunction>fullThrust,

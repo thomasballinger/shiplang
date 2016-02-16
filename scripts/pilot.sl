@@ -41,7 +41,7 @@
 ;        (ping spot)
 ;        (fireMissile)))
 
-(defn citizenScript ()
+(defn boundingBox ()
   (forever
     (thrustFor .1)
     (if (and (> y 400) (> dy 0))
@@ -51,6 +51,15 @@
             (do (turnTo 90)
                 (thrustFor .2))))))
 
+(defn citizenScript ()
+  (stop)
+  (forever
+    (turnTo (headingToClosestPlanet))
+    (if (< (distToClosestPlanet)
+           (* speed (+ (stopTime) (reverseTime))))
+        (stop))
+    (thrustFor .1)))
+
 (defn holderScript ()
   (seekGun)
   (citizenScript))
@@ -59,9 +68,10 @@
 (defn stopTime () (/ speed maxThrust))
 
 (defn stop ()
-   (leftFor (reverseTime))
-   (thrustFor (stopTime)))
+  (turnTo (opp vHeading))
+  (thrustFor (stopTime)))
 
+; pretty crappy stop, only works if vheading = heading
 (defn seekGun ()
   (define gun 0)
   (while (< gun 1)

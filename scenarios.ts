@@ -21,7 +21,10 @@ export var gunner = function():any{
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
         world.addBackgroundEntity(makePlanet(400, 300, 40, '#ab43af'));
+        world.addBackgroundEntity(makePlanet(-1200, -1000, 60, '#3bd951'));
         world.addEntity(makeShip(ships.Triangle, -300, 350, 270, builtinScripts.citizenScript));
+        world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
+        world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
         world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
         world.addEntity(makeShip(ships.Holder, 0, 200, 270, builtinScripts.holderScript));
         world.addEntity(makeShip(ships.Triangle, 200, 250, 90, builtinScripts.citizenScript));
