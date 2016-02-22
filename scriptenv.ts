@@ -260,6 +260,8 @@ function makeControls():MakeControlsReturnType{
         distToClosestComponent: <YieldFunction>function():any{ return e.distFrom(w.findClosestComponent(e)); },
         headingToClosestPlanet: <YieldFunction>function():any{ return e.towards(w.findClosestBackgroundEntity(e)); },
         distToClosestPlanet: <YieldFunction>function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); },
+        headingToNthPlanet: <YieldFunction>function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); },
+        distToNthPlanet: <YieldFunction>function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); },
         keypress: keypress,
         keyPressed: <YieldFunction>keyPressed,
         fullThrust: <YieldFunction>fullThrust,
