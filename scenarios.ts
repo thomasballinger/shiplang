@@ -68,6 +68,7 @@ export var scenario1 = function():any{
         ship.imtheplayer = true;
         world.addEntity(ship);
         world.addEntity(ship2);
+        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
         //world.addEntity(makeShip(ships.Triangle, 70, 190, 270, scripts.pilotScript));
         for (var i=0; i<boidArgs.length; i++){
             world.addEntity(makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],

@@ -346,6 +346,10 @@ export function initShipEnv(interpreter: any, scope: any){
             var s = x.data;
             return interpreter.createPrimitive(controls['keyPressed'](s));
         }));
+    interpreter.setProperty(scope, 'distToClosestShip',
+        interpreter.createNativeFunction(function(){
+            return interpreter.createPrimitive(controls['distToClosestShip']());
+        }));
     function fireMissileAsync(script: any, color?: any){
         if (script === undefined){ throw Error('Firing a missile requires a script'); }
         if (script.type !== 'function'){

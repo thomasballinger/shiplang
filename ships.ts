@@ -73,7 +73,7 @@ export var DroneMissile = {
     explosionSize: 30,
     armorMax: 1,
     isInertialess: false,
-    lifespan: <number>undefined,
+    lifespan: 20,
 }
 
 export var NeedleMissile = {
