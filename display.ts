@@ -133,20 +133,21 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,
-             [[-25, -25],
-              [-19, -25],
-              [-19, 25],
-              [-25, 25]],
+             [[-20, -25],
+              [-15, -22],
+              [-15, 22],
+              [-20, 25]],
              e.h,
              esf);
     }
     ctx.fillStyle="#aaeebb";
+    ctx.fillStyle=e.drawStatus['color'] || "#aaeebb";
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,
-             [[25, 0],
-              [-20, -22],
-              [-20, 22]],
+             [[20, 0],
+              [-15, -22],
+              [-15, 22]],
              e.h,
              esf);
   },

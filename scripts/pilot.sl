@@ -25,9 +25,10 @@
 
 (defn attackScript ()
   (forever
-    (thrustFor .03)
+    (if (> (distToClosestShip) 300)
+        (thrustFor .1))
     (if (and (< (headingDiff h (headingToClosestShip)) 5)
-	     (< (distToClosestShip) 600))
+	     (< (distToClosestShip) 800))
       (do
         (fireLaser "#123456")
         (fireLaser "#123456")

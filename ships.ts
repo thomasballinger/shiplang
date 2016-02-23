@@ -26,10 +26,10 @@ export var Triangle = {
 
 export var FatTriangle = {
     type: 'fattriangle',
-    r: 20,
+    r: 17,
     maxThrust: 200,
     maxDH: 300,
-    maxSpeed: 200,
+    maxSpeed: 500,
     isMunition: false,
     explosionSize: 40,
     armorMax: 100,
