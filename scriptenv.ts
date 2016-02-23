@@ -4,6 +4,7 @@ import { Player } from './player';
 var manual = require('./manual');
 import * as ships from './ships';
 import { putMessage } from './messagelog';
+import { headingDiff } from './shipmath';
 
 import { GameTime } from './interfaces';
 
@@ -32,6 +33,7 @@ var funcs = {
         }
         return a === b;
     },
+    'headingDiff': function(a: number, b: number){ return headingDiff(a, b); },
     'and': function(a: boolean, b: boolean){ return a && b; },
     'or': function(a: boolean, b: boolean){ return a || b; },
     'opp': function(degrees: number){ return (degrees + 180) % 360; },

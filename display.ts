@@ -127,6 +127,29 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              e.h,
              esf);
   },
+  'fattriangle': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle="#335599";
+    if (e.thrust > 0){
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[-25, -25],
+              [-19, -25],
+              [-19, 25],
+              [-25, 25]],
+             e.h,
+             esf);
+    }
+    ctx.fillStyle="#aaeebb";
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[25, 0],
+              [-20, -22],
+              [-20, 22]],
+             e.h,
+             esf);
+  },
   'holder': function(e, ctx, dx, dy, psf, esf){
     ctx.fillStyle="#eeaa22";
     if (e.thrust > 0){

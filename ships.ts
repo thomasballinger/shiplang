@@ -10,6 +10,7 @@ export var Boid = {
     isInertialess: false,
     lifespan: <number>undefined,
 }
+
 export var Triangle = {
     type: 'triangle',
     r: 10,
@@ -19,6 +20,19 @@ export var Triangle = {
     isMunition: false,
     explosionSize: 20,
     armorMax: 20,
+    isInertialess: false,
+    lifespan: <number>undefined,
+}
+
+export var FatTriangle = {
+    type: 'fattriangle',
+    r: 20,
+    maxThrust: 200,
+    maxDH: 300,
+    maxSpeed: 200,
+    isMunition: false,
+    explosionSize: 40,
+    armorMax: 100,
     isInertialess: false,
     lifespan: <number>undefined,
 }

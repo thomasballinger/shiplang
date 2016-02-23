@@ -23,6 +23,17 @@
     (define targetHeading (headingToClosest))
     (turnTo targetHeading)))
 
+(defn attackScript ()
+  (forever
+    (thrustFor .03)
+    (if (and (< (headingDiff h (headingToClosestShip)) 5)
+	     (< (distToClosestShip) 600))
+      (do
+        (fireLaser "#123456")
+        (fireLaser "#123456")
+        (fireLaser "#123456")))
+    (define targetHeading (headingToClosestShip))
+    (turnTo targetHeading)))
 
 (defn enemyScript ()
   (leftFor .6)
