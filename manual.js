@@ -32,7 +32,6 @@ Controls.prototype.isPressed = function(key){
   return !!this.pressed[keyCodeFor[key.toUpperCase()]];
 };
 Controls.prototype.initialize = function(obj){
-  console.log('delay:', this.delay);
   var events = this.events;
   var pressed = this.pressed;
   var delay = this.delay;

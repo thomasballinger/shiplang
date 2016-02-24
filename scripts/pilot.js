@@ -8,6 +8,7 @@ function manual(){
   if (keyPressed(' ')){ fireMissile(dumbRocket, '#aa1144'); }
   if (keyPressed('w')){ waitFor(1); }
   if (keyPressed('l')){ land(); }
+  if (keyPressed('j')){ jump(); }
 }
 // Try adding laser firing!
 // Your ship has a laser gun installed,

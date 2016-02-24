@@ -4,6 +4,7 @@ import { WorldBuilder } from './interfaces';
 import * as objectivebar from './objectivebar';
 import { Player } from './player';
 import * as ships from './ships';
+import { putMessage } from './messagelog';
 
 var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
 (<any>window).normalScript = require("raw!./scripts/pilot.js");
@@ -30,6 +31,9 @@ export var gunner = function():any{
         world.addEntity(makeShip(ships.Holder, 0, 200, 270, builtinScripts.holderScript));
         world.addEntity(makeShip(ships.Triangle, 200, 250, 90, builtinScripts.citizenScript));
         world.addEntity(ship); // adding the ship last means it goes in front
+
+        putMessage('Your mission: destroy 5 astroids.');
+
         (<any>window).world = world;
         return world;
     }
@@ -85,8 +89,8 @@ export var scenario1 = function():any{
 
 export var sol = function():any{
     objectivebar.set(`
-    Hang out in space!<br />
-    Or land on a planet with L.`);
+    Land on a planet with L<br />
+    or travel with J`);
 
     var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
         var world = new SpaceWorld();
@@ -95,7 +99,7 @@ export var sol = function():any{
         ship.imtheplayer = true;
         var earth = makePlanet(100, 100, 50, '#004000');
         earth.onLand = function(){
-            console.log('landed on earth');
+            putMessage('landed on earth');
             Player.fromStorage().set('location', 'earth').go();
         }
         var luna = makePlanet(300, 200, 30, '#aa9922');
@@ -113,6 +117,34 @@ export var sol = function():any{
         world.addEntity(makeShip(ships.Triangle, -300, -750, 270, builtinScripts.enemyScript));
         world.addEntity(makeShip(ships.Triangle, -500, -750, 270, builtinScripts.enemyScript));
         world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
+        world.addEntity(ship); // adding the ship last means it goes in front
+        (<any>window).world = world;
+        return world;
+    }
+    reset.instructions = "i"
+    return reset
+}
+
+export var robo = function():any{
+    objectivebar.set(`
+    Cosmic interference causes manual controls to be unresponsive in this region.<br />
+    You'll be best equipped if you let your ship's computer do the piloting.
+`);
+
+    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
+        var world = new SpaceWorld();
+        var p = Player.fromStorage().spaceLocation;
+        var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
+        ship.imtheplayer = true;
+        var tolok = makePlanet(200, -100, 200, '#420209');
+        tolok.onLand = function(){
+            putMessage('landed on the alien planet of Tolok');
+            Player.fromStorage().set('location', 'tolok').go();
+        }
+        world.addBackgroundEntity(tolok);
+        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
+        world.addEntity(makeShip(ships.FatTriangle, -1300, 1200, 170, builtinScripts.attackScript));
+        world.addEntity(makeShip(ships.FatTriangle, 1000, 400, 170, builtinScripts.attackScript));
         world.addEntity(ship); // adding the ship last means it goes in front
         (<any>window).world = world;
         return world;

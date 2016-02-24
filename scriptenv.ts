@@ -266,6 +266,23 @@ function makeCommands():MakeCommandsReturnType{
             return 'done';
         }),
 
+        new AsyncCommand('jump', function():any{
+            var closest = w.findClosestBackgroundEntity(e);
+            if (closest && e.distFrom(closest) < 400){
+                putMessage('Too close to a planet to make the jump into hyperspace');
+                return function(){ return true; };
+            }
+            if (e.speed() > 30){
+                putMessage('Moving too quickly to make the jump into hyperspace');
+                return function(){ return true; };
+            }
+            Player.fromStorage().set('spaceLocation', [0, 0]);
+            var current = Player.fromStorage().location;
+            var next = current === 'Sol' ? 'robo' : 'Sol';
+            Player.fromStorage().set('location', next).go();
+            return 'done';
+        }),
+
         new AsyncCommand('attach', function():any{
             return function(){ return true; }
         }, function(): boolean{

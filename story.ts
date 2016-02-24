@@ -1,23 +1,36 @@
 import { Player } from './player';
 
 var earthtexts = require("raw!./text/earth.txt").split(/\n---\n?/g);
+var toloktexts = require("raw!./text/tolok.txt").split(/\n---\n?/g);
 
 
 function style(text: string): string{
     return text.replace(/\n/g, '<br/>');
 }
 
-export function earth(){
+function storyClicker(texts: string[], atEnd: ()=>void){
     var bar = document.getElementById('modalbar');
     var index = 0;
-    bar.innerHTML = style(earthtexts[index]);
+    bar.innerHTML = style(texts[index]);
     bar.hidden = false;
     bar.addEventListener('click', function(){
         index += 1;
-        if (index > earthtexts.length-1){
-            Player.fromStorage().set('location', 'Sol').go();
+        if (index > texts.length-1){
+            atEnd();
         } else {
-            bar.innerHTML = style(earthtexts[index]);
+            bar.innerHTML = style(texts[index]);
         }
+    });
+}
+
+export function earth(){
+    storyClicker(earthtexts, function(){
+        Player.fromStorage().set('location', 'Sol').go();
+    })
+}
+
+export function tolok(){
+    storyClicker(toloktexts, function(){
+        Player.fromStorage().set('location', 'robo').go();
     });
 }

@@ -10,3 +10,5 @@ export function putMessage(s: string){
       }
   }, 2000);
 }
+
+//TODO save these in player object

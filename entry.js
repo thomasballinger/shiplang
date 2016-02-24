@@ -3,7 +3,7 @@ require("./style.css");
 import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';
 import { Player } from './player';
-import { earth } from './story';
+import { earth, tolok } from './story';
 import * as scenarios from './scenarios';
 
 window.deepcopy = require('./deepcopy'); // needed by JS interpreter
@@ -21,6 +21,8 @@ routes = {
   'level1': function(){
     Player.fromStorage().set('script', gunnerScript);
     outerspace(scenarios.gunner);},
+  'tolok': tolok,
+  'robo': function(){outerspace(scenarios.robo);},
 };
 
 function getHash(){
