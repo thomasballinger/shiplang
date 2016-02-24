@@ -24,7 +24,7 @@ export class Updater{
                 public onChangeViewedEntity?: (e: Ship)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
-        this.controls = new manual.Controls(keyHandlerTarget);
+        this.controls = new manual.Controls(keyHandlerTarget, this.worldBuilder.controlsDelay);
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
         this.tickers = [];

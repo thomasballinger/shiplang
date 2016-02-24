@@ -3,9 +3,10 @@
 var keyboardMap = require('./keyboardmap').keyboardMap;
 var keyCodeFor = require('./keyboardmap').keyCodeFor;
 
-function Controls(obj){
+function Controls(obj, delay){
   this.events = [];
   this.pressed = {};
+  this.delay = delay || 0;
   this.initialize(obj);
 }
 Controls.prototype.getEvent = function*(){
@@ -31,11 +32,27 @@ Controls.prototype.isPressed = function(key){
   return !!this.pressed[keyCodeFor[key.toUpperCase()]];
 };
 Controls.prototype.initialize = function(obj){
+  console.log('delay:', this.delay);
   var events = this.events;
   var pressed = this.pressed;
+  var delay = this.delay;
+
   obj.addEventListener('keydown', function(e){
-    events.push(e);
-    pressed[e.keyCode] = true;
+
+    var handler = (function(innerE){
+      return function(){
+        events.push(innerE);
+        pressed[innerE.keyCode] = true;
+      };
+    })(e);
+
+    if (delay === 0){
+      //TODO make delay work in simulator
+      // (currently old keystroke will come in late)
+      handler();
+    } else {
+      setTimeout(handler, delay);
+    }
 
     if ([37, 38, 29, 40, // arrows
         32, // spacebar
@@ -50,8 +67,20 @@ Controls.prototype.initialize = function(obj){
   }, true); // useCapture true, so on the way down instead of up!
   */
   obj.addEventListener('keyup', function(e){
-    events.push(e);
-    pressed[e.keyCode] = false;
+
+    var handler = (function(innerE){
+      return function(){
+        events.push(innerE);
+        pressed[innerE.keyCode] = false;
+      };
+    })(e);
+
+    if (delay === 0){
+      handler();
+    } else {
+      setTimeout(handler, delay);
+    }
+
     return false;
   });
 };

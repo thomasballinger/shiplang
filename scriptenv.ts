@@ -249,7 +249,6 @@ function makeCommands():MakeCommandsReturnType{
         new AsyncCommand('land', function():any{
             var closest = w.findClosestBackgroundEntity(e);
             if (!closest) { return function(){ return true; }; }
-            console.log(closest, e.speed(), closest.landOn);
             if (e.distFrom(closest) > closest.r){
                 putMessage('Not close enough to a planet to land');
                 return function(){ return true; };

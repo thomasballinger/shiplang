@@ -68,11 +68,8 @@
   (define i 0)
   (while 1
     (define i (+ i 1))
-    (log i)
     (while (or (> (distToNthPlanet i) 50)
                (> speed 100))
-      (log (distToNthPlanet i))
-      (log speed)
       (turnTo (headingToNthPlanet i))
       (if (< (distToNthPlanet i)
              (* speed (+ (stopTime) (reverseTime))))

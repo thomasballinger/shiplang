@@ -57,7 +57,8 @@ export type ByteCode = [BC, any];
 
 export interface WorldBuilder {
     (scripts: any): SpaceWorld;
-    instructions: string
+    instructions: string;
+    controlsDelay: number;
 }
 
 // These define a ship type but not its instantaneous properties

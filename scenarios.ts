@@ -118,5 +118,6 @@ export var sol = function():any{
         return world;
     }
     reset.instructions = "i"
+    reset.controlsDelay = 1000
     return reset
 }
