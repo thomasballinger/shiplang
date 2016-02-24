@@ -35,8 +35,25 @@ interface YieldFunction {
 //       * color
 //
 //     Eventually want a system for specifying which are legal to call
+interface NamespaceInit{
+    interpreterInit(interpreter: Interpreter, scope: any): void;
+    shiplangInit(obj: any): void;
+}
 
-class Command{
+class Data {
+    constructor(public name: string, public getter: ()=>any){}
+    // JSInterpreter doesn't implement properties, so have to use functions
+    interpreterInit(interpreter: Interpreter, scope: any){
+        var getter = <()=>any>(function(){ return interpreter.createPrimitive(this.getter()); });
+        interpreter.setProperty(scope, this.name, interpreter.createNativeFunction(getter));
+    }
+    shiplangInit(obj: any){
+        Object.defineProperty(obj, this.name, { get: this.getter });
+    }
+    // So long as an entity, game time, and game world are
+}
+
+class Command {
     constructor(public name: string,
                 public body: any, // function with any signature
                 public paramTypes?: string[],
@@ -49,7 +66,7 @@ class Command{
         }
     }
     isAsync: boolean;
-    interpreterInit(interpreter: any, scope: any){
+    interpreterInit(interpreter: Interpreter, scope: any){
         var self = this;
         interpreter.setProperty(scope, this.name, interpreter.createNativeFunction(function(){
             var args = <any[]>[];
@@ -58,17 +75,24 @@ class Command{
                 if (self.paramTypes[i] && arguments[i].type !== self.paramTypes[i]){
                     throw new Error('Expected arg '+i+' to be a '+self.paramTypes[i]);
                 }
-                args.push(arguments[i].data);
             }
-            return interpreter.createPrimitive(self.body.apply(null, arguments));
+            for (var i=0; i<arguments.length; i++){
+                if (arguments[i].type === 'function'){
+                    args.push(arguments[i]);
+                } else {
+                    args.push(arguments[i].data);
+                    // TODO do some more typechecking here
+                }
+            }
+            return interpreter.createPrimitive(self.body.apply(null, args));
         }));
     }
-    shiplangFunction():YieldFunction{
-        return <YieldFunction>this.body;
+    shiplangInit(obj: any){
+        obj[this.name] = this.body;
     }
 }
 
-class AsyncCommand extends Command{
+class AsyncCommand extends Command implements NamespaceInit{
     constructor(name: string,
                 body: any, // should return a ()=>boolean
                 public onFinish?: any, // same signature as body
@@ -89,27 +113,35 @@ class AsyncCommand extends Command{
                 if (self.paramTypes[i] && arguments[i].type !== self.paramTypes[i]){
                     throw new Error('Expected arg '+i+' to be a '+self.paramTypes[i]);
                 }
-                args.push(arguments[i].data);
             }
-            var val = self.body.apply(null, arguments);
+            for (var i=0; i<arguments.length; i++){
+                if (arguments[i].type === 'function'){
+                    args.push(arguments[i]);
+                } else {
+                    args.push(arguments[i].data);
+                    // TODO do some more typechecking here
+                    // also deduplicate this code with a parent method
+                }
+            }
+            var val = self.body.apply(null, args);
             return val;
         }
         var finishFunction = function(){
             var args = <any[]>[];
 
+            // alr: ()=>(boolean|string)eady did typechecking when asyncFunction was called
             for (var i=0; i<arguments.length; i++){
-                // alr: ()=>(boolean|string)eady did typechecking when asyncFunction was called
                 args.push(arguments[i].data);
             }
-            return interpreter.createPrimitive(self.onFinish.apply(null, arguments));
+            return interpreter.createPrimitive(self.onFinish.apply(null, args));
         }
         asyncFunction.finish = finishFunction;
         interpreter.setProperty(scope, this.name, interpreter.createAsyncFunction(asyncFunction));
     }
-    shiplangFunction(): YieldFunction{
+    shiplangInit(obj: any){
         this.body.finish = this.onFinish;
         this.body.requiresYield = true;
-        return this.body;
+        obj[this.name] = this.body;
     }
 
 }
@@ -143,13 +175,16 @@ var funcs = {
 // running scripts could be achieved through it!
 Object.defineProperty(funcs, '__deepCopyPassthrough', {value: true})
 
-type MakeControlsReturnType = [(e: any)=>void,
+type MakeCommandsReturnType = [(e: any)=>void,
                                (t: any)=>void,
                                (w: any)=>void,
                                (k: any)=>void,
-                               {[a:string]:any;}];
+                               NamespaceInit[]];
 
-function makeControls():MakeControlsReturnType{
+// Functions available to scripts
+function makeCommands():MakeCommandsReturnType{
+
+    // data all control functions close over
     var e = <Ship>undefined;
     var t = <GameTime>undefined;
     var w = <any>undefined;
@@ -158,161 +193,7 @@ function makeControls():MakeControlsReturnType{
     function setGameTime(time:GameTime){ t = time; }
     function setGameWorld(world: any){ w = world; }
     function setKeyControls(keyControls: any){ keys = keyControls; }
-
-    // Functions available to scripts
-    //
-    // It's advisable to let the argument undefined do something reasonable
-    //
-    //TODO add arity checks to these (maybe ranges?) and ideally have a parse
-    //step that looks for them!
-
     var keygen = <any>undefined;
-    var keypress = <YieldFunction>function(){
-        keygen = manual.actOnKey(e, keys)
-        var {value, done} = keygen.next()
-        if (done) { throw Error('expected done to be false'); }
-        return value;
-    }
-    keypress.requiresYield = true;
-    keypress.finish = function(){
-        var {value, done} = keygen.next()
-        if (!done) { throw Error('expected done to be true'); }
-        return value;
-    }
-
-    var keyPressed = function(name: string){
-        return keys.isPressed(name);
-    }
-
-    //TODO why do I have to annotate these with 'any'?
-    var waitFor = <YieldFunction>function(n):any{
-        if (n.isPrimitive){ n = n.data; }
-        var timeFinished = t + n;
-        return function(){
-            return t > timeFinished;
-        }
-    }
-    waitFor.requiresYield = true;
-    waitFor.finish = function(){}
-
-    var turnTo = <YieldFunction>function(hTarget):any{
-        e.hTarget = hTarget;
-        return function(){ return e.hTarget === undefined; }
-    }
-    turnTo.requiresYield = true;
-    turnTo.finish = function(){}
-
-    var detonate = <YieldFunction>function():any{
-      e.r = e.explosionSize;
-      e.type = 'explosion';
-      e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
-      e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
-      return 'done';
-    }
-    detonate.requiresYield = true;
-    detonate.finish = function(){}
-
-    var land = <YieldFunction>function():any{
-        var closest = w.findClosestBackgroundEntity(e);
-        if (!closest) { return function(){ return true; }; }
-        console.log(closest, e.speed(), closest.landOn);
-        if (e.distFrom(closest) > closest.r){
-            putMessage('Not close enough to a planet to land');
-            return function(){ return true; };
-        }
-        if (e.speed() > 30){
-            putMessage('Moving too quickly to land on this planet');
-            return function(){ return true; };
-        }
-        if (!closest.onLand){
-            putMessage("Can't land on this planet yet, sorry!");
-            return function(){ return true; };
-        }
-        Player.fromStorage().set('spaceLocation', [e.x, e.y]);
-        closest.onLand();
-        return 'done';
-    }
-    land.requiresYield = true;
-    land.finish = function(){};
-
-    var attach = <YieldFunction>function():any{
-        return function(){ return true; }
-    }
-    attach.requiresYield = true;
-    attach.finish = function(){
-        var closest = w.findClosestComponent(e);
-        if (!closest) { return function(){ return true; }; }
-        if (e.distFrom(closest) < closest.r*2 + e.r &&
-                e.speed() < 30){
-            closest.attachedTo = e;
-            closest.yOffset = 5;
-            closest.xOffset = 5;
-            return true;
-        }
-        return false;
-    };
-
-    var fireMissile = <YieldFunction>function(script, color):any{
-        var startTime = t;
-        var missileFired = false;
-        return function(){
-            if (t < startTime + .1){
-                return false;
-            } else if (!missileFired){
-                // TODO fork the interpreter here
-                // If the script passed in is a JS-Interpreter function,
-                // fork the interpreter and pass a script tuple
-                // with that forked interpreter.
-                // TODO dispatch on context maybe?
-                if (script instanceof evaluation.CompiledFunctionObject){
-                    w.fireMissile(e, ships.DroneMissile, script, color);
-                } else {
-                    var plsFork = [e.context, script]
-                    w.fireMissile(e, ships.DroneMissile, plsFork, color);
-                }
-                missileFired = true;
-            } else if (t < startTime + .3){
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-    fireMissile.requiresYield = true;
-    fireMissile.finish = function(){}
-
-    var fireNeedleMissile = <YieldFunction>function(script, color):any{
-        var startTime = t;
-        var missileFired = false;
-        return function(){
-            if (t < startTime + .1){
-                return false;
-            } else if (!missileFired){
-                w.fireMissile(e, ships.NeedleMissile, script, color);
-                missileFired = true;
-            } else if (t < startTime + .2){
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-    fireNeedleMissile.requiresYield = true;
-    fireNeedleMissile.finish = function(){}
-
-    var fireLaser = <YieldFunction>function(color):any{
-        var startTime = t;
-        w.fireLaser(e, color);
-        return function(){
-            if (t < startTime + .1){
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-    fireLaser.requiresYield = true;
-    fireLaser.finish = function(){}
 
     var commands = [
         new Command('fullThrust', function(){ e.thrust = e.maxThrust; }),
@@ -320,86 +201,193 @@ function makeControls():MakeControlsReturnType{
         new Command('fullLeft', function(){ e.dh = -e.maxDH; }),
         new Command('fullRight', function(){ e.dh = e.maxDH; }),
         new Command('noTurn', function(){ e.dh = 0; }),
+        new Command('distToClosestShip', function(){ return w.distToClosestShip(e); }),
+        new Command('headingToClosestShip', function():any{ return e.towards(w.findClosestShip(e)); }),
+        new Command('headingToClosest', function():any{ return e.towards(w.findClosest(e)); }),
+        new Command('headingToClosestComponent', function():any{ return e.towards(w.findClosestComponent(e)); }),
+        new Command('distToClosestComponent', function():any{ return e.distFrom(w.findClosestComponent(e)); }),
+        new Command('headingToClosestPlanet', function():any{ return e.towards(w.findClosestBackgroundEntity(e)); }),
+        new Command('distToClosestPlanet', function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); }),
+        new Command('headingToNthPlanet', function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); }),
+        new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
 
-        new AsyncCommand('thrustFor', function(n: number):any{
-            e.thrust = e.maxThrust;
+        new AsyncCommand('keypress', function(){
+            keygen = manual.actOnKey(e, keys)
+            var {value, done} = keygen.next()
+            if (done) { throw Error('expected done to be false'); }
+            return value;
+        }, function(){
+            var {value, done} = keygen.next()
+            if (!done) { throw Error('expected done to be true'); }
+            return value;
+        }),
+
+        new Command('keyPressed', function(name: string){
+            return keys.isPressed(name);
+        }),
+
+        new AsyncCommand('waitFor', function(n: number):any{
             var timeFinished = t + n;
             return function(){
                 return t > timeFinished;
             }
         }),
+
+        new AsyncCommand('turnTo', function(hTarget: number):any{
+            e.hTarget = hTarget;
+            return function(){ return e.hTarget === undefined; }
+        }),
+
+        new Command('detonate', function():any{
+            e.r = e.explosionSize;
+            e.type = 'explosion';
+            e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
+            e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;
+            return 'done';
+        }),
+
+        new AsyncCommand('land', function():any{
+            var closest = w.findClosestBackgroundEntity(e);
+            if (!closest) { return function(){ return true; }; }
+            console.log(closest, e.speed(), closest.landOn);
+            if (e.distFrom(closest) > closest.r){
+                putMessage('Not close enough to a planet to land');
+                return function(){ return true; };
+            }
+            if (e.speed() > 30){
+                putMessage('Moving too quickly to land on this planet');
+                return function(){ return true; };
+            }
+            if (!closest.onLand){
+                putMessage("Can't land on this planet yet, sorry!");
+                return function(){ return true; };
+            }
+            Player.fromStorage().set('spaceLocation', [e.x, e.y]);
+            closest.onLand();
+            return 'done';
+        }),
+
+        new AsyncCommand('attach', function():any{
+            return function(){ return true; }
+        }, function(): boolean{
+            var closest = w.findClosestComponent(e);
+            if (!closest) { return false; }
+            if (e.distFrom(closest) < closest.r*2 + e.r && e.speed() < 30){
+                closest.attachedTo = e;
+                closest.yOffset = 5;
+                closest.xOffset = 5;
+                return true;
+            }
+            return false;
+        }),
+
+        new AsyncCommand('fireMissile', function(script: any, color: string): any{
+            var startTime = t;
+            var missileFired = false;
+            return function(){
+                if (t < startTime + .1){
+                    return false;
+                } else if (!missileFired){
+                    // TODO fork the interpreter here
+                    // If the script passed in is a JS-Interpreter function,
+                    // fork the interpreter and pass a script tuple
+                    // with that forked interpreter.
+                    // TODO dispatch on context maybe?
+                    if (script instanceof evaluation.CompiledFunctionObject){
+                        w.fireMissile(e, ships.DroneMissile, script, color);
+                    } else {
+                        var plsFork = [e.context, script]
+                        w.fireMissile(e, ships.DroneMissile, plsFork, color);
+                    }
+                    missileFired = true;
+                } else if (t < startTime + .3){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }),
+
+        new Command('fireNeedleMissile', function(script: any, color: string): any{
+            var startTime = t;
+            var missileFired = false;
+            return function(){
+                if (t < startTime + .1){
+                    return false;
+                } else if (!missileFired){
+                    w.fireMissile(e, ships.NeedleMissile, script, color);
+                    missileFired = true;
+                } else if (t < startTime + .2){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }),
+
+        new AsyncCommand('fireLaser', function(color: string): any{
+            var startTime = t;
+            w.fireLaser(e, color);
+            return function(){
+                if (t < startTime + .1){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }),
+
+        new AsyncCommand('thrustFor', function(n: number): any{
+            e.thrust = e.maxThrust;
+            var timeFinished = t + n;
+            return function(){
+                return t > timeFinished;
+            }
+        }, function(){ e.thrust = 0; }),
+
+        new AsyncCommand('leftFor', function(n: number): any{
+            e.dh = e.maxDH;
+            var timeFinished = t + n;
+            return function(){ return t > timeFinished; }
+        }, function(){ e.dh = 0; }),
+
+            new AsyncCommand('rightFor', function(n: number): any{
+            e.dh = -e.maxDH;
+            var timeFinished = t + n;
+            return function(){ return t > timeFinished; }
+        }, function(){ e.dh = 0; }),
+
+        new Data('x', function(){ return e.x; }),
+        new Data('y', function(){ return e.y; }),
+        new Data('dx', function(){ return e.dx; }),
+        new Data('dy', function(){ return e.dy; }),
+        new Data('r', function(){ return e.r; }),
+        new Data('h', function(){ return e.h; }),
+        new Data('dh', function(){ return e.dh; }),
+        new Data('maxDH', function(){ return e.maxDH; }),
+        new Data('maxThrust', function(){ return e.maxThrust; }),
+        new Data('maxSpeed', function(){ return e.maxSpeed; }),
+        new Data('speed', function(){ return e.speed(); }),
+        new Data('vHeading', function(){ return e.vHeading(); }),
     ];
+    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, commands];
+}
 
-    // temp hack while refactoring into commands
-    (<any>window).commands = commands;
-
-    var leftFor = <YieldFunction>function(n):any{
-        e.dh = e.maxDH;
-        var timeFinished = t + n;
-        return function(){ return t > timeFinished; }
+function makeControls(commands: any): any{
+    var controls = {};
+    for (var cmd of commands){
+        cmd.shiplangInit(controls);
     }
-    leftFor.requiresYield = true;
-    leftFor.finish = function(){ e.dh = 0; }
-
-    var rightFor = <YieldFunction>function(n):any{
-        e.dh = -e.maxDH;
-        var timeFinished = t + n;
-        return function(){ return t > timeFinished; }
-    }
-    rightFor.requiresYield = true;
-    rightFor.finish = function(){ e.dh = 0; }
-
-    var controls:{[name: string]: YieldFunction} = {
-        leftFor: leftFor,
-        rightFor: rightFor,
-        fireMissile: fireMissile,
-        fireNeedleMissile: fireNeedleMissile,
-        fireLaser: fireLaser,
-        waitFor: waitFor,
-        turnTo: turnTo,
-        detonate: detonate,
-        distToClosestShip: <YieldFunction>function(){ return w.distToClosestShip(e); },
-        headingToClosestShip: <YieldFunction>function():any{ return e.towards(w.findClosestShip(e)); },
-        headingToClosest: <YieldFunction>function():any{ return e.towards(w.findClosest(e)); },
-        headingToClosestComponent: <YieldFunction>function():any{ return e.towards(w.findClosestComponent(e)); },
-        distToClosestComponent: <YieldFunction>function():any{ return e.distFrom(w.findClosestComponent(e)); },
-        headingToClosestPlanet: <YieldFunction>function():any{ return e.towards(w.findClosestBackgroundEntity(e)); },
-        distToClosestPlanet: <YieldFunction>function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); },
-        headingToNthPlanet: <YieldFunction>function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); },
-        distToNthPlanet: <YieldFunction>function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); },
-        keypress: keypress,
-        keyPressed: <YieldFunction>keyPressed,
-        land: <YieldFunction>land,
-        attach: <YieldFunction>attach,
-    }
-    for (var command of commands){
-        controls[command.name] = <YieldFunction>command.shiplangFunction();
-    }
-
-    function makeAccessor(prop: string){ return function() { return e[prop]; }; }
-
-    for (var propname of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH',
-                          'maxThrust', 'maxSpeed']){
-        Object.defineProperty(controls, propname, { get: makeAccessor(propname) });
-    }
-    Object.defineProperty(controls, 'speed', { get: function() { return e.speed(); }, });
-    Object.defineProperty(controls, 'vHeading', { get: function() { return e.vHeading(); }, });
-
-
-
-
-
     // So long as an entity, game time, and game world are
     // reset (so copies don't happen during ticks) a controls
     // object doesn't need to be copied.
     Object.defineProperty(controls, '__deepCopyPassthrough', {value: true})
-    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, controls];
+    return controls;
 }
 
 export var [setCurrentEntity, setGameTime, setGameWorld,
-     setKeyControls, controls] = makeControls();
-//var stuff = makeControls();
-//export var setCurrentEntity = <(x: any)=>void>stuff[0]
+     setKeyControls, commands] = makeCommands();
+export var controls = makeControls(commands);
 
 export function SLgetScripts(s: string){
     var ast = evaluation.parser.parse(s);
@@ -425,60 +413,10 @@ export function buildShipEnv():evaluation.Environment{
 }
 
 export function initShipEnv(interpreter: any, scope: any){
-    for (var prop of Object.keys(controls)){
-        if (prop === 'thrustFor'){
-            console.log('skipping thrustFor...');
-            continue;
-        }
-        if (controls[prop].requiresYield){
-            if (!controls[prop].finish){ continue; }
-            interpreter.setProperty(scope, prop,
-                interpreter.createAsyncFunction(controls[prop]));
-        }
+    for (var cmd of commands){
+        cmd.interpreterInit(interpreter, scope);
     }
-    interpreter.setProperty(scope, 'log',
-        interpreter.createNativeFunction(function(x: any){ console.log('from jsinterp:', x); }));
-
-    for (var command of (<any>window).commands){
-        command.interpreterInit(interpreter, scope);
-    }
-
-    interpreter.setProperty(scope, 'keyPressed',
-        interpreter.createNativeFunction(function(x: any){
-            if (!x.isPrimitive || x.type !== 'string' || typeof x.data !== 'string'){
-                throw Error('not a string');
-            }
-            var s = x.data;
-            return interpreter.createPrimitive(controls['keyPressed'](s));
-        }));
-    interpreter.setProperty(scope, 'distToClosestShip',
-        interpreter.createNativeFunction(function(){
-            return interpreter.createPrimitive(controls['distToClosestShip']());
-        }));
-    function fireMissileAsync(script: any, color?: any){
-        if (script === undefined){ throw Error('Firing a missile requires a script'); }
-        if (script.type !== 'function'){
-            throw Error('provided script is supicious...');
-        }
-        if (color === undefined){
-            color = {data: undefined, isPrimitive: true};
-        } else if (!color.isPrimitive || color.type !== 'string' || typeof color.data !== 'string'){
-            throw Error('provided color not a string');
-        }
-        var color = color.data;
-        return controls['fireMissile'](script, color);
-    }
-    (<any>fireMissileAsync).finish = (<any>controls['fireMissile']).finish;
-    interpreter.setProperty(scope, 'fireMissile',
-        interpreter.createAsyncFunction(fireMissileAsync));
-    for (var prop of ['x', 'y', 'dx', 'dy', 'h', 'r', 'dh', 'maxDH', 'maxThrust', 'maxSpeed', 'speed', 'vHeading']){
-        // these are properties hopefully?
-        interpreter.setProperty(scope, prop,
-            interpreter.createNativeFunction(
-                (function(p: any){
-                    return function(){
-                        return interpreter.createPrimitive(controls[p]);
-                    };
-                })(prop)));
-    }
+    interpreter.setProperty(scope, 'log', interpreter.createNativeFunction(
+        function(x: any){ console.log('from jsinterp:', x);
+    }));
 }
