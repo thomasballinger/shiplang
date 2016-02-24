@@ -53,10 +53,10 @@ function fireMissile(e:Entity, ship: ShipSpec, script: Script, t:GameTime){
 function fireLaser(e:Entity, gameTime:GameTime){
     var laser = new Entity('laser',
                            e.x + x_comp(e.h)*e.r,
-    e.y + y_comp(e.h)*e.r,
-    e.dx + x_comp(e.h) * 600,
-    e.dy + y_comp(e.h) * 600,
-    2);
+                           e.y + y_comp(e.h)*e.r,
+                           e.dx + x_comp(e.h) * 600,
+                           e.dy + y_comp(e.h) * 600,
+                           2);
     laser.firedBy = e;
     laser.firedAt = Number.MAX_VALUE;  // never damages owner
     laser.timeToDie = gameTime + 1.5;
@@ -110,10 +110,12 @@ export class SpaceWorld{
         missile.drawStatus['color'] = color;
         this.addEntity(missile);
     }
-    fireLaser = function(entity: Entity, script: Script, color:string){
-        var missile = fireLaser(entity, this.gameTime);
-        missile.drawStatus['color'] = color;
-        this.addEntity(missile);
+    fireLaser = function(entity: Entity, color: string, intensity: number){
+        var blast = fireLaser(entity, this.gameTime);
+        blast.drawStatus['color'] = color;
+        blast.damage = intensity || 1;
+        blast.r = Math.max(blast.r, Math.sqrt(blast.r * (1 + (intensity || 0))))
+        this.addEntity(blast);
     }
     addEntity(entity: Entity){
         this.entities.push(entity);
@@ -180,9 +182,12 @@ export class SpaceWorld{
         }).filter(function(x){ return !beingLaunchedByCollider(x, gameTime);});
 
         for (var k=0; k<weaponCollisions.length; k++){
+            var e1 = weaponCollisions[k][0]
+            var e2 = weaponCollisions[k][1]
             for (var e of weaponCollisions[k]){
-
-                e.armor -= 1; // hitting things causes munitions to lose armor
+                // hitting things causes munitions to lose armor
+                e1.armor -= Math.max(1, e2.damage || 0);
+                e2.armor -= Math.max(1, e1.damage || 0);
             }
         }
 

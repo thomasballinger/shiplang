@@ -85,7 +85,7 @@ type ShipDrawFunc = (e: Ship, ctx:CanvasRenderingContext2D, dx:number, dy:number
 
 var entityDraws = <{[type:string]: EntityDrawFunc}>{
   'laser': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#ffff00";
+    ctx.fillStyle= e.drawStatus['color'] || "#ffff00";
     ctx.beginPath();
     ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
     ctx.fill(); //TODO prettier lasers

@@ -25,6 +25,8 @@ export class Entity{
         this.armor = this.armorMax
         this.explosionSize = 0;
         this.randomSeed = Math.random();
+        this.weaponCharge = 0;
+        this.damage = 0;
     }
     type: string;
     x: number;
@@ -44,6 +46,8 @@ export class Entity{
     explosionSize: number;
     isComponent: boolean;
     randomSeed: number;
+    weaponCharge: number;
+    damage: number;
 
     // some bookkeeping props for SpaceWorld
     dead: boolean;     // will be cleaned up this tick

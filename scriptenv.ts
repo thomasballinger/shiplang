@@ -44,8 +44,9 @@ class Data {
     constructor(public name: string, public getter: ()=>any){}
     // JSInterpreter doesn't implement properties, so have to use functions
     interpreterInit(interpreter: Interpreter, scope: any){
-        var getter = <()=>any>(function(){ return interpreter.createPrimitive(this.getter()); });
-        interpreter.setProperty(scope, this.name, interpreter.createNativeFunction(getter));
+        var getter = this.getter;
+        var wrapper = <()=>any>(function(){ return interpreter.createPrimitive(getter()); });
+        interpreter.setProperty(scope, this.name, interpreter.createNativeFunction(wrapper));
     }
     shiplangInit(obj: any){
         Object.defineProperty(obj, this.name, { get: this.getter });
@@ -213,6 +214,13 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToClosestByType', function(name: string){ return w.distToClosestByType(e, name); }),
         new Command('headingToClosestByType', function(name: string):any{ return e.towards(w.findClosestByType(e, name)); }),
 
+        new AsyncCommand('chargeFor', function(n: number){
+            var timeFinished = t + n;
+            return function(){ return t > timeFinished; }
+        }, function(n: number){
+            e.weaponCharge = Math.min(1, e.weaponCharge + n);
+        }),
+
         new AsyncCommand('keypress', function(){
             keygen = manual.actOnKey(e, keys)
             var {value, done} = keygen.next()
@@ -349,9 +357,16 @@ function makeCommands():MakeCommandsReturnType{
 
         new AsyncCommand('fireLaser', function(color: string): any{
             var startTime = t;
-            w.fireLaser(e, color);
+            if (e.weaponCharge){
+                var waitTime = .3;
+                w.fireLaser(e, color, e.weaponCharge * 3 + 1);
+            } else {
+                var waitTime = .1
+                w.fireLaser(e, color);
+            }
+            e.weaponCharge = 0;
             return function(){
-                if (t < startTime + .1){
+                if (t < startTime + waitTime){
                     return false;
                 } else {
                     return true;
@@ -389,6 +404,7 @@ function makeCommands():MakeCommandsReturnType{
         new Data('maxDH', function(){ return e.maxDH; }),
         new Data('maxThrust', function(){ return e.maxThrust; }),
         new Data('maxSpeed', function(){ return e.maxSpeed; }),
+        new Data('weaponCharge', function(){ return e.weaponCharge; }),
         new Data('speed', function(){ return e.speed(); }),
         new Data('vHeading', function(){ return e.vHeading(); }),
     ];
