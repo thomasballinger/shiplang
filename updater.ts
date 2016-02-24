@@ -32,10 +32,13 @@ export class Updater{
         this.savedWorlds = [];
         this.codeHasChanged = false;
         this.userFunctionBodies = new UserFunctionBodies();
-        this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
-        this.player = this.world.getPlayer();
-        this.viewedEntity = this.player;
-        this.lastValid = '1';
+
+        //TODO unnecessary? These will be triggered on code change,
+        //     which currently has to happen.
+        //this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
+        //this.player = this.world.getPlayer();
+        //this.viewedEntity = this.player;
+        //this.lastValid = '1';
     }
     world: SpaceWorld;
     lastValid: string;

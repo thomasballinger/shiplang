@@ -24,6 +24,9 @@ export var gunner = function():any{
         world.addBackgroundEntity(makePlanet(400, 300, 40, '#ab43af'));
         world.addBackgroundEntity(makePlanet(-1200, -1000, 60, '#3bd951'));
         world.addBackgroundEntity(makePlanet(800, 2000, 80, '#8b2141'));
+        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
+        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
+        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
         world.addEntity(makeShip(ships.Triangle, -300, 350, 270, builtinScripts.citizenScript));
         world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
         world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
@@ -32,7 +35,7 @@ export var gunner = function():any{
         world.addEntity(makeShip(ships.Triangle, 200, 250, 90, builtinScripts.citizenScript));
         world.addEntity(ship); // adding the ship last means it goes in front
 
-        putMessage('Your mission: destroy 5 astroids.');
+        putMessage('Your mission: destroy 2 astroids.');
 
         (<any>window).world = world;
         return world;
@@ -72,6 +75,7 @@ export var scenario1 = function():any{
         ship.imtheplayer = true;
         world.addEntity(ship);
         world.addEntity(ship2);
+        world.addEntity(makeShip(ships.Astroid, -100, 350, 270, builtinScripts.wander));
         world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
         //world.addEntity(makeShip(ships.Triangle, 70, 190, 270, scripts.pilotScript));
         for (var i=0; i<boidArgs.length; i++){

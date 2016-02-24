@@ -210,6 +210,8 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToClosestPlanet', function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); }),
         new Command('headingToNthPlanet', function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); }),
         new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
+        new Command('distToClosestByType', function(name: string){ return w.distToClosestByType(e, name); }),
+        new Command('headingToClosestByType', function(name: string):any{ return e.towards(w.findClosestByType(e, name)); }),
 
         new AsyncCommand('keypress', function(){
             keygen = manual.actOnKey(e, keys)
@@ -226,6 +228,10 @@ function makeCommands():MakeCommandsReturnType{
             return keys.isPressed(name);
         }),
 
+        new Command('rand', function(){
+            return e.getRandom()
+        }),
+
         new AsyncCommand('waitFor', function(n: number):any{
             var timeFinished = t + n;
             return function(){
@@ -238,7 +244,7 @@ function makeCommands():MakeCommandsReturnType{
             return function(){ return e.hTarget === undefined; }
         }),
 
-        new Command('detonate', function():any{
+        new AsyncCommand('detonate', function():any{
             e.r = e.explosionSize;
             e.type = 'explosion';
             e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
@@ -324,7 +330,7 @@ function makeCommands():MakeCommandsReturnType{
             }
         }),
 
-        new Command('fireNeedleMissile', function(script: any, color: string): any{
+        new AsyncCommand('fireNeedleMissile', function(script: any, color: string): any{
             var startTime = t;
             var missileFired = false;
             return function(){

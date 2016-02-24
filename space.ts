@@ -219,6 +219,11 @@ export class SpaceWorld{
             return x.dead !== true;
         });
     }
+    findClosestByType = function(e1: Entity, type: string){
+        return this.findClosest(e1, this.ships().filter(function(x: Entity){
+            return x.type === type;
+        }));
+    }
     findClosestShip = function(e1: Entity){
         return this.findClosest(e1, this.ships());
     };

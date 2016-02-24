@@ -256,4 +256,23 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              e.h,
              esf);
   },
+  'astroid': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle="#889922";
+    if (e.thrust > 0){
+        ctx.fillStyle="#aabb22";
+    }
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[30, 0],
+              [10, 10],
+              [0, 30],
+              [-10, 10],
+              [-30, 0],
+              [-10, -10],
+              [0, -30],
+              [10, -10]],
+             0,
+             esf);
+    }
 };

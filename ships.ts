@@ -88,3 +88,17 @@ export var NeedleMissile = {
     isInertialess: true,
     lifespan: 6,
 }
+
+export var Astroid = {
+    type: 'astroid',
+    r: 30,
+    maxThrust: 100,
+    maxDH: 500,
+    maxSpeed: 100,
+    isMunition: false,
+    explosionSize: 100,
+    armorMax: 20,
+    isInertialess: false,
+    lifespan: <number>undefined,
+}
+

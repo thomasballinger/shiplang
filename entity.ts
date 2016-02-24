@@ -24,6 +24,7 @@ export class Entity{
         this.armorMax = 1;
         this.armor = this.armorMax
         this.explosionSize = 0;
+        this.randomSeed = Math.random();
     }
     type: string;
     x: number;
@@ -42,6 +43,7 @@ export class Entity{
     armorMax: number;
     explosionSize: number;
     isComponent: boolean;
+    randomSeed: number;
 
     // some bookkeeping props for SpaceWorld
     dead: boolean;     // will be cleaned up this tick
@@ -54,7 +56,7 @@ export class Entity{
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
     towards(e: Entity){
-      if (e === undefined){ return 0; }
+      if (e === undefined){ return sm.towardsPoint(this.x, this.y, 0, 0); }
       return sm.towardsPoint(this.x, this.y, e.x, e.y);
     }
     vHeading(){
@@ -69,6 +71,10 @@ export class Entity{
     }
     distFrom(e: Entity){
         return sm.dist(this.x, this.y, e.x, e.y);
+    }
+    getRandom(){
+        var x = Math.sin(this.randomSeed++) * 10000;
+        return x - Math.floor(x);
     }
 
     move(dt: GameTime):void{

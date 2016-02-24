@@ -53,6 +53,17 @@
 ;        (ping spot)
 ;        (fireMissile)))
 
+(defn wander ()
+  (forever
+    (leftFor (rand))
+    (thrustFor (rand))
+    (leftFor (rand))
+    (thrustFor (rand))
+    (leftFor (rand))
+    (thrustFor (rand))
+    (turnTo (headingToClosestPlanet))
+    (thrustFor (+ 1 (rand)))))
+
 (defn boundingBox ()
   (forever
     (thrustFor .1)
@@ -78,7 +89,14 @@
 
 (defn holderScript ()
   (seekGun)
+  (define killed 0)
+  (while (< killed 2)
+    (hunt "astroid"))
   (citizenScript))
+
+(defn hunt (type)
+  (turnTo (headingToClosestByType type))
+  (thrustFor .1))
 
 (defn reverseTime () (/ 180 maxDH ))
 (defn stopTime () (/ speed maxThrust))

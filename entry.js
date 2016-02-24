@@ -25,27 +25,27 @@ routes = {
   'robo': function(){outerspace(scenarios.robo);},
 };
 
-function getHash(){
-  if(window.location.hash) {
-    return window.location.hash.slice(1);
+function getLocation(){
+  if(window.location.search) {
+    return window.location.search.slice(1);
   } else {
     return '';
   }
 }
 
 function main(){
-  cmd = getHash();
+  cmd = getLocation();
   if (cmd === 'reset'){
     Player.clear();
-    window.location.hash = '';
-  }
-  if (cmd === 'simulator'){
+    window.location = window.location.protocol + '//' + window.location.host;
+  } else if (cmd === 'simulator'){
     Player.clear();
-    window.location.hash = '';
     Player.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]);
+    window.location = window.location.protocol + '//' + window.location.host;
+  } else {
+    var player = Player.fromStorage();
+    routes[player.location]();
   }
-  var player = Player.fromStorage();
-  routes[player.location]();
 }
 
 main();
