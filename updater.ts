@@ -1,5 +1,5 @@
 //Orchestrates stuff
-import { SpaceWorld } from './space';
+import { System } from './system';
 import { Ship, Entity } from './entity';
 var manual = require('./manual');
 import * as scriptEnv from './scriptenv';
@@ -40,13 +40,13 @@ export class Updater{
         //this.viewedEntity = this.player;
         //this.lastValid = '1';
     }
-    world: SpaceWorld;
+    world: System;
     lastValid: string;
     codeHasChanged: boolean;
     controls: any;
     observers: Updateable[];
     tickers: (()=>void)[];
-    savedWorlds: SpaceWorld[];
+    savedWorlds: System[];
     player: Ship;
     _viewedEntity: Ship;
     userFunctionBodies: UserFunctionBodies;

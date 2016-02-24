@@ -85,7 +85,7 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 }
 
 
-export class SpaceWorld{
+export class System{
     constructor(){
         this.entities = [];
         this.bgEntities = [];
@@ -99,7 +99,7 @@ export class SpaceWorld{
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);
     }
-    copy():SpaceWorld{
+    copy():System{
         //var t0 = window.performance.now();
         var world = deepcopy(this);
         //console.log(window.performance.now() - t0);
@@ -300,11 +300,11 @@ export class SpaceWorld{
         return <Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
     }
 
-    deepCopyCreate():SpaceWorld{
-        if (this.inTick){ throw Error("SpaceWorld can't be copied during a tick!"); }
-        return new SpaceWorld();
+    deepCopyCreate():System{
+        if (this.inTick){ throw Error("System can't be copied during a tick!"); }
+        return new System();
     };
-    deepCopyPopulate = function(copy: SpaceWorld, memo:any, innerDeepCopy:any){
+    deepCopyPopulate = function(copy: System, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
         copy.gameTime = this.gameTime;
     };

@@ -1,6 +1,6 @@
 import { Entity, Ship } from './entity';
 import { CompiledFunctionObject, BC } from './eval';
-import { SpaceWorld } from './space';
+import { System } from './system';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { JSContext } from './codetypes';
 
@@ -56,7 +56,7 @@ export type Script = ((e: Entity)=>Generator) |
 export type ByteCode = [BC, any];
 
 export interface WorldBuilder {
-    (scripts: any): SpaceWorld;
+    (scripts: any): System;
     instructions: string;
     controlsDelay: number;
 }
@@ -82,7 +82,7 @@ export interface Context {
 }
 
 export interface Updateable {
-    update(e: Entity, w: SpaceWorld): void;
+    update(e: Entity, w: System): void;
 }
 
 export interface Scenario {

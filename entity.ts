@@ -49,7 +49,7 @@ export class Entity{
     weaponCharge: number;
     damage: number;
 
-    // some bookkeeping props for SpaceWorld
+    // some bookkeeping props for System
     dead: boolean;     // will be cleaned up this tick
     inactive: boolean; // sticking around for a bit to look pretty
     imtheplayer: boolean; // world resets on player's death

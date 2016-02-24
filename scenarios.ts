@@ -1,4 +1,4 @@
-import { SpaceWorld, makeShip, makeBoid, makePlanet, makeComponent } from './space';
+import { System, makeShip, makeBoid, makePlanet, makeComponent } from './system';
 import { SLgetScripts } from './scriptenv';
 import { WorldBuilder } from './interfaces';
 import * as objectivebar from './objectivebar';
@@ -16,8 +16,8 @@ export var gunner = function():any{
     You're a gunner.<br/>
     Use space and f to fire.<br/>
     <a href="/#space" onclick="Player.fromStorage().set('location', 'Sol').set('script', window.normalScript).go();">quit this job, it sucks</a>`);
-    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
-        var world = new SpaceWorld();
+    var reset = <WorldBuilder>function reset(script: any): System {
+        var world = new System();
         var p = Player.fromStorage().spaceLocation;
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
@@ -61,13 +61,13 @@ export var scenario1 = function():any{
                      Math.random() * 100 - 50]);
     }
 
-    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
+    var reset = <WorldBuilder>function reset(script: any): System {
 
         var boidScript = builtinScripts.enemyScript;
         var playerScript = script;
         var enemyScript = builtinScripts.enemyScript;
 
-        var world = new SpaceWorld();
+        var world = new System();
 
         var ship = makeShip(ships.Triangle, -200, 350, 270, playerScript);
         (<any>window).ship = ship;
@@ -96,8 +96,8 @@ export var sol = function():any{
     Land on a planet with L<br />
     or travel with J`);
 
-    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
-        var world = new SpaceWorld();
+    var reset = <WorldBuilder>function reset(script: any): System {
+        var world = new System();
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
@@ -135,8 +135,8 @@ export var robo = function():any{
     You'll be best equipped if you let your ship's computer do the piloting.
 `);
 
-    var reset = <WorldBuilder>function reset(script: any): SpaceWorld {
-        var world = new SpaceWorld();
+    var reset = <WorldBuilder>function reset(script: any): System {
+        var world = new System();
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
