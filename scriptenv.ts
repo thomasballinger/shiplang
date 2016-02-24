@@ -16,7 +16,55 @@ interface YieldFunction {
 
 //TODO redesign this module to manufacture functions for either
 //     style, JSInterpreter or SL
+//
+//     Need to work in three situations:
+//     * ShipLang
+//       * function to run
+//       * whether async
+//       * if async, function for checking if done
+//       * if async, function to call when done
+//       * can be property access
+//     * JS
+//       * whether async
+//       * type of return value
+//       * types of parameters
+//     * custom blockly block
+//       * requirements for JS interp
+//       * types of inputs (including degrees)
+//       * color
+//
+//     Eventually want a system for specifying which are legal to call
 
+class SyncronousCommand{
+    constructor(public name: string,
+                public body: any, // function with any signature
+                public paramTypes?: string[],
+                public numRequiredParams?: number){
+        if (paramTypes === undefined){
+            this.paramTypes = paramTypes = [];
+        }
+        if (numRequiredParams === undefined){
+            this.numRequiredParams = paramTypes.length;
+        }
+    }
+    interpreterInit(interpreter: any, scope: any){
+        var self = this;
+        interpreter.setProperty(scope, this.name, interpreter.createNativeFunction(function(){
+            var args = <any[]>[];
+            for (var i=0; i<self.paramTypes.length; i++){
+                if (i >= arguments.length){ break; }
+                if (self.paramTypes[i] && arguments[i].type !== self.paramTypes[i]){
+                    throw new Error('Expected arg '+i+' to be a '+self.paramTypes[i]);
+                }
+                args.push(arguments[i].data);
+            }
+            return interpreter.createPrimitive(self.body.apply(null, arguments));
+        }));
+    }
+}
+
+// Allow ShipLang programs to use JavaScript builtins
+// Only used for ShipLang programs
 var funcs = {
     '+': function(){
       return Array.prototype.slice.call(arguments).reduce(function(a:number, b:number){
@@ -223,11 +271,16 @@ function makeControls():MakeControlsReturnType{
     thrustFor.requiresYield = true;
     thrustFor.finish = function(){ e.thrust = 0; }
 
-    var fullThrust = function(){ e.thrust = e.maxThrust; }
-    var cutThrust = function(){ e.thrust = 0; }
-    var fullLeft = function(){ e.dh = -e.maxDH; }
-    var fullRight = function(){ e.dh = e.maxDH; }
-    var noTurn = function(){ e.dh = 0; }
+    var commands = [
+        new SyncronousCommand('fullThrust', function(){ e.thrust = e.maxThrust; }),
+        new SyncronousCommand('cutThrust', function(){ e.thrust = 0; }),
+        new SyncronousCommand('fullLeft', function(){ e.dh = -e.maxDH; }),
+        new SyncronousCommand('fullRight', function(){ e.dh = e.maxDH; }),
+        new SyncronousCommand('noTurn', function(){ e.dh = 0; }),
+    ];
+
+    // temp hack while refactoring into commands
+    (<any>window).commands = commands;
 
     var leftFor = <YieldFunction>function(n):any{
         e.dh = e.maxDH;
@@ -266,13 +319,11 @@ function makeControls():MakeControlsReturnType{
         distToNthPlanet: <YieldFunction>function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); },
         keypress: keypress,
         keyPressed: <YieldFunction>keyPressed,
-        fullThrust: <YieldFunction>fullThrust,
-        cutThrust: <YieldFunction>cutThrust,
-        fullLeft: <YieldFunction>fullLeft,
-        fullRight: <YieldFunction>fullRight,
-        noTurn: <YieldFunction>noTurn,
         land: <YieldFunction>land,
         attach: <YieldFunction>attach,
+    }
+    for (var command of commands){
+        controls[command.name] = <YieldFunction>command.body;
     }
 
     function makeAccessor(prop: string){ return function() { return e[prop]; }; }
@@ -333,11 +384,11 @@ export function initShipEnv(interpreter: any, scope: any){
     }
     interpreter.setProperty(scope, 'log',
         interpreter.createNativeFunction(function(x: any){ console.log('from jsinterp:', x); }));
-    interpreter.setProperty(scope, 'fullThrust', interpreter.createNativeFunction(function(){ controls['fullThrust'](); }));
-    interpreter.setProperty(scope, 'cutThrust', interpreter.createNativeFunction(function(){ controls['cutThrust'](); }));
-    interpreter.setProperty(scope, 'fullLeft', interpreter.createNativeFunction(function(){ controls['fullLeft'](); }));
-    interpreter.setProperty(scope, 'fullRight', interpreter.createNativeFunction(function(){ controls['fullRight'](); }));
-    interpreter.setProperty(scope, 'noTurn', interpreter.createNativeFunction(function(){ controls['noTurn'](); }));
+
+    for (var command of (<any>window).commands){
+        command.interpreterInit(interpreter, scope);
+    }
+
     interpreter.setProperty(scope, 'keyPressed',
         interpreter.createNativeFunction(function(x: any){
             if (!x.isPrimitive || x.type !== 'string' || typeof x.data !== 'string'){
