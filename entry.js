@@ -9,7 +9,7 @@ import * as scenarios from './scenarios';
 window.deepcopy = require('./deepcopy'); // needed by JS interpreter
 window.Player = Player; // for convenience in onClicks of links
 
-window.DEBUGMODE = false;
+window.DEBUGMODE = true;
 
 var gunnerScript = require("raw!./scripts/gunner.js");
 

@@ -6,13 +6,14 @@ import * as ships from './ships';
 import { putMessage } from './messagelog';
 import { headingDiff } from './shipmath';
 
-import { GameTime } from './interfaces';
+import { GameTime, Interpreter, JSInterpAsyncInput } from './interfaces';
 
 interface YieldFunction {
     (...args:any[]): ()=>(boolean|string);
     finish(...args: any[]): (any);
     requiresYield: boolean;
 }
+
 
 //TODO redesign this module to manufacture functions for either
 //     style, JSInterpreter or SL
@@ -35,7 +36,7 @@ interface YieldFunction {
 //
 //     Eventually want a system for specifying which are legal to call
 
-class SyncronousCommand{
+class Command{
     constructor(public name: string,
                 public body: any, // function with any signature
                 public paramTypes?: string[],
@@ -47,6 +48,7 @@ class SyncronousCommand{
             this.numRequiredParams = paramTypes.length;
         }
     }
+    isAsync: boolean;
     interpreterInit(interpreter: any, scope: any){
         var self = this;
         interpreter.setProperty(scope, this.name, interpreter.createNativeFunction(function(){
@@ -61,6 +63,55 @@ class SyncronousCommand{
             return interpreter.createPrimitive(self.body.apply(null, arguments));
         }));
     }
+    shiplangFunction():YieldFunction{
+        return <YieldFunction>this.body;
+    }
+}
+
+class AsyncCommand extends Command{
+    constructor(name: string,
+                body: any, // should return a ()=>boolean
+                public onFinish?: any, // same signature as body
+                paramTypes?: string[],
+                numRequiredParams?: number){
+        super(name, body, paramTypes, numRequiredParams);
+        this.isAsync = true;
+        if (onFinish === undefined){
+            this.onFinish = function(){};
+        }
+    }
+    interpreterInit(interpreter: Interpreter, scope: any){
+        var self = this;
+        var asyncFunction = <JSInterpAsyncInput>function(){
+            var args = <any[]>[];
+            for (var i=0; i<self.paramTypes.length; i++){
+                if (i >= arguments.length){ break; }
+                if (self.paramTypes[i] && arguments[i].type !== self.paramTypes[i]){
+                    throw new Error('Expected arg '+i+' to be a '+self.paramTypes[i]);
+                }
+                args.push(arguments[i].data);
+            }
+            var val = self.body.apply(null, arguments);
+            return val;
+        }
+        var finishFunction = function(){
+            var args = <any[]>[];
+
+            for (var i=0; i<arguments.length; i++){
+                // alr: ()=>(boolean|string)eady did typechecking when asyncFunction was called
+                args.push(arguments[i].data);
+            }
+            return interpreter.createPrimitive(self.onFinish.apply(null, arguments));
+        }
+        asyncFunction.finish = finishFunction;
+        interpreter.setProperty(scope, this.name, interpreter.createAsyncFunction(asyncFunction));
+    }
+    shiplangFunction(): YieldFunction{
+        this.body.finish = this.onFinish;
+        this.body.requiresYield = true;
+        return this.body;
+    }
+
 }
 
 // Allow ShipLang programs to use JavaScript builtins
@@ -263,20 +314,20 @@ function makeControls():MakeControlsReturnType{
     fireLaser.requiresYield = true;
     fireLaser.finish = function(){}
 
-    var thrustFor = <YieldFunction>function(n):any{
-        e.thrust = e.maxThrust;
-        var timeFinished = t + n;
-        return function(){ return t > timeFinished; }
-    }
-    thrustFor.requiresYield = true;
-    thrustFor.finish = function(){ e.thrust = 0; }
-
     var commands = [
-        new SyncronousCommand('fullThrust', function(){ e.thrust = e.maxThrust; }),
-        new SyncronousCommand('cutThrust', function(){ e.thrust = 0; }),
-        new SyncronousCommand('fullLeft', function(){ e.dh = -e.maxDH; }),
-        new SyncronousCommand('fullRight', function(){ e.dh = e.maxDH; }),
-        new SyncronousCommand('noTurn', function(){ e.dh = 0; }),
+        new Command('fullThrust', function(){ e.thrust = e.maxThrust; }),
+        new Command('cutThrust', function(){ e.thrust = 0; }),
+        new Command('fullLeft', function(){ e.dh = -e.maxDH; }),
+        new Command('fullRight', function(){ e.dh = e.maxDH; }),
+        new Command('noTurn', function(){ e.dh = 0; }),
+
+        new AsyncCommand('thrustFor', function(n: number):any{
+            e.thrust = e.maxThrust;
+            var timeFinished = t + n;
+            return function(){
+                return t > timeFinished;
+            }
+        }),
     ];
 
     // temp hack while refactoring into commands
@@ -299,7 +350,6 @@ function makeControls():MakeControlsReturnType{
     rightFor.finish = function(){ e.dh = 0; }
 
     var controls:{[name: string]: YieldFunction} = {
-        thrustFor: thrustFor,
         leftFor: leftFor,
         rightFor: rightFor,
         fireMissile: fireMissile,
@@ -323,7 +373,7 @@ function makeControls():MakeControlsReturnType{
         attach: <YieldFunction>attach,
     }
     for (var command of commands){
-        controls[command.name] = <YieldFunction>command.body;
+        controls[command.name] = <YieldFunction>command.shiplangFunction();
     }
 
     function makeAccessor(prop: string){ return function() { return e[prop]; }; }
@@ -376,6 +426,10 @@ export function buildShipEnv():evaluation.Environment{
 
 export function initShipEnv(interpreter: any, scope: any){
     for (var prop of Object.keys(controls)){
+        if (prop === 'thrustFor'){
+            console.log('skipping thrustFor...');
+            continue;
+        }
         if (controls[prop].requiresYield){
             if (!controls[prop].finish){ continue; }
             interpreter.setProperty(scope, prop,

@@ -9,6 +9,11 @@ export interface Selection {
     finish: number;
 }
 
+export interface JSInterpAsyncInput {
+    (...args: any[]): (()=>boolean)|string;
+    finish: (...args: any[])=> any;
+    }
+
 export interface Interpreter {
     step(): boolean;
     run(): boolean;
@@ -18,6 +23,11 @@ export interface Interpreter {
     copy(): Interpreter;
     exec(func: JSInterpFunction): void;
     runFunctionNow(func: any): void;
+
+    createAsyncFunction(func: JSInterpAsyncInput): void;
+    createNativeFunction(func: any): void;
+    createPrimitive(obj: any): any;
+    setProperty(scope: any, name: string, interp: any): void;
 }
 
 export interface Generator {
