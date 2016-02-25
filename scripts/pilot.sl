@@ -89,14 +89,15 @@
 
 (defn holderScript ()
   (seekGun)
-  (define killed 0)
-  (while (< killed 2)
+  (while (> (countByType "astroid") 0)
     (hunt "astroid"))
   (citizenScript))
 
 (defn hunt (type)
   (turnTo (headingToClosestByType type))
-  (thrustFor .1))
+  (if (> (distToClosestByType type) 500)
+      (thrustFor .4)
+      (thrustFor .1)))
 
 (defn reverseTime () (/ 180 maxDH ))
 (defn stopTime () (/ speed maxThrust))

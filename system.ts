@@ -113,8 +113,9 @@ export class System{
     fireLaser = function(entity: Entity, color: string, intensity: number){
         var blast = fireLaser(entity, this.gameTime);
         blast.drawStatus['color'] = color;
-        blast.damage = intensity || 1;
-        blast.r = Math.max(blast.r, Math.sqrt(blast.r * (1 + (intensity || 0))))
+        var multiplier = intensity || 1
+        blast.damage = 1 * multiplier;
+        blast.r = blast.r * Math.pow(Math.max(1, blast.r * multiplier), 2/3)
         this.addEntity(blast);
     }
     addEntity(entity: Entity){
@@ -223,6 +224,12 @@ export class System{
             }
             return x.dead !== true;
         });
+    }
+    // doesn't include passed in entity
+    countByType = function(e1: Entity, type: string){
+        return this.entities.filter(function(x: Entity){
+            return x.type === type && x !== e1;
+        }).length
     }
     findClosestByType = function(e1: Entity, type: string){
         return this.findClosest(e1, this.ships().filter(function(x: Entity){

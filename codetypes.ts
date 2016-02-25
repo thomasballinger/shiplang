@@ -138,7 +138,7 @@ export class JSContext implements Context {
             var unfinished = this.step(e);
             if (!unfinished){
                 this.done = true;
-                console.log('finished JS script');
+                //console.log('finished JS script');
             }
 
             if (this.highlight){

@@ -27,3 +27,10 @@ export function y_comp(h:number){
     return Math.sin(h * Math.PI / 180);
 }
 
+// assuming my current speed,
+// assuming their current speed,
+// given my projectile speed,
+// what heading to face to hit?
+//export function intersectHeading(x1: n, y1, dx1, dy1, x2, y2, dx2, dy2){
+//
+//}

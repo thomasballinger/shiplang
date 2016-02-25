@@ -178,6 +178,7 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              esf);
   },
   'gunship': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle="#562539";
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,

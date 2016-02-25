@@ -35,7 +35,7 @@ export var gunner = function():any{
         world.addEntity(makeShip(ships.Triangle, 200, 250, 90, builtinScripts.citizenScript));
         world.addEntity(ship); // adding the ship last means it goes in front
 
-        putMessage('Your mission: destroy 2 astroids.');
+        putMessage('Your mission: destroy all astroids. The geometric things.');
 
         (<any>window).world = world;
         return world;

@@ -55,7 +55,7 @@ export class Entity{
     imtheplayer: boolean; // world resets on player's death
     viewable: boolean;
 
-    attachedTo: Entity;
+    attachedTo: Ship;
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
@@ -74,6 +74,7 @@ export class Entity{
         return Math.cos(theta) * this.speed();
     }
     distFrom(e: Entity){
+        if (!e){ return 1000000; }
         return sm.dist(this.x, this.y, e.x, e.y);
     }
     getRandom(){
@@ -214,7 +215,7 @@ export class Component extends Ship{
     xOffset: number;
     yOffset: number;
     move(dt: GameTime){
-        if (this.attachedTo){
+        if (this.attachedTo && this.attachedTo.type !== 'explosion'){
             var h = this.attachedTo.h
             this.x = (this.attachedTo.x +
                       this.xOffset * Math.cos(h * Math.PI / 180) -
@@ -223,8 +224,13 @@ export class Component extends Ship{
                       this.xOffset * Math.sin(h * Math.PI / 180) +
                       this.yOffset * Math.cos(h * Math.PI / 180));
             this.h = this.attachedTo.h;
-            this.dx = this.attachedTo.dx // not used to move, but
-            this.dy = this.attachedTo.dy // needed for projectiles
+            this.dx = this.attachedTo.dx; // not used to move, but
+            this.dy = this.attachedTo.dy; // needed for projectiles
+            this.dh = this.attachedTo.dh; // and for floating
+        } else {
+            this.x += this.dx * dt
+            this.y += this.dy * dt
+            this.h += this.dh * dt
         }
         if (this.type === 'explosion'){ //TODO factor this out, it's repeated code
             this.r = Math.max(this.r - 10*dt*this.r, 1);

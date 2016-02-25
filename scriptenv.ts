@@ -202,6 +202,7 @@ function makeCommands():MakeCommandsReturnType{
         new Command('fullLeft', function(){ e.dh = -e.maxDH; }),
         new Command('fullRight', function(){ e.dh = e.maxDH; }),
         new Command('noTurn', function(){ e.dh = 0; }),
+
         new Command('distToClosestShip', function(){ return w.distToClosestShip(e); }),
         new Command('headingToClosestShip', function():any{ return e.towards(w.findClosestShip(e)); }),
         new Command('headingToClosest', function():any{ return e.towards(w.findClosest(e)); }),
@@ -211,8 +212,10 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToClosestPlanet', function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); }),
         new Command('headingToNthPlanet', function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); }),
         new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
-        new Command('distToClosestByType', function(name: string){ return w.distToClosestByType(e, name); }),
+        new Command('distToClosestByType', function(name: string){ return e.distFrom(w.findClosestByType(e, name)); }),
         new Command('headingToClosestByType', function(name: string):any{ return e.towards(w.findClosestByType(e, name)); }),
+
+        new Command('countByType', function(name: string): any{ return w.countByType(e, name); }),
 
         new AsyncCommand('chargeFor', function(n: number){
             var timeFinished = t + n;
