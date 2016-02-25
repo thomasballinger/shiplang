@@ -5,7 +5,7 @@ function manual(){
   if (keyPressed('UP')){ fullThrust(); }
   if (keyPressed('LEFT')){ fullLeft(); }
   if (keyPressed('RIGHT')){ fullRight(); }
-  if (keyPressed(' ')){ fireMissile(dumbRocket, '#aa1144'); }
+  if (keyPressed(' ')){ fireMissile(ProNav, '#aa1144'); }
   if (keyPressed('w')){ waitFor(1); }
   if (keyPressed('l')){ land(); }
   if (keyPressed('j')){ jump(); }
@@ -21,6 +21,22 @@ function dumbRocket(){
       detonate();
     }
     thrustFor(0.1);
+  }
+}
+
+function ProNav(){
+  thrustFor(1);
+  while (true){
+    thrustFor(0.1);
+    var initial = headingToClosestByType('fattriangle');
+    waitFor(0.1);
+    var newHeading = headingToClosestByType('fattriangle');
+    log(headingDiff(initial, newHeading));
+    if (headingToLeft(initial, newHeading)){
+      rightFor(0.01 * headingDiff(initial, newHeading));
+    } else {
+      leftFor(0.01 * headingDiff(initial, newHeading));
+    }
   }
 }
 

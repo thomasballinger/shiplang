@@ -159,11 +159,8 @@ export class Ship extends Entity{
     move(dt: GameTime){
         super.move(dt);
         if (this.hTarget !== undefined){
-            //TODO move this math to shipmath
-            var diff = (this.h - this.hTarget + 3600) % 360;
-            var delta = diff <= 180 ? diff : 360 - diff;
-            diff = this.hTarget - this.h;
-            if (diff > 0 ? diff > 180 : diff >= -180){
+            var delta = sm.headingDiff(this.h, this.hTarget)
+            if (sm.headingToLeft(this.h, this.hTarget)){
               this.h = (this.h - Math.min(this.maxDH*dt, delta) + 3600) % 360;
             } else {
               this.h = (this.h + Math.min(this.maxDH*dt, delta) + 3600) % 360;

@@ -16,6 +16,13 @@ export function headingDiff(h1: Degrees, h2: Degrees): Degrees{
                     Math.abs(h1 - (h2 + 360)));
 }
 
+export function headingToLeft(h1: Degrees, h2: Degrees): boolean{
+    var diff = (h1 - h2 + 3600) % 360;
+    var delta = diff <= 180 ? diff : 360 - diff;
+    diff = h2 - h1;
+    return (diff > 0 ? diff > 180 : diff >= -180)
+}
+
 export function dist(x1: number, y1: number, x2: number, y2: number){
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }

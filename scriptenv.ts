@@ -4,7 +4,7 @@ import { Player } from './player';
 var manual = require('./manual');
 import * as ships from './ships';
 import { putMessage } from './messagelog';
-import { headingDiff } from './shipmath';
+import { headingDiff, headingToLeft } from './shipmath';
 
 import { GameTime, Interpreter, JSInterpAsyncInput } from './interfaces';
 
@@ -165,10 +165,10 @@ var funcs = {
         }
         return a === b;
     },
-    'headingDiff': function(a: number, b: number){ return headingDiff(a, b); },
     'and': function(a: boolean, b: boolean){ return a && b; },
     'or': function(a: boolean, b: boolean){ return a || b; },
     'opp': function(degrees: number){ return (degrees + 180) % 360; },
+    'abs': function(degrees: number){ return Math.abs(degrees); },
 }
 // Even though it wouldn't hurt to copy this object, all the functions would
 // be deepCopy passthroughs anyway. If a way to *modify* this array were added,
@@ -197,6 +197,9 @@ function makeCommands():MakeCommandsReturnType{
     var keygen = <any>undefined;
 
     var commands = [
+        new Command('headingDiff', function(a: number, b: number){ return headingDiff(a, b); }),
+        new Command('headingToLeft', function(a: number, b: number){ return headingToLeft(a, b); }),
+
         new Command('fullThrust', function(){ e.thrust = e.maxThrust; }),
         new Command('cutThrust', function(){ e.thrust = 0; }),
         new Command('fullLeft', function(){ e.dh = -e.maxDH; }),
