@@ -59,9 +59,15 @@ export class Entity{
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
-    towards(e: Entity){
-      if (e === undefined){ return sm.towardsPoint(this.x, this.y, 0, 0); }
-      return sm.towardsPoint(this.x, this.y, e.x, e.y);
+    towards(e: Entity): number;
+    towards(x: number, y: number): number;
+    towards(eOrX: Entity|number, y?: number){
+      if (eOrX === undefined){ return sm.towardsPoint(this.x, this.y, 0, 0); }
+      if (typeof eOrX === 'number' && typeof y === 'number'){
+          return sm.towardsPoint(this.x, this.y, eOrX, y);
+      } else if (eOrX instanceof Entity){
+          return sm.towardsPoint(this.x, this.y, eOrX.x, eOrX.y);
+      }
     }
     vHeading(){
       return sm.towardsPoint(0, 0, this.dx, this.dy);
@@ -81,6 +87,10 @@ export class Entity{
         var x = Math.sin(this.randomSeed++) * 10000;
         return x - Math.floor(x);
     }
+
+    // assuming constant velocity, predict position
+    xIn(dt: GameTime): number{ return this.x + this.dx * dt; }
+    yIn(dt: GameTime): number{ return this.y + this.dy * dt; }
 
     move(dt: GameTime):void{
         if (this.type === 'explosion'){

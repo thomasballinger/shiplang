@@ -4,7 +4,7 @@ import { Player } from './player';
 var manual = require('./manual');
 import * as ships from './ships';
 import { putMessage } from './messagelog';
-import { headingDiff, headingToLeft } from './shipmath';
+import { headingDiff, headingToLeft, closingSpeed } from './shipmath';
 
 import { GameTime, Interpreter, JSInterpAsyncInput } from './interfaces';
 
@@ -218,6 +218,16 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToClosestByType', function(name: string){ return e.distFrom(w.findClosestByType(e, name)); }),
         new Command('headingToClosestByType', function(name: string):any{ return e.towards(w.findClosestByType(e, name)); }),
 
+        new Command('closingToClosestByType', function(name: string):any{
+            var o = w.findClosestByType(e, name)
+            return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
+        }),
+        new Command('headingToClosestByTypeIn', function(name: string, dt: number): any{
+            var closest = w.findClosestByType(e, name)
+            if (closest === undefined){ return e.towards(undefined); }
+            return e.towards(closest.xIn(dt), closest.yIn(dt));
+        }),
+
         new Command('countByType', function(name: string): any{ return w.countByType(e, name); }),
 
         new AsyncCommand('chargeFor', function(n: number){
@@ -413,6 +423,8 @@ function makeCommands():MakeCommandsReturnType{
         new Data('weaponCharge', function(){ return e.weaponCharge; }),
         new Data('speed', function(){ return e.speed(); }),
         new Data('vHeading', function(){ return e.vHeading(); }),
+
+        new Data('laserSpeed', function(){ return 600; }),
     ];
     return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, commands];
 }

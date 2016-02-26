@@ -34,6 +34,15 @@ export function y_comp(h:number){
     return Math.sin(h * Math.PI / 180);
 }
 
+export function closingSpeed(x1: number, y1: number, dx1: number, dy1: number,
+                              x2: number, y2: number, dx2: number, dy2: number){
+    var step = 0.01;
+    var d1 = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+    var d2 = Math.sqrt(Math.pow(x2 + dx2*step - x1 - dx1*step, 2) +
+                       Math.pow(y2 + dy2*step - y1 - dy1*step, 2));
+    return (d1 - d2) / step;
+}
+
 // assuming my current speed,
 // assuming their current speed,
 // given my projectile speed,

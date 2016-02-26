@@ -93,8 +93,18 @@
     (hunt "astroid"))
   (citizenScript))
 
+(defn aim (type)
+  (define dt (/ (distToClosestByType type)
+		(+ laserSpeed (closingToClosestByType type))))
+  (define heading (headingToClosestByTypeIn type dt))
+  (define turnTime (/ (headingDiff h heading) maxDH))
+
+  (define dt (+ dt turnTime))
+  (define heading (headingToClosestByTypeIn type dt))
+  (turnTo heading))
+
 (defn hunt (type)
-  (turnTo (headingToClosestByType type))
+  (aim type)
   (if (> (distToClosestByType type) 500)
       (thrustFor .4)
       (thrustFor .1)))
