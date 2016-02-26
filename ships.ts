@@ -94,7 +94,7 @@ export var Astroid = {
     r: 30,
     maxThrust: 100,
     maxDH: 500,
-    maxSpeed: 100,
+    maxSpeed: 300,
     isMunition: false,
     explosionSize: 100,
     armorMax: 20,

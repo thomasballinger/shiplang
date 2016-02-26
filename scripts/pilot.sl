@@ -26,15 +26,15 @@
 (defn attackScript ()
   (forever
     (if (> (distToClosestShip) 300)
-        (thrustFor .1))
-    (if (and (< (headingDiff h (headingToClosestShip)) 5)
-	     (< (distToClosestShip) 800))
       (do
+        (turnTo (headingToClosestShip))
+        (thrustFor .1)))
+    (if (< (distToClosestShip) 800)
+      (do
+        (aimAtClosestShip)
         (fireLaser "#123456")
         (fireLaser "#123456")
-        (fireLaser "#123456")))
-    (define targetHeading (headingToClosestShip))
-    (turnTo targetHeading)))
+        (fireLaser "#123456")))))
 
 (defn enemyScript ()
   (leftFor .6)
@@ -93,7 +93,18 @@
     (hunt "astroid"))
   (citizenScript))
 
-(defn aim (type)
+(defn aimAtClosestShip ()
+  (define dt (/ (distToClosestShip)
+		(+ laserSpeed (closingToClosestShip))))
+  (define heading (headingToClosestShipIn dt))
+  (define turnTime (/ (headingDiff h heading) maxDH))
+
+  (define dt (+ dt turnTime))
+  (define heading (headingToClosestShip dt))
+  (turnTo heading))
+
+
+(defn aimByType (type)
   (define dt (/ (distToClosestByType type)
 		(+ laserSpeed (closingToClosestByType type))))
   (define heading (headingToClosestByTypeIn type dt))
@@ -104,7 +115,7 @@
   (turnTo heading))
 
 (defn hunt (type)
-  (aim type)
+  (aimByType type)
   (if (> (distToClosestByType type) 500)
       (thrustFor .4)
       (thrustFor .1)))

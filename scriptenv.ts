@@ -227,6 +227,15 @@ function makeCommands():MakeCommandsReturnType{
             if (closest === undefined){ return e.towards(undefined); }
             return e.towards(closest.xIn(dt), closest.yIn(dt));
         }),
+        new Command('headingToClosestShipIn', function(name: string, dt: number): any{
+            var closest = w.findClosestShip(e)
+            if (closest === undefined){ return e.towards(undefined); }
+            return e.towards(closest.xIn(dt), closest.yIn(dt));
+        }),
+        new Command('closingToClosestShip', function(name: string):any{
+            var o = w.findClosestShip(e, name)
+            return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
+        }),
 
         new Command('countByType', function(name: string): any{ return w.countByType(e, name); }),
 
