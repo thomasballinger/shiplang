@@ -7,14 +7,20 @@
     "type": "git",
     "url": "https://github.com/thomasballinger/shiplang.git"
   },
+  "scripts": {
+    "dev": "webpack-dev-server --config webpack.tests.config.js --port 8080",
+    "devtest": "webpack-dev-server --config webpack.tests.config.js --port 8081"
+  },
   "dependencies": {
     "devpack": "0.0.0",
+    "mocha-loader": "^0.7.1",
     "react": "^0.14.7",
     "react-ace": "^3.1.0",
     "webpack-dev-server": "^1.14.1"
   },
   "devDependencies": {
     "babel-preset-es2015-webpack": "^6.3.14",
+    "chai": "^3.5.0",
     "webpack": "^2.0.7-beta"
   }
 }
