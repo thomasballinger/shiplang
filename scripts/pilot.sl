@@ -32,9 +32,9 @@
     (if (< (distToClosestShip) 800)
       (do
         (aimAtClosestShip)
-        (fireLaser "#123456")
-        (fireLaser "#123456")
-        (fireLaser "#123456")))))
+        (fireLaser "#cccc21")
+        (fireLaser "#cccc21")
+        (fireLaser "#cccc21")))))
 
 (defn enemyScript ()
   (leftFor .6)

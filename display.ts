@@ -190,6 +190,18 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              esf);
   },
   'boid': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle="#1569C7";
+    if (e.thrust > 0){
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[-13, -10],
+              [-9, -10],
+              [-9, 10],
+              [-13, 10]],
+             e.h,
+             esf);
+    }
     ctx.fillStyle="#ffeebb";
     drawPoly(ctx,
              (e.x-dx)*psf,
@@ -198,6 +210,30 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
               [-e.r, e.r],
               [e.r, e.r],
               [e.r, -e.r]],
+             e.h,
+             esf);
+  },
+  'shuttle': function(e, ctx, dx, dy, psf, esf){
+    ctx.fillStyle="#1569C7";
+    ctx.fillStyle="#ffeebb";
+    if (e.thrust > 0){
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[-(e.r+2), (-e.r/2)],
+              [-(e.r), -(e.r/2)],
+              [-(e.r), e.r/2],
+              [-(e.r+2), e.r/2]],
+             e.h,
+             esf);
+    }
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[e.r, -e.r/3],
+              [e.r,  e.r/3],
+              [-e.r, e.r/2],
+              [-e.r, -e.r/2]],
              e.h,
              esf);
   },

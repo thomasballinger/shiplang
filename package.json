@@ -8,7 +8,7 @@
     "url": "https://github.com/thomasballinger/shiplang.git"
   },
   "scripts": {
-    "dev": "webpack-dev-server --config webpack.tests.config.js --port 8080",
+    "dev": "webpack-dev-server --config webpack.config.js --port 8080",
     "devtest": "webpack-dev-server --config webpack.tests.config.js --port 8081"
   },
   "dependencies": {

@@ -27,6 +27,16 @@ export var Boid = shipWithChanges(SimpleShip, {
     armorMax: 4,
 });
 
+export var Shuttle = shipWithChanges(SimpleShip, {
+    type: 'shuttle',
+    r: 7,
+    maxThrust: 40,
+    maxDH: 100,
+    maxSpeed: 100,
+    explosionSize: 20,
+    armorMax: 3,
+});
+
 export var Triangle = shipWithChanges(SimpleShip, {
     type: 'triangle',
     r: 10,
