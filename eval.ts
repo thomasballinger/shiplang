@@ -516,7 +516,6 @@ export function runBytecodeOneStep(counterStack: number[], bytecodeStack: ByteCo
             var callback = stack[stack.length-1];
             counterStack[counterStack.length-1]++;
             return callback;
-            break;
         case BC.JumpIfNot:
             var cond = stack.pop();
             if (!cond) {

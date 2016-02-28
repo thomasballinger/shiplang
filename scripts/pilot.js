@@ -31,7 +31,6 @@ function ProNav(){
     var initial = headingToClosestByType('fattriangle');
     waitFor(0.1);
     var newHeading = headingToClosestByType('fattriangle');
-    log(headingDiff(initial, newHeading));
     if (headingToLeft(initial, newHeading)){
       rightFor(0.01 * headingDiff(initial, newHeading));
     } else {

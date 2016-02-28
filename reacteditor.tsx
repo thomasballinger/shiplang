@@ -13,6 +13,7 @@ require('brace/theme/github');
 export function makeReactEditor(delayedInit: (editor: any)=>void,
                                 onChange: (s: string)=>void){
     // Render first editor
+    console.log(render);
     render(
       <AceEditor
         mode="javascript"

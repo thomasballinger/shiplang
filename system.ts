@@ -2,7 +2,8 @@ import { Entity, Ship, Spob, Component } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
-import deepcopy from './deepcopy';
+
+var deepcopy = (<any>window).deepcopy;
 
 import { GameTime, Script, ShipSpec } from './interfaces';
 

@@ -1,15 +1,17 @@
 require("./style.css");
 
+window.deepcopy = require('./deepcopy'); // needed by JS interpreter
+
 import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';
 import { Player } from './player';
 import { earth, tolok } from './story';
 import * as scenarios from './scenarios';
 
-window.deepcopy = require('./deepcopy'); // needed by JS interpreter
 window.Player = Player; // for convenience in onClicks of links
 
-window.DEBUGMODE = true;
+window.DEBUGMODE = true; // errors resulting from running user's script
+                         // are throw instead of displayed and ignored
 
 var gunnerScript = require("raw!./scripts/gunner.js");
 

@@ -1,4 +1,4 @@
-import { ShipSpec } from './interfaces';
+import { ShipSpec, Gov } from './interfaces';
 
 //Order matters in this file: Ships can only
 //inherit with this function using ships defined above them.
@@ -25,7 +25,7 @@ export var Boid = shipWithChanges(SimpleShip, {
     maxSpeed: 100,
     explosionSize: 20,
     armorMax: 4,
-    government: 'trader',
+    government: 'civilian',
 });
 
 export var Shuttle = shipWithChanges(SimpleShip, {
@@ -36,6 +36,7 @@ export var Shuttle = shipWithChanges(SimpleShip, {
     maxSpeed: 100,
     explosionSize: 20,
     armorMax: 3,
+    government: 'civilian',
 });
 
 export var Triangle = shipWithChanges(SimpleShip, {
@@ -46,6 +47,7 @@ export var Triangle = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
+    government: 'pirate'
 });
 
 export var FatTriangle = shipWithChanges(SimpleShip, {
@@ -56,6 +58,7 @@ export var FatTriangle = shipWithChanges(SimpleShip, {
     maxSpeed: 500,
     explosionSize: 40,
     armorMax: 100,
+    government: 'pirate'
 });
 
 export var Gunship = shipWithChanges(SimpleShip, {
@@ -66,6 +69,7 @@ export var Gunship = shipWithChanges(SimpleShip, {
     maxSpeed: 0,
     explosionSize: 12,
     armorMax: 20,
+    government: 'player'
 });
 
 export var Holder = shipWithChanges(SimpleShip, {
@@ -76,6 +80,7 @@ export var Holder = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
+    government: 'military'
 });
 
 export var DroneMissile = {
@@ -89,6 +94,7 @@ export var DroneMissile = {
     armorMax: 1,
     isInertialess: false,
     lifespan: 20,
+    government: <Gov>undefined,
 }
 
 export var NeedleMissile = {
@@ -102,6 +108,7 @@ export var NeedleMissile = {
     armorMax: 1,
     isInertialess: true,
     lifespan: 6,
+    government: <Gov>undefined,
 }
 
 export var Astroid = shipWithChanges(SimpleShip, {
@@ -112,5 +119,6 @@ export var Astroid = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 100,
     armorMax: 20,
+    government: 'debris',
 });
 
