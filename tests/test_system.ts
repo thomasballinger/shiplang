@@ -3,6 +3,7 @@ import { System } from '../system';
 import { Entity } from '../entity';
 import { assert } from 'chai';
 
+
 describe('System', () => {
     describe('#copy', () => {
         it("shouldn't create copies that share entities", () => {
