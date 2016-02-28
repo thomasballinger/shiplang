@@ -48,6 +48,7 @@ export class Entity{
     randomSeed: number;
     weaponCharge: number;
     damage: number;
+    government: string;
 
     // some bookkeeping props for System
     dead: boolean;     // will be cleaned up this tick

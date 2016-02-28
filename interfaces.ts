@@ -72,6 +72,7 @@ export interface ShipSpec {type: string,
                     armorMax: number,
                     isInertialess: boolean,
                     lifespan: number,
+                    government: string,
 }
 
 export interface Context {
@@ -88,3 +89,5 @@ export interface Updateable {
 export interface Scenario {
     (): WorldBuilder;
 }
+
+type Gov = "player" | "civilian" | "pirate";

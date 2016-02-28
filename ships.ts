@@ -25,6 +25,7 @@ export var Boid = shipWithChanges(SimpleShip, {
     maxSpeed: 100,
     explosionSize: 20,
     armorMax: 4,
+    government: 'trader',
 });
 
 export var Shuttle = shipWithChanges(SimpleShip, {

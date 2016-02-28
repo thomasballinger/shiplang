@@ -3,6 +3,7 @@
         "target": "es6",
         "outDir": "built",
         "noImplicitAny": true,
+        "noFallthroughCasesInSwitch": true,
         "rootDir": ".",
         "sourceMap": true,
         "jsx": "react"
