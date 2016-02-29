@@ -53,6 +53,8 @@ export function outerspace(scenario: Scenario){
 
   updater.notifyOfCodeChange();
 
+  setup.stealDebugKeys(updater);
+
   function tick(){
     var tickTime = updater.tick(0.032); // 30fps
     setTimeout(tick, Math.max(5, 33.5-tickTime));

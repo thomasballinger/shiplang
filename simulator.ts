@@ -66,7 +66,8 @@ export function simulator(){
     update: function(player, world){ this.hud.tick('ships: '+world.entities.length); }
   });
 
-  setup.stealKeys(updater);
+  setup.stealSimulatorKeys(updater);
+  setup.stealDebugKey(updater);
 
   function tick(){
     var tickTime = updater.tick(0.032); // 30fps

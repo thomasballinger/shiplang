@@ -128,10 +128,7 @@ export class Updater{
             if (changed.hasOwnProperty('*main*')){
                 // start over totally, top level change
                 this.userFunctionBodies.reset();
-                this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
-                this.player = this.world.getPlayer();
-                this.viewedEntity = this.player;
-                this.onReset();
+                this.reset(s);
             } else if (Object.keys(changed).length === 0) {
                 //console.log('no function asts changed');
             } else {
@@ -147,20 +144,29 @@ export class Updater{
                     // Start over because modified functions have never been *defined*
                     //console.log('starting over, function not yet defined');
                     this.userFunctionBodies.reset();
-                    this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
-                    this.player = this.world.getPlayer();
-                    this.viewedEntity = this.player;
-                    this.onReset();
+                    this.reset(s)
                 } else {
                     //console.log('restoring from game time', save.gameTime)
-                    this.world = save;
-                    this.player = this.world.getPlayer();
-                    this.viewedEntity = this.player;
-                    this.onReset();
+                    this.restartFromSave(save);
                 }
             }
             this.lastValid = s;
         }
+    }
+
+    reset(s?: string){
+        console.log('resetting');
+        if (s === undefined){ s = this.lastValid; }
+        this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
+        this.player = this.world.getPlayer();
+        this.viewedEntity = this.player;
+        this.onReset()
+    }
+    restartFromSave(world: System){
+        this.world = world;
+        this.player = this.world.getPlayer();
+        this.viewedEntity = this.player;
+        this.onReset();
     }
 
     // please advance world state one tick and update displays
@@ -191,10 +197,7 @@ export class Updater{
 
         //TODO factor out reset behavior
         if (this.player.dead){
-            this.world = this.worldBuilder([this.lastValid, this.userFunctionBodies, this.highlight]);
-            this.player = this.world.getPlayer();
-            this.viewedEntity = this.player;
-            this.onReset()
+            this.reset();
         }
         /*
         this.savedWorlds.push(this.world.copy());

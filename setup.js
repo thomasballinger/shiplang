@@ -8,7 +8,7 @@ function makeFullscreen(element){
   }
 }
 
-function stealKeys(updater){
+function stealSimulatorKeys(updater){
   var canvas = document.getElementById('canvas');
   function toggleEditor(){
       var editor = document.getElementById('editor');
@@ -34,6 +34,19 @@ function stealKeys(updater){
   });
 }
 
+function stealDebugKeys(updater){
+  if (window.DEBUGMODE){
+    window.addEventListener('keydown', function(e){
+      // can't use q in debug mode to write scripts :)
+      if (e.keyCode === 81) {
+        updater.reset();
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    });
+  }
+}
+
 function waitForWindow(func){
   // useful for iframes, for which window.innerWidth is 0 for a while
   function waiter(){
@@ -56,5 +69,6 @@ function resizeCanvas(id){
 
 exports.resizeCanvas = resizeCanvas;
 exports.waitForWindow = waitForWindow;
-exports.stealKeys = stealKeys;
+exports.stealSimulatorKeys = stealSimulatorKeys;
+exports.stealDebugKeys = stealDebugKeys;
 exports.makeFullscreen = makeFullscreen;
