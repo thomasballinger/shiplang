@@ -28,9 +28,9 @@ function ProNav(){
   thrustFor(1);
   while (true){
     thrustFor(0.1);
-    var initial = headingToClosestByType('fattriangle');
+    var initial = headingToClosestByGov('pirate');
     waitFor(0.1);
-    var newHeading = headingToClosestByType('fattriangle');
+    var newHeading = headingToClosestByGov('pirate');
     if (headingToLeft(initial, newHeading)){
       rightFor(0.01 * headingDiff(initial, newHeading));
     } else {

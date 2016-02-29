@@ -85,8 +85,8 @@
 
 (defn holderScript ()
   (seekGun)
-  (while (> (countByType "astroid") 0)
-    (hunt "astroid"))
+  (while (> (countOfGov "debris") 0)
+    (hunt "debris"))
   (citizenScript))
 
 (defn aimAtClosestShip ()
@@ -100,19 +100,19 @@
   (turnTo heading))
 
 
-(defn aimByType (type)
-  (define dt (/ (distToClosestByType type)
-		(+ laserSpeed (closingToClosestByType type))))
-  (define heading (headingToClosestByTypeIn type dt))
+(defn aimOfGov (type)
+  (define dt (/ (distToClosestOfGov type)
+		(+ laserSpeed (closingToClosestOfGov type))))
+  (define heading (headingToClosestOfGovIn type dt))
   (define turnTime (/ (headingDiff h heading) maxDH))
 
   (define dt (+ dt turnTime))
-  (define heading (headingToClosestByTypeIn type dt))
+  (define heading (headingToClosestOfGovIn type dt))
   (turnTo heading))
 
 (defn hunt (type)
-  (aimByType type)
-  (if (> (distToClosestByType type) 500)
+  (aimOfGov type)
+  (if (> (distToClosestOfGov type) 500)
       (thrustFor .4)
       (thrustFor .1)))
 

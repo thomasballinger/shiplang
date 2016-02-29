@@ -235,14 +235,14 @@ export class System{
         });
     }
     // doesn't include passed in entity
-    countByType = function(e1: Entity, type: string){
+    countOfGov = function(e1: Entity, gov: string){
         return this.entities.filter(function(x: Entity){
-            return x.type === type && x !== e1;
+            return x.government === gov && x !== e1;
         }).length
     }
-    findClosestByType = function(e1: Entity, type: string){
+    findClosestOfGov = function(e1: Entity, gov: string){
         return this.findClosest(e1, this.ships().filter(function(x: Entity){
-            return x.type === type;
+            return x.government === gov;
         }));
     }
     findClosestShip = function(e1: Entity){

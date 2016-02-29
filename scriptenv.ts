@@ -212,18 +212,19 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToClosestPlanet', function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); }),
         new Command('headingToNthPlanet', function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); }),
         new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
-        new Command('distToClosestByType', function(name: string){ return e.distFrom(w.findClosestByType(e, name)); }),
-        new Command('headingToClosestByType', function(name: string):any{ return e.towards(w.findClosestByType(e, name)); }),
 
-        new Command('closingToClosestByType', function(name: string):any{
-            var o = w.findClosestByType(e, name)
+        new Command('distToClosestOfGov', function(name: string){ return e.distFrom(w.findClosestOfGov(e, name)); }),
+        new Command('headingToClosestOfGov', function(name: string):any{ return e.towards(w.findClosestOfGov(e, name)); }),
+        new Command('closingToClosestOfGov', function(name: string):any{
+            var o = w.findClosestOfGov(e, name)
             return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
         }),
-        new Command('headingToClosestByTypeIn', function(name: string, dt: number): any{
-            var closest = w.findClosestByType(e, name)
+        new Command('headingToClosestOfGovIn', function(name: string, dt: number): any{
+            var closest = w.findClosestOfGov(e, name)
             if (closest === undefined){ return e.towards(undefined); }
             return e.towards(closest.xIn(dt), closest.yIn(dt));
         }),
+
         new Command('headingToClosestShipIn', function(name: string, dt: number): any{
             var closest = w.findClosestShip(e)
             if (closest === undefined){ return e.towards(undefined); }
@@ -234,7 +235,7 @@ function makeCommands():MakeCommandsReturnType{
             return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
         }),
 
-        new Command('countByType', function(name: string): any{ return w.countByType(e, name); }),
+        new Command('countOfGov', function(name: string): any{ return w.countOfGov(e, name); }),
 
         new AsyncCommand('chargeFor', function(n: number){
             var timeFinished = t + n;

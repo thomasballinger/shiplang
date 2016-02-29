@@ -155,7 +155,6 @@ export class Updater{
     }
 
     reset(s?: string){
-        console.log('resetting');
         if (s === undefined){ s = this.lastValid; }
         this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
         this.player = this.world.getPlayer();
