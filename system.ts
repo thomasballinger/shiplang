@@ -145,11 +145,19 @@ export class System{
         return collisions;
     }
 
-    // If an entity is an explosion, find collisions to deal damage,
-    // then set .inactive = true on it so it doesn't keep doing damage.
-    // .inactive things are NOT CLEANED UP!
-    // Set .dead = true
-    // and then inactivate it
+    // Entities that explode pass through these stages:
+    //
+    //  type     | .dead | .inactive
+    // ----------+-------+----------
+    //   ?       | false | false
+    //  type changed to explosion because armor becomes <= 0
+    // explosion | false | false    type changed to explosion
+    //  after the explosion gets a chance to collide, inactivated
+    // explosion | false | true
+    //  once the explosion's radius gets too small marked for removal
+    // explosion | true  | true
+    //  this causes the entity to be removed from the world.entities list
+    //
     checkCollisions(){
         var gameTime = this.gameTime;
 
