@@ -19,7 +19,7 @@ export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:
     return boid;
 }
 
-export function makeShip(kind: ShipSpec, x: number, y: number, h: number, script: Script){
+export function makeShip(kind: ShipSpec, x: number, y: number, h: number, script?: Script){
     var ship = new Ship(kind, x, y, script);
     ship.h = h;
     return ship;
@@ -236,6 +236,7 @@ export class System{
     }
     // doesn't include passed in entity
     countOfGov = function(e1: Entity, gov: string){
+        if (gov === undefined){ throw Error("countOfGov needs two arguments"); }
         return this.entities.filter(function(x: Entity){
             return x.government === gov && x !== e1;
         }).length

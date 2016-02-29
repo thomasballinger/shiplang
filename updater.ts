@@ -112,6 +112,13 @@ export class Updater{
         }
     }
 
+    debugData(){
+        if ((<any>window).DEBUGMODE){
+            (<any>window).world = this.world;
+            (<any>window).player = this.player;
+        }
+    }
+
     loadJS(){
         var s = this.getCode();
         try {
@@ -160,12 +167,14 @@ export class Updater{
         this.player = this.world.getPlayer();
         this.viewedEntity = this.player;
         this.onReset()
+        this.debugData();
     }
     restartFromSave(world: System){
         this.world = world;
         this.player = this.world.getPlayer();
         this.viewedEntity = this.player;
         this.onReset();
+        this.debugData();
     }
 
     // please advance world state one tick and update displays

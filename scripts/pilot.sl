@@ -70,11 +70,11 @@
             (do (turnTo 90)
                 (thrustFor .2))))))
 
-(defn citizenScript ()
+(defn visitPlanetsScript ()
   (stop)
   (define i (randInt 3))
   (while 1
-    (define i (+ i 1))
+    (define i (+ i (randInt 0 3)))
     (while (or (> (distToNthPlanet i) 50)
                (> speed 100))
       (turnTo (headingToNthPlanet i))
@@ -87,16 +87,24 @@
   (seekGun)
   (while (> (countOfGov "debris") 0)
     (hunt "debris"))
-  (citizenScript))
+  (visitPlanetsScript))
 
+; assumes a barrage of three lasers
 (defn aimAtClosestShip ()
-  (define dt (/ (distToClosestShip)
+  (define laserTime (/ (distToClosestShip)
 		(+ laserSpeed (closingToClosestShip))))
+  (define dt (+ laserTime 0))
   (define heading (headingToClosestShipIn dt))
-  (define turnTime (/ (headingDiff h heading) maxDH))
 
-  (define dt (+ dt turnTime))
-  (define heading (headingToClosestShip dt))
+  (define turnTime (/ (headingDiff h heading) maxDH))
+  (define dt (+ laserTime turnTime))
+  (define laserTime (/ (distToClosestShipIn dt)
+		(+ laserSpeed (closingToClosestShip))))
+  (define dt (+ laserTime turnTime))
+
+  (define timeToMid (+ dt .1))
+  (define heading (headingToClosestShipIn timeToMid))
+
   (turnTo heading))
 
 

@@ -1,5 +1,11 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
 
+// Profile is a serializable object that 
+// The record not permanently saved until landing is called "Profile"
+// Upon landing the profile is saved.
+//
+// Both of these should be 
+
 export class Player{
     constructor(data: any){
         for (var prop of Object.keys(data)){

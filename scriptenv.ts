@@ -193,6 +193,7 @@ function makeCommands():MakeCommandsReturnType{
             DEBUG_REPORT_CONTINUE = false;
             return function(){ return DEBUG_REPORT_CONTINUE; }
         }),
+        new Command('debugger', function(){ debugger; }),
 
         new Command('headingDiff', function(a: number, b: number){ return headingDiff(a, b); }),
         new Command('headingToLeft', function(a: number, b: number){ return headingToLeft(a, b); }),
@@ -225,10 +226,19 @@ function makeCommands():MakeCommandsReturnType{
             return e.towards(closest.xIn(dt), closest.yIn(dt));
         }),
 
-        new Command('headingToClosestShipIn', function(name: string, dt: number): any{
+        new Command('headingToClosestShipIn', function(dt: number): any{
+            if (dt === undefined){ throw Error('needs arg'); }
+            //TODO do this arg checking generally
             var closest = w.findClosestShip(e)
             if (closest === undefined){ return e.towards(undefined); }
-            return e.towards(closest.xIn(dt), closest.yIn(dt));
+            return e.towardsIn(closest, dt);
+        }),
+        new Command('distToClosestShipIn', function(dt: number): any{
+            if (dt === undefined){ throw Error('needs arg'); }
+            //TODO do this arg checking generally
+            var closest = w.findClosestShip(e)
+            if (closest === undefined){ return e.towards(undefined); }
+            return e.distFromIn(closest, dt);
         }),
         new Command('closingToClosestShip', function(name: string):any{
             var o = w.findClosestShip(e, name)

@@ -70,6 +70,9 @@ export class Entity{
           return sm.towardsPoint(this.x, this.y, eOrX.x, eOrX.y);
       }
     }
+    towardsIn(e: Entity, dt: number){
+        return sm.towardsPoint(this.xIn(dt), this.yIn(dt), e.xIn(dt), e.yIn(dt));
+    }
     vHeading(){
       return sm.towardsPoint(0, 0, this.dx, this.dy);
     }
@@ -80,9 +83,18 @@ export class Entity{
         var theta = (this.vHeading() + 3600 - h + 180) % 360 - 180;
         return Math.cos(theta) * this.speed();
     }
-    distFrom(e: Entity){
-        if (!e){ return 1000000; }
-        return sm.dist(this.x, this.y, e.x, e.y);
+    distFrom(e: Entity): number;
+    distFrom(x: number, y: number): number;
+    distFrom(eOrX: Entity|number, y?: number){
+      if (eOrX === undefined){ return 1000000; }
+      if (typeof eOrX === 'number' && typeof y === 'number'){
+          return sm.dist(this.x, this.y, eOrX, y);
+      } else if (eOrX instanceof Entity){
+          return sm.dist(this.x, this.y, eOrX.x, eOrX.y);
+      }
+    }
+    distFromIn(e: Entity, dt: number){
+        return sm.dist(this.xIn(dt), this.yIn(dt), e.xIn(dt), e.yIn(dt));
     }
     getRandom(){
         var x = Math.sin(this.randomSeed++) * 10000;
@@ -115,7 +127,7 @@ function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
 
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script: Script){
+    constructor(spec: ShipSpec, x: number, y: number, script?: Script){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -154,6 +166,7 @@ export class Ship extends Entity{
         if (spec.lifespan !== undefined){
             this.timeToDie = -spec.lifespan;
         }
+        this.government = spec.government;
     }
     maxThrust: number;
     maxDH: number;
@@ -206,6 +219,11 @@ export class Ship extends Entity{
         if (speed > this.maxSpeed && !this.isInertialess){
             this.dx = this.dx * (this.maxSpeed / speed);
             this.dy = this.dy * (this.maxSpeed / speed);
+        }
+        if (isNaN(this.x)){
+            1 + 1;
+            debugger;
+            throw Error('nan value: '+this.x );
         }
 
     }

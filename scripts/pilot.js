@@ -28,9 +28,9 @@ function ProNav(){
   thrustFor(1);
   while (true){
     thrustFor(0.1);
-    var initial = headingToClosestByGov('pirate');
+    var initial = headingToClosestOfGov('pirate');
     waitFor(0.1);
-    var newHeading = headingToClosestByGov('pirate');
+    var newHeading = headingToClosestOfGov('pirate');
     if (headingToLeft(initial, newHeading)){
       rightFor(0.01 * headingDiff(initial, newHeading));
     } else {

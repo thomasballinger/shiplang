@@ -27,7 +27,7 @@ export var gunner = function():any{
             Math.random()*2000 - 1000,
             Math.random()*2000 - 1000,
             Math.random() * 360,
-            builtinScripts.citizenScript,
+            builtinScripts.visitPlanetsScript,
         ];
     });
 
@@ -36,6 +36,7 @@ export var gunner = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
+        ship.government = 'player'
         world.addBackgroundEntity(makePlanet(1400, 1300, 40, '#ab43af'));
         world.addBackgroundEntity(makePlanet(-1600, -1800, 60, '#3bd951'));
         world.addBackgroundEntity(makePlanet(-1800, 1600, 80, '#8b2141'));
@@ -113,6 +114,7 @@ export var sol = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
+        ship.government = 'player'
         var earth = makePlanet(100, 100, 50, '#004000');
         earth.onLand = function(){
             putMessage('landed on earth');
@@ -132,12 +134,12 @@ export var sol = function():any{
         world.addBackgroundEntity(mars);
 
         for (var y of [550, -2400, 1200, -1000]){
-            world.addEntity(makeShip(ships.Shuttle, -300, y, 270, builtinScripts.citizenScript));
-            world.addEntity(makeShip(ships.Shuttle, -200, y, 270, builtinScripts.citizenScript));
-            world.addEntity(makeShip(ships.Shuttle, -100, y, 270, builtinScripts.citizenScript));
-            world.addEntity(makeShip(ships.Shuttle,    0, y, 270, builtinScripts.citizenScript));
-            world.addEntity(makeShip(ships.Boid,     100, y, 270, builtinScripts.citizenScript));
-            world.addEntity(makeShip(ships.Boid,     200, y, 270, builtinScripts.citizenScript));
+            world.addEntity(makeShip(ships.Shuttle, -300, y, 270, builtinScripts.visitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle, -200, y, 270, builtinScripts.visitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle, -100, y, 270, builtinScripts.visitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle,    0, y, 270, builtinScripts.visitPlanetsScript));
+            world.addEntity(makeShip(ships.Boid,     100, y, 270, builtinScripts.visitPlanetsScript));
+            world.addEntity(makeShip(ships.Boid,     200, y, 270, builtinScripts.visitPlanetsScript));
         }
 
         world.addEntity(makeShip(ships.Triangle, -300, -750, 270, builtinScripts.enemyScript));
@@ -162,6 +164,7 @@ export var robo = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
+        ship.government = 'player'
         var tolok = makePlanet(200, -100, 200, '#420209');
         tolok.onLand = function(){
             putMessage('landed on the alien planet of Tolok');
