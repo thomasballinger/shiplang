@@ -261,8 +261,16 @@ function makeCommands():MakeCommandsReturnType{
             return keys.isPressed(name);
         }),
 
-        new Command('rand', function(){
-            return e.getRandom()
+        new Command('rand', function(){ return e.getRandom() }),
+        new Command('randInt', function(lower: number, upper: number){
+            if (lower === undefined){
+                lower = 0
+                upper = 2
+            } else if (upper === undefined){
+                upper = lower;
+                lower = 0;
+            }
+            return Math.floor(e.getRandom() * (upper - lower)) + lower;
         }),
 
         new AsyncCommand('waitFor', function(n: number):any{

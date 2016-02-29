@@ -57,10 +57,6 @@
   (forever
     (leftFor (rand))
     (thrustFor (rand))
-    (leftFor (rand))
-    (thrustFor (rand))
-    (leftFor (rand))
-    (thrustFor (rand))
     (turnTo (headingToClosestPlanet))
     (thrustFor (+ 1 (rand)))))
 
@@ -76,7 +72,7 @@
 
 (defn citizenScript ()
   (stop)
-  (define i 0)
+  (define i (randInt 100))
   (while 1
     (define i (+ i 1))
     (while (or (> (distToNthPlanet i) 50)

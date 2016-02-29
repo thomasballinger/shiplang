@@ -1,6 +1,6 @@
 import { System, makeShip, makeBoid, makePlanet, makeComponent } from './system';
 import { SLgetScripts } from './scriptenv';
-import { WorldBuilder } from './interfaces';
+import { WorldBuilder, ShipSpec } from './interfaces';
 import * as objectivebar from './objectivebar';
 import { Player } from './player';
 import * as ships from './ships';
@@ -16,23 +16,35 @@ export var gunner = function():any{
     You're a gunner.<br/>
     Use space and f to fire.<br/>
     <a href="/#space" onclick="Player.fromStorage().set('location', 'Sol').set('script', window.normalScript).go();">quit this job, it sucks</a>`);
+
+    var NUMCIVILIANS = 30
+    var civilianArgs = <[ShipSpec, number, number, number][]>[];
+    for (var i=0; i<NUMCIVILIANS; i++){
+      civilianArgs.push([
+         [ships.Boid, ships.Shuttle, ships.Triangle][Math.floor(Math.random() * 3)],
+         Math.random()*2000 - 1000,
+         Math.random()*2000 - 1000,
+         Math.random() * 360,
+         builtinScripts.citizenScript,
+      ]);
+    }
+
     var reset = <WorldBuilder>function reset(script: any): System {
         var world = new System();
         var p = Player.fromStorage().spaceLocation;
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
         world.addBackgroundEntity(makePlanet(400, 300, 40, '#ab43af'));
-        world.addBackgroundEntity(makePlanet(-1200, -1000, 60, '#3bd951'));
-        world.addBackgroundEntity(makePlanet(800, 2000, 80, '#8b2141'));
+        world.addBackgroundEntity(makePlanet(-600, -800, 60, '#3bd951'));
+        world.addBackgroundEntity(makePlanet(-800, 600, 80, '#8b2141'));
         world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Triangle, -300, 350, 270, builtinScripts.citizenScript));
-        world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
-        world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
-        world.addEntity(makeShip(ships.Triangle, -500, 250, 170, builtinScripts.citizenScript));
+        world.addEntity(makeShip(ships.Astroid,  300, 350, 270, builtinScripts.wander));
+        world.addEntity(makeShip(ships.Astroid, -300, -350, 270, builtinScripts.wander));
+
+        civilianArgs.map(function(x){
+            world.addEntity(makeShip.apply(null, x))
+        })
         world.addEntity(makeShip(ships.Holder, 0, 200, 270, builtinScripts.holderScript));
-        world.addEntity(makeShip(ships.Triangle, 200, 250, 90, builtinScripts.citizenScript));
         world.addEntity(ship); // adding the ship last means it goes in front
 
         putMessage('Your mission: destroy all astroids. The geometric things.');
