@@ -39,7 +39,7 @@ export class SLContext implements Context {
         context.bytecodeStack = <ByteCode[][]>[f.code];
         context.stack = <any[]>[];
         context.counterStack = [0];
-        context.envStack = [f.env];
+        context.envStack = [deepcopy(f.env)];
         // context is ready
         return context
     }
