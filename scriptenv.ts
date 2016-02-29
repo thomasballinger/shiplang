@@ -15,25 +15,9 @@ interface YieldFunction {
 }
 
 
-//TODO redesign this module to manufacture functions for either
-//     style, JSInterpreter or SL
-//
-//     Need to work in three situations:
-//     * ShipLang
-//       * function to run
-//       * whether async
-//       * if async, function for checking if done
-//       * if async, function to call when done
-//       * can be property access
-//     * JS
-//       * whether async
-//       * type of return value
-//       * types of parameters
-//     * custom blockly block
-//       * requirements for JS interp
+//TODO Add to these commands functionality needed for Blockly
 //       * types of inputs (including degrees)
 //       * color
-//
 //     Eventually want a system for specifying which are legal to call
 interface NamespaceInit{
     interpreterInit(interpreter: Interpreter, scope: any): void;
@@ -182,6 +166,13 @@ type MakeCommandsReturnType = [(e: any)=>void,
                                (k: any)=>void,
                                NamespaceInit[]];
 
+var DEBUG_REPORT_CONTINUE = false;
+var DEBUG_REPORT_VALUE = <any>undefined;
+export function debugReport(){
+    DEBUG_REPORT_CONTINUE = true;
+    return DEBUG_REPORT_VALUE;
+}
+
 // Functions available to scripts
 function makeCommands():MakeCommandsReturnType{
 
@@ -197,6 +188,12 @@ function makeCommands():MakeCommandsReturnType{
     var keygen = <any>undefined;
 
     var commands = [
+        new AsyncCommand('__debug_report', function(x: any):any{
+            DEBUG_REPORT_VALUE = x;
+            DEBUG_REPORT_CONTINUE = false;
+            return function(){ return DEBUG_REPORT_CONTINUE; }
+        }),
+
         new Command('headingDiff', function(a: number, b: number){ return headingDiff(a, b); }),
         new Command('headingToLeft', function(a: number, b: number){ return headingToLeft(a, b); }),
 

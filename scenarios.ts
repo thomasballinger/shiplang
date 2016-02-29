@@ -8,6 +8,7 @@ import { Player } from './player';
 import * as ships from './ships';
 import { putMessage } from './messagelog';
 
+
 var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
 (<any>window).normalScript = require("raw!./scripts/pilot.js");
 
@@ -119,7 +120,7 @@ export var sol = function():any{
         }
         var luna = makePlanet(300, 200, 30, '#aa9922');
         luna.onLand = function(){
-            Player.fromStorage().set('location', 'level1').go();
+            Player.fromStorage().set('location', 'level1').set('spaceLocation', [1200, 1300]).go();
         }
         var mars = makePlanet(-200, 1300, 45, '#ee3333');
         mars.onLand = function(){

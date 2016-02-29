@@ -72,7 +72,7 @@
 
 (defn citizenScript ()
   (stop)
-  (define i (randInt 100))
+  (define i (randInt 3))
   (while 1
     (define i (+ i 1))
     (while (or (> (distToNthPlanet i) 50)
