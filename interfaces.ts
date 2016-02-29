@@ -62,17 +62,32 @@ export interface WorldBuilder {
 }
 
 // These define a ship type but not its instantaneous properties
-export interface ShipSpec {type: string,
-                    r: number,
-                    maxThrust: number,
-                    maxDH: number,
-                    maxSpeed: number,
-                    explosionSize: number,
-                    isMunition: boolean,
-                    armorMax: number,
-                    isInertialess: boolean,
-                    lifespan: number,
-                    government: Gov,
+export interface ShipSpec {
+    type: string,
+    r: number,
+    maxThrust: number,
+    maxDH: number,
+    maxSpeed: number,
+    explosionSize: number,
+    isMunition: boolean,
+    armorMax: number,
+    isInertialess: boolean,
+    lifespan: number,
+    government: Gov,
+}
+
+export interface ShipSpecChanges {
+    type?: string,
+    r?: number,
+    maxThrust?: number,
+    maxDH?: number,
+    maxSpeed?: number,
+    explosionSize?: number,
+    isMunition?: boolean,
+    armorMax?: number,
+    isInertialess?: boolean,
+    lifespan?: number,
+    government?: Gov,
 }
 
 export interface Context {

@@ -1,17 +1,34 @@
-import { ShipSpec, Gov } from './interfaces';
+import { ShipSpec, ShipSpecChanges, Gov } from './interfaces';
+
+declare module "./interfaces" {
+    interface ShipSpec {
+        [prop: string]: any;
+    }
+    interface ShipSpecChanges {
+        [prop: string]: any;
+    }
+}
 
 //Order matters in this file: Ships can only
 //inherit with this function using ships defined above them.
-function shipWithChanges(parent: any, changes: any): ShipSpec{
+function shipWithChanges(parent: ShipSpec, changes: ShipSpecChanges): ShipSpec{
     for (var prop in Object.keys(parent)){
         if (!changes.hasOwnProperty(prop)){
             changes[prop] = parent[prop];
         }
     }
-    return changes;
+    return <ShipSpec>changes;
 }
 
-var SimpleShip = {
+var SimpleShip: ShipSpec= {
+    type: 'boid',
+    r: 10,
+    maxThrust: 100,
+    maxDH: 100,
+    maxSpeed: 100,
+    explosionSize: 20,
+    armorMax: 1,
+    government: 'civilian',
     isMunition: false,
     isInertialess: false,
     lifespan: <number>undefined,

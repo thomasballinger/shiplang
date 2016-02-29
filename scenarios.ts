@@ -42,7 +42,7 @@ export var gunner = function():any{
     }
     reset.instructions = "i"
     return reset
-}
+};
 
 export var scenario1 = function():any{
 
