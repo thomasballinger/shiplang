@@ -10,8 +10,9 @@ import * as scenarios from './scenarios';
 
 window.Player = Player; // for convenience in onClicks of links
 
-window.DEBUGMODE = true; // errors resulting from running user's script
-                         // are throw instead of displayed and ignored
+// errors resulting from running user's script
+// are throw instead of displayed and ignored
+window.DEBUGMODE = false;
 
 var gunnerScript = require("raw!./scripts/gunner.js");
 
