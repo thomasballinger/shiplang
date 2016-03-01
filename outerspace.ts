@@ -40,7 +40,8 @@ export function outerspace(scenario: Scenario){
       canvas.height = window.innerHeight;
     }
   });
-  updater.registerObserver(new SpaceDisplay('canvas', 1, 1, .1));
+  var mainDisplay = new SpaceDisplay('canvas', 1, 1, .1);
+  updater.registerObserver(mainDisplay);
   updater.registerObserver(new SpaceDisplay('minimap', 0.07, 0.3, 0));
   updater.registerObserver(<Updateable>{
     lurper: new Lerper('player-armor', '#cc8800'),
@@ -54,6 +55,7 @@ export function outerspace(scenario: Scenario){
   updater.notifyOfCodeChange();
 
   setup.stealDebugKeys(updater);
+  setup.stealZoomKeys(mainDisplay)
 
   function tick(){
     var tickTime = updater.tick(0.032); // 30fps

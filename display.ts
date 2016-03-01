@@ -2,10 +2,14 @@ import { Entity, Ship } from './entity';
 import { System } from './system';
 
 export class SpaceDisplay{
-    constructor(id: string, public psf: number, public esf: number, public bgp: number){
+    constructor(id: string, public psfOrig: number, public esfOrig: number, public bgp: number){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);
         this.ctx = this.canvas.getContext('2d');
+        this.psf = psfOrig;
+        this.esf = esfOrig;
     }
+    psf: number;
+    esf: number;
     renderCentered(centered: Entity, entities: Entity[],
                    positionScaleFactor:number, entityScaleFactor:number,
                    backgroundParallax:number){
@@ -43,6 +47,8 @@ export class SpaceDisplay{
             return (e.x > left && e.x < right && e.y > top && e.y < bottom)
         })
     }
+    zoomIn(){  this.psf *= 6/8; this.esf *= 6/8; }
+    zoomOut(){ this.psf *= 8/6; this.esf *= 8/6; }
 }
 
 function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number):void{

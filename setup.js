@@ -34,7 +34,7 @@ function stealSimulatorKeys(updater){
   });
 }
 
-function stealDebugKeys(updater){
+function stealDebugKeys(display){
   if (window.DEBUGMODE){
     window.addEventListener('keydown', function(e){
       // can't use q in debug mode to write scripts :)
@@ -45,6 +45,23 @@ function stealDebugKeys(updater){
       }
     });
   }
+}
+
+function stealZoomKeys(display){
+  window.addEventListener('keydown', function(e){
+    // stealing right command
+    if (e.keyCode === 93) {
+      display.zoomIn();
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    // and alt
+    if (e.keyCode === 18) {
+      display.zoomOut();
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  });
 }
 
 function waitForWindow(func){
@@ -71,4 +88,5 @@ exports.resizeCanvas = resizeCanvas;
 exports.waitForWindow = waitForWindow;
 exports.stealSimulatorKeys = stealSimulatorKeys;
 exports.stealDebugKeys = stealDebugKeys;
+exports.stealZoomKeys = stealZoomKeys;
 exports.makeFullscreen = makeFullscreen;
