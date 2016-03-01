@@ -143,34 +143,3 @@
           (leftFor (reverseTime))
           (thrustFor (stopTime))
           (define gun (attach))))))
-; when syntax checking: x, y, dx, dy, and others
-; are all dynamic scope. Assigning to them is an error.
-;
-; when syntax checking: warn when shadowing with define.
-; Provide syntax hints when using builtins.
-;
-
-; do we need tail-call optimization? Recursion kinda sucks...
-; but then mutual recursion is a natural way to build interfaces,
-; a la text adventure games that blow the stack.
-
-; Only some functions are available, as determined by
-; equipment loadout - as the user types, highlight
-; those that aren't installed differently
-; than 
-
-; somehow suggest the name of scripts - I guess start with them
-; loaded.
-;
-
-;* JS interop
-;* possible to cause a yield from a JS function
-;make it possi
-;
-;thrustFor etc. are builtins higher up the scope chain.
-;Their implementations are wrt the current entity,
-;and they all 
-;
-;Need to implement ai functions as yeilds
-
-

@@ -67,7 +67,7 @@ export function simulator(){
   });
 
   setup.stealSimulatorKeys(updater);
-  setup.stealDebugKey(updater);
+  setup.stealDebugKeys(updater);
 
   function tick(){
     var tickTime = updater.tick(0.032); // 30fps
