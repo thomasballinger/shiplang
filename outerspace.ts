@@ -54,12 +54,17 @@ export function outerspace(scenario: Scenario){
 
   updater.notifyOfCodeChange();
 
-  setup.stealDebugKeys(updater);
+  var fastForward = [false];
+  setup.stealDebugKeys(updater, fastForward);
   setup.stealZoomKeys(mainDisplay)
 
   function tick(){
-    var tickTime = updater.tick(0.032); // 30fps
-    setTimeout(tick, Math.max(5, 33.5-tickTime));
+    var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
+    if (fastForward[0]){
+        setTimeout(tick, 1);
+    } else {
+        setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
+    }
   }
   tick();
 }

@@ -27,7 +27,6 @@ export class Updater{
         this.controls = new manual.Controls(keyHandlerTarget, this.worldBuilder.controlsDelay);
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
-        this.tickers = [];
         //console.log(this.worldBuilder.instructions);
         this.savedWorlds = [];
         this.codeHasChanged = false;
@@ -45,7 +44,6 @@ export class Updater{
     codeHasChanged: boolean;
     controls: any;
     observers: Updateable[];
-    tickers: (()=>void)[];
     savedWorlds: System[];
     player: Ship;
     _viewedEntity: Ship;
@@ -80,10 +78,6 @@ export class Updater{
     // objects to call .update() on ever tick
     registerObserver(obj: Updateable){
         this.observers.push(obj);
-    }
-    // functions to call on ever tick
-    registerTicker(obj: ()=>void){
-        this.tickers.push(obj);
     }
 
     // called when the editor has new state (it might not actually
@@ -178,7 +172,7 @@ export class Updater{
     }
 
     // please advance world state one tick and update displays
-    tick(dt: number):number{
+    tick(dt: number, updateDisplays=true):number{
         var tickStartTime = new Date().getTime();
 
         if (this.codeHasChanged){
@@ -199,9 +193,12 @@ export class Updater{
         world.tick(dt, this.setError);
         //world.tick(dt, function(e){ throw e; });
         this.ensureView()
-        this.observers.map(function(obs){
-            obs.update(viewedEntity, world);
-        })
+
+        if (updateDisplays){
+            this.observers.map(function(obs){
+                obs.update(viewedEntity, world);
+            })
+        }
 
         //TODO factor out reset behavior
         if (this.player.dead){

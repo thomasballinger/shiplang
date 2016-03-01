@@ -34,12 +34,18 @@ function stealSimulatorKeys(updater){
   });
 }
 
-function stealDebugKeys(display){
+function stealDebugKeys(display, fastForward){
   if (window.DEBUGMODE){
     window.addEventListener('keydown', function(e){
       // can't use q in debug mode to write scripts :)
       if (e.keyCode === 81) {
         updater.reset();
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      // or z
+      if (e.keyCode === 90) {
+        fastForward[0] = !fastForward[0];
         e.stopPropagation();
         e.preventDefault();
       }
