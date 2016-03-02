@@ -1,3 +1,5 @@
+var alternate = 0;
+
 function manual(){
   waitFor(0.001);
   cutThrust();
@@ -5,24 +7,20 @@ function manual(){
   if (keyPressed('UP')){ fullThrust(); }
   if (keyPressed('LEFT')){ fullLeft(); }
   if (keyPressed('RIGHT')){ fullRight(); }
-  if (keyPressed(' ')){ fireMissile(ProNav, '#aa1144'); }
+  if (keyPressed(' ')){
+    if (alternate){
+      fireMissile(ProNav, '#aa1144');
+      alternate = 0;
+    } else {
+      fireMissile(towardExpected, '#11aa44');
+      alternate = 1;
+    }
+  }
   if (keyPressed('w')){ waitFor(1); }
   if (keyPressed('l')){ land(); }
   if (keyPressed('j')){ jump(); }
 }
-// Try adding laser firing!
-// Your ship has a laser gun installed,
-// just call fireLaser() wherever you want.
-
-function dumbRocket(){
-  thrustFor(2);
-  while (true){
-    if (distToClosestShip() < 40){
-      detonate();
-    }
-    thrustFor(0.1);
-  }
-}
+// Try adding laser firing! Call fireLaser() somewhere
 
 function ProNav(){
   thrustFor(1);
@@ -38,6 +36,26 @@ function ProNav(){
     }
   }
 }
+
+function towardExpected(){
+  while(true){
+    var dt = distToClosestOfGov('pirate') / 300;
+    var dir = headingToClosestOfGovIn('pirate', dt);
+    turnTo(dir);
+    thrustFor(.1);
+  }
+}
+
+function dumbRocket(){
+  thrustFor(2);
+  while (true){
+    if (distToClosestShip() < 40){
+      detonate();
+    }
+    thrustFor(0.1);
+  }
+}
+
 
 function stayInBounds(){
   while (true){

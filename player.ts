@@ -1,10 +1,45 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
 
-// Profile is a serializable object that 
-// The record not permanently saved until landing is called "Profile"
-// Upon landing the profile is saved.
+// Plan:
+// Get rid of Player, replace with Profile
+// Profile is a serializable object that only gets saved on landing.
+// The temporary part is called log?
 //
-// Both of these should be 
+// Log saved to profile each time
+//   * landed on a planet
+//   * take off from planet
+//   * anything on a planet happens
+//
+// Example Log:
+// Hit a government shuttlecraft with a laser
+// Hit a government shuttlecraft with a missile
+// Killed a government shuttlecraft
+// *Landed on Earth*
+// *Took off from Earth into Sol system*
+// Jumped to robo system
+// Laser at alien digeridoo
+// Laser at alien digeridoo
+// Killed alien digeridoo
+// Landed on tolok
+//
+// For debugging there should be a way to view this log
+//
+// When loading player, location accessors can be accessors
+// on log data:
+// * location (system or planet)
+// * space location (coordinates in space)
+//
+// Some data will actually be stored:
+// script string;
+// savedScripts string[];
+//
+//
+// what about missions like "defend shuttles in system"
+// escort these specific three
+//
+// how to deal with living systems where people jump in and out?
+// how to create conditions like "if this mission, spawn these ships"
+// on-ship-death triggers, or 
 
 export class Player{
     constructor(data: any){

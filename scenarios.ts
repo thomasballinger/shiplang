@@ -12,6 +12,24 @@ import { putMessage } from './messagelog';
 var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
 (<any>window).normalScript = require("raw!./scripts/pilot.js");
 
+// A ship builder object should be built that uses a random seed
+// (for reproducibility) to create ships with random probability.
+// It can be asked to spawn initial ships, and asked to spawn more
+// ships on a 30 times per second basis.
+// Needs to be deterministic given a seed.
+
+/*
+class ShipSpawner{
+    constructor(spec: SystemSpec){};
+    reset(seed: number);
+    getRandom(){};
+}
+*/
+// After this scenarios won't do so much work
+//
+//
+//
+
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
 export var gunner = function():any{
@@ -86,6 +104,7 @@ export var scenario1 = function():any{
         (<any>window).ship = ship;
         var ship2 = makeShip(ships.Triangle, -300, 350, 270, enemyScript);
         ship.imtheplayer = true;
+        ship.government = 'player'
         world.addEntity(ship);
         world.addEntity(ship2);
         world.addEntity(makeShip(ships.Astroid, -100, 350, 270, builtinScripts.wander));
@@ -97,6 +116,7 @@ export var scenario1 = function():any{
                                      boidScript));
         }
 
+        (<any>window).world = world;
         return world;
     }
     reset.instructions = `
