@@ -38,6 +38,7 @@ function ProNav(){
 }
 
 function towardExpected(){
+  thrustFor(1);
   while(true){
     var dt = distToClosestOfGov('pirate') / 300;
     var dir = headingToClosestOfGovIn('pirate', dt);
