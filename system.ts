@@ -2,6 +2,7 @@ import { Entity, Ship, Spob, Component } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
+import { Event, EventType } from './mission';
 
 var deepcopy = (<any>window).deepcopy;
 
@@ -158,8 +159,9 @@ export class System{
     // explosion | true  | true
     //  this causes the entity to be removed from the world.entities list
     //
-    checkCollisions(){
+    checkCollisions(): Event[]{
         var gameTime = this.gameTime;
+        var events: Event[] = [];
 
         // eliminate old explosions and other things fading away
         var activeEntities = this.entities.filter(function(x){return !x.inactive;});
@@ -169,16 +171,25 @@ export class System{
             var e1 = x[0]; var e2 = x[1];
             if (e1.type === 'explosion' && e2.type === 'explosion'){return undefined;}
             if (e1.type !== 'explosion' && e2.type !== 'explosion'){return undefined;}
-            if (e1.type === 'explosion'){ return e2; }
-            if (e2.type === 'explosion'){ return e1; }
+            if (e1.type === 'explosion'){ return [e2, e1]; }
+            if (e2.type === 'explosion'){ return [e1, e2]; }
             throw Error('I thought that was exhaustive...');
-        }).filter(function(x){
-            return !!x;
+        }).filter(function(x: [Entity, Entity]){
+            if (x === undefined){ return false; }
+            var entity: Entity = x[0];
+            return !!entity;
         });
 
         var EXPLOSION_DAMAGE = 3;
-        touchingExplosion.map(function(x){
-            x.armor -= EXPLOSION_DAMAGE;
+        touchingExplosion.map(function(x: [Entity, Entity]){
+            var entity: Entity = x[0]
+            var explosion: Entity = x[1]
+            entity.armor -= EXPLOSION_DAMAGE;
+            if (explosion.firedBy){
+                events.push(new Event(
+                    entity.armor > 0 ? EventType.Provoke : EventType.Kill,
+                    explosion.firedBy, entity));
+            }
         });
 
         // Inactivate explosions that have already had a frame to cause damage
@@ -192,12 +203,17 @@ export class System{
         }).filter(function(x){ return !beingLaunchedByCollider(x, gameTime);});
 
         for (var k=0; k<weaponCollisions.length; k++){
-            var e1 = weaponCollisions[k][0]
-            var e2 = weaponCollisions[k][1]
-            for (var e of weaponCollisions[k]){
-                // hitting things causes munitions to lose armor
-                e1.armor -= Math.max(1, e2.damage || 0);
-                e2.armor -= Math.max(1, e1.damage || 0);
+            var e1: Entity = weaponCollisions[k][0]
+            var e2: Entity = weaponCollisions[k][1]
+            // munitions colliding with any other forground entities
+            // damages the armor of both entity and the munition
+            for (var [e, m] of [[e1, e2], [e2, e1]]){
+                e.armor -= Math.max(1, m.damage || 0);
+                if (m.firedBy){
+                    events.push(new Event(
+                        e.armor > 0 ? EventType.Provoke : EventType.Kill,
+                        m.firedBy, e));
+                }
             }
         }
 
@@ -233,6 +249,7 @@ export class System{
             }
             return x.dead !== true;
         });
+        return [new Event(EventType.Provoke, this.entities[0], this.entities[0])];
     }
     // doesn't include passed in entity
     countOfGov = function(e1: Entity, gov: string){
@@ -293,16 +310,16 @@ export class System{
     }
     tick = function(dt:GameTime, setError:(msg: string)=>void){
         this.inTick = true;
-
         this.gameTime += dt;
-        for (var i=0; i<this.entities.length; i++){
-            var entity = this.entities[i];
-            if (entity === undefined){
-                throw Error('entity does not exist: ' + this.entities);
-            }
-            entity.move(dt);
-        }
-        this.checkCollisions();
+
+        this.entities.map(function(x: Entity){ x.move(dt); });
+        var events = this.checkCollisions();
+        console.log(events)
+        // Tell missions about events
+        // Tell governments about events
+        // (these are all to do with the player)
+
+        // Run ai for each ship
         scriptEnv.setGameWorld(this);
         for (var i=0; i<this.entities.length; i++){
             var e = this.entities[i];
@@ -311,6 +328,7 @@ export class System{
             scriptEnv.setGameTime(this.gameTime);
             var success = e.context.safelyStep(e, setError);
         }
+
         this.inTick = false;
     };
     getPlayer():Ship{

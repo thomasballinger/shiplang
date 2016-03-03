@@ -1,5 +1,4 @@
-import { Ship } from './entity';
-import * as missions from './missions';
+import { Entity } from './entity';
 
 // Events exist only within a tick and therefore don't
 // need to be serializable. They can reference entities
@@ -16,8 +15,8 @@ export enum EventType {
 
 export class Event {
     constructor(public type: EventType,
-                public actor: Ship,
-                public target: Ship){}
+                public actor: Entity,
+                public target: Entity){}
 }
 
 export interface MissionStatic {
@@ -54,3 +53,32 @@ function loadMission(name: string, data: any): Mission{
 export function loadMissions(missionsData: [string, any][]){
     return missionsData.map(function(x){ return loadMission(x[0], x[1]); })
 }
+
+export var missions = <moduleOfMissions>{
+    'KillFiveAstroidsMission': class KillFiveAstroidsMission extends Mission {
+        initializeData(){
+            this.data = {killed: 0}
+        }
+        processEvent(e: Event){
+            if (e.type === EventType.Kill &&
+                e.actor.government === 'player' &&
+                e.target.government === 'debris'){
+                this.data['killed'] += 1
+            }
+        }
+    },
+    'DontAttackCiviliansMission': class DontAttackCiviliansMission extends Mission {
+        initializeData(){
+            this.data = {killed: 0}
+        }
+        processEvent(e: Event){
+            if (e.type === EventType.Provoke &&
+                e.actor.government === 'player' &&
+                e.target.government === 'citizen'){
+                //TODO clean up civilian -> civilian or something
+                this.data['killed'] += 1
+            }
+        }
+    }
+}
+

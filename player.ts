@@ -90,5 +90,6 @@ export class Player{
     name: string;
     location: string;
     script: string;
+    missions: [string, any][]
 }
 
