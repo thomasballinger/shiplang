@@ -15,7 +15,6 @@ describe('Commands', () => {
     setCurrentEntity(ship)
     describe("#headingToClosestShipIn", () => {
         it("notices if called with not enough arguments", () => {
-            console.log(controls.headingToClosestShipIn(.5))
             assert.notEqual(undefined, controls.headingToClosestShipIn(.5))
             assert.throws(function(){controls.headingToClosestShipIn();})
         });

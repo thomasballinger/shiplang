@@ -8,13 +8,13 @@ interface moduleOfMissions {
 }
 
 describe('Missions', () => {
-    for (var missionName of Object.keys(missions)){
-        it("can be round-trip serialized", () => {
+    it("can be round-trip serialized", () => {
+        for (var missionName of Object.keys(missions)){
             var missionClass = missions[missionName];
-            var m = new missionClass
+            var m = new missionClass();
             var data = m.save();
             var reconstitutedData = JSON.parse(JSON.stringify(data));
             assert.deepEqual(data, reconstitutedData)
-        });
-    }
+        }
+    });
 });

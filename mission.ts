@@ -25,7 +25,7 @@ export interface MissionStatic {
 
 export abstract class Mission {
     /** Return value should be JSON serializable */
-    constuctor(data?: any){
+    constructor(data?: any){
         if (data === undefined){
             this.initializeData();
         } else {
@@ -33,7 +33,7 @@ export abstract class Mission {
         }
     }
     save(): [string, any]{
-        return [this.constructor.toString(), this.data];
+        return [this.constructor.name, this.data];
     }
     /** could be overriden to do some validation */
     load(data: any){
@@ -57,7 +57,7 @@ export function loadMissions(missionsData: [string, any][]){
 export var missions = <moduleOfMissions>{
     'KillFiveAstroidsMission': class KillFiveAstroidsMission extends Mission {
         initializeData(){
-            this.data = {killed: 0}
+            this.data = {killed: 0};
         }
         processEvent(e: Event){
             if (e.type === EventType.Kill &&
