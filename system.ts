@@ -184,7 +184,7 @@ export class System{
         touchingExplosion.map(function(x: [Entity, Entity]){
             var entity: Entity = x[0]
             var explosion: Entity = x[1]
-            entity.armor -= EXPLOSION_DAMAGE;
+            entity.takeDamage(EXPLOSION_DAMAGE);
             if (explosion.firedBy){
                 events.push(new Event(
                     entity.armor > 0 ? EventType.Provoke : EventType.Kill,
@@ -208,7 +208,7 @@ export class System{
             // munitions colliding with any other forground entities
             // damages the armor of both entity and the munition
             for (var [e, m] of [[e1, e2], [e2, e1]]){
-                e.armor -= Math.max(1, m.damage || 0);
+                e.takeDamage(Math.max(1, m.damage || 0));
                 if (m.firedBy){
                     events.push(new Event(
                         e.armor > 0 ? EventType.Provoke : EventType.Kill,
@@ -308,7 +308,7 @@ export class System{
         var index = n % this.bgEntities.length;
         return this.bgEntities[index];
     }
-    tick = function(dt:GameTime, setError:(msg: string)=>void){
+    tick(dt:GameTime, setError:(msg: string)=>void){
         this.inTick = true;
         this.gameTime += dt;
 
@@ -323,14 +323,14 @@ export class System{
         scriptEnv.setGameWorld(this);
         for (var i=0; i<this.entities.length; i++){
             var e = this.entities[i];
-            if (e.context === undefined){ continue; }
+            if ((<any>e).context === undefined){ continue; }
             scriptEnv.setCurrentEntity(e);
             scriptEnv.setGameTime(this.gameTime);
-            var success = e.context.safelyStep(e, setError);
+            var success = (<any>e).context.safelyStep(e, setError);
         }
 
         this.inTick = false;
-    };
+    }
     getPlayer():Ship{
         return <Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
     }

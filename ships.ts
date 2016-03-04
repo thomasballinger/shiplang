@@ -28,6 +28,7 @@ var SimpleShip: ShipSpec= {
     maxSpeed: 100,
     explosionSize: 20,
     armorMax: 1,
+    shieldsMax: 0,
     government: 'civilian',
     isMunition: false,
     isInertialess: false,
@@ -64,6 +65,7 @@ export var Triangle = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
+    shieldsMax: 10,
     government: 'pirate'
 });
 
@@ -109,6 +111,7 @@ export var DroneMissile = {
     isMunition: true,
     explosionSize: 30,
     armorMax: 1,
+    shieldsMax: 0,
     isInertialess: false,
     lifespan: 20,
     government: <Gov>undefined,
@@ -123,6 +126,7 @@ export var NeedleMissile = {
     isMunition: true,
     explosionSize: 10,
     armorMax: 1,
+    shieldsMax: 0,
     isInertialess: true,
     lifespan: 6,
     government: <Gov>undefined,
@@ -136,6 +140,7 @@ export var Astroid = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 100,
     armorMax: 20,
+    shieldsMax: 0,
     government: 'debris',
 });
 

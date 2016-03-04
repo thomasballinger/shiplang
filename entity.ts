@@ -6,6 +6,7 @@ import { UserFunctionBodies } from './userfunctionbodies';
 
 import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context, JSInterpFunction } from './interfaces';
 
+var SHIELDS_RECHARGE_RATE = 1;
 
 // Asteroids, missiles, ships, planets, projectiles.
 // If a projectile wouldn't need it, doesn't belong here
@@ -18,11 +19,12 @@ export class Entity{
         this.dy = dy;
         this.r = r;
         this.h = 0;
-        this.armor = 0;
         this.destructable = true;
         this.drawStatus = {};
         this.armorMax = 1;
-        this.armor = this.armorMax
+        this.shieldsMax = 0;
+        this.armor = this.armorMax;
+        this.shields = this.shieldsMax;
         this.explosionSize = 0;
         this.randomSeed = Math.random();
         this.weaponCharge = 0;
@@ -42,7 +44,9 @@ export class Entity{
     firedBy: Entity;
     drawStatus: {[property:string]: any;}
     armor: number;
+    shields: number;
     armorMax: number;
+    shieldsMax: number;
     explosionSize: number;
     isComponent: boolean;
     randomSeed: number;
@@ -115,6 +119,12 @@ export class Entity{
     deepCopyCreate():Entity{
         return new Entity(undefined, undefined, undefined, undefined, undefined, undefined);
     }
+    takeDamage(d: number): void{
+        var absorbed = Math.min(this.shields, d);
+        var pierced = Math.max(0, d - this.shields)
+        this.shields -= absorbed;
+        this.armor -= pierced;
+    }
 }
 
 export class Spob extends Entity{ // Spob stands for "space object" as per the EV Bible
@@ -161,7 +171,9 @@ export class Ship extends Entity{
         this.dh = 0;
         this.hTarget = undefined;
         this.armorMax = spec.armorMax;
+        this.shieldsMax = spec.shieldsMax;
         this.armor = spec.armorMax;
+        this.shields = spec.shieldsMax;
         this.isInertialess = spec.isInertialess;
         if (spec.lifespan !== undefined){
             this.timeToDie = -spec.lifespan;
@@ -182,6 +194,7 @@ export class Ship extends Entity{
 
     move(dt: GameTime){
         super.move(dt);
+        this.shields = Math.min(this.shieldsMax, this.shields + SHIELDS_RECHARGE_RATE*dt);
         if (this.hTarget !== undefined){
             var delta = sm.headingDiff(this.h, this.hTarget)
             if (sm.headingToLeft(this.h, this.hTarget)){

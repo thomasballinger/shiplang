@@ -48,6 +48,10 @@ export function outerspace(scenario: Scenario){
     update: function(player, world){ this.lurper.update(player.armor, player.armorMax); }
   });
   updater.registerObserver(<Updateable>{
+    lurper: new Lerper('player-shields', '#44cc00'),
+    update: function(player, world){ this.lurper.update(player.shields, player.shieldsMax); }
+  });
+  updater.registerObserver(<Updateable>{
     hud: new FPS('fps'),
     update: function(player, world){ this.hud.tick('ships: '+world.entities.length); }
   });

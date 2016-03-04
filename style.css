@@ -34,9 +34,18 @@ body {
   border: 5px solid black;
   background-color: #001900;
 }
-#fps {
+#player-shields {
   position: absolute;
   top: 230;
+  right: 0;
+  width: 200;
+  height: 20;
+  border: 5px solid black;
+  background-color: #001900;
+}
+#fps {
+  position: absolute;
+  top: 250;
   right: 0;
   width: 200;
   height: 20;
@@ -46,7 +55,7 @@ body {
 }
 #objectivebar {
   position: absolute;
-  top: 250;
+  top: 270;
   right: 0;
   width: 200;
   border: 5px solid black;

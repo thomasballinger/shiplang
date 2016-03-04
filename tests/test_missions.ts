@@ -1,18 +1,16 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { Mission, MissionStatic } from '../mission';
-import * as missions from '../missions';
+import { Mission, MissionStatic, missions } from '../mission';
 
 interface moduleOfMissions {
     [key: string]: MissionStatic;
 }
 
 describe('Missions', () => {
-    for (var missionName of <string[]>['KillGiveAstroidsMission',
-                                       'DontKillCiviliansMission']){
+    for (var missionName of Object.keys(missions)){
         it("can be round-trip serialized", () => {
-            var missionClass = (<moduleOfMissions><any>missions)[missionName];
+            var missionClass = missions[missionName];
             var m = new missionClass
             var data = m.save();
             var reconstitutedData = JSON.parse(JSON.stringify(data));

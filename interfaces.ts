@@ -71,11 +71,12 @@ export interface ShipSpec {
     explosionSize: number,
     isMunition: boolean,
     armorMax: number,
+    shieldsMax: number,
     isInertialess: boolean,
     lifespan: number,
     government: Gov,
 }
-
+// New properties should be added both above and below
 export interface ShipSpecChanges {
     type?: string,
     r?: number,
@@ -85,6 +86,7 @@ export interface ShipSpecChanges {
     explosionSize?: number,
     isMunition?: boolean,
     armorMax?: number,
+    shieldsMax?: number,
     isInertialess?: boolean,
     lifespan?: number,
     government?: Gov,
