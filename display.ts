@@ -1,6 +1,8 @@
 import { Entity, Ship } from './entity';
 import { System } from './system';
 
+//TODO invert y axis
+
 export class SpaceDisplay{
     constructor(id: string, public psfOrig: number, public esfOrig: number, public bgp: number){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);

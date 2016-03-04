@@ -110,7 +110,7 @@ export class Entity{
     yIn(dt: GameTime): number{ return this.y + this.dy * dt; }
 
     move(dt: GameTime):void{
-        if (this.type === 'explosion'){
+        if (this.type === 'explosion' && this.inactive){
             this.r = Math.max(this.r - 10*dt*this.r, 1);
         }
         this.x += this.dx * dt;
@@ -254,6 +254,7 @@ export class Component extends Ship{
     xOffset: number;
     yOffset: number;
     move(dt: GameTime){
+        this.shields = Math.min(this.shieldsMax, this.shields + SHIELDS_RECHARGE_RATE*dt);
         if (this.attachedTo && this.attachedTo.type !== 'explosion'){
             var h = this.attachedTo.h
             this.x = (this.attachedTo.x +

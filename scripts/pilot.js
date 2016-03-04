@@ -19,6 +19,7 @@ function manual(){
   if (keyPressed('w')){ waitFor(1); }
   if (keyPressed('l')){ land(); }
   if (keyPressed('j')){ jump(); }
+  if (keyPressed('f')){ fireLaser(); }
 }
 // Try adding laser firing! Call fireLaser() somewhere
 

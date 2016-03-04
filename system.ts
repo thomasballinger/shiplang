@@ -112,7 +112,7 @@ export class System{
         missile.drawStatus['color'] = color;
         this.addEntity(missile);
     }
-    fireLaser = function(entity: Entity, color: string, intensity: number){
+    fireLaser = function(entity: Entity, color: string, intensity?: number){
         var blast = fireLaser(entity, this.gameTime);
         blast.drawStatus['color'] = color;
         var multiplier = intensity || 1
@@ -176,14 +176,13 @@ export class System{
             throw Error('I thought that was exhaustive...');
         }).filter(function(x: [Entity, Entity]){
             if (x === undefined){ return false; }
-            var entity: Entity = x[0];
+            var [entity, explosion] = x
             return !!entity;
         });
 
         var EXPLOSION_DAMAGE = 3;
         touchingExplosion.map(function(x: [Entity, Entity]){
-            var entity: Entity = x[0]
-            var explosion: Entity = x[1]
+            var [entity, explosion] = x;
             entity.takeDamage(EXPLOSION_DAMAGE);
             if (explosion.firedBy){
                 events.push(new Event(
@@ -205,7 +204,7 @@ export class System{
         for (var k=0; k<weaponCollisions.length; k++){
             var e1: Entity = weaponCollisions[k][0]
             var e2: Entity = weaponCollisions[k][1]
-            // munitions colliding with any other forground entities
+            // munitions colliding with any other foreground entities
             // damages the armor of both entity and the munition
             for (var [e, m] of [[e1, e2], [e2, e1]]){
                 e.takeDamage(Math.max(1, m.damage || 0));
@@ -314,7 +313,7 @@ export class System{
 
         this.entities.map(function(x: Entity){ x.move(dt); });
         var events = this.checkCollisions();
-        console.log(events)
+        //console.log(events)
         // Tell missions about events
         // Tell governments about events
         // (these are all to do with the player)

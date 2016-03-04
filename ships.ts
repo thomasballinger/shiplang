@@ -12,7 +12,7 @@ declare module "./interfaces" {
 //Order matters in this file: Ships can only
 //inherit with this function using ships defined above them.
 function shipWithChanges(parent: ShipSpec, changes: ShipSpecChanges): ShipSpec{
-    for (var prop in Object.keys(parent)){
+    for (var prop of Object.keys(parent)){
         if (!changes.hasOwnProperty(prop)){
             changes[prop] = parent[prop];
         }
@@ -65,7 +65,6 @@ export var Triangle = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
-    shieldsMax: 10,
     government: 'pirate'
 });
 
