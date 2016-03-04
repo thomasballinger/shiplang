@@ -31,7 +31,7 @@
         (thrustFor .1)))
     (if (< (distToClosestShip) 800)
       (do
-        (aimAtClosestShip)
+        (aimAtClosestEnemy)
         (fireLaser "#cccc21")
         (fireLaser "#cccc21")
         (fireLaser "#cccc21")))))
@@ -85,42 +85,46 @@
 
 (defn holderScript ()
   (seekGun)
-  (while (> (countOfGov "debris") 0)
-    (hunt "debris"))
+  (while (> (enemyCount) 0)
+    (hunt))
   (visitPlanetsScript))
 
 ; assumes a barrage of three lasers
-(defn aimAtClosestShip ()
-  (define laserTime (/ (distToClosestShip)
-		(+ laserSpeed (closingToClosestShip))))
+(defn aimAtClosestEnemy ()
+  (define laserTime (/ (distToClosestEnemy)
+		(+ laserSpeed (closingToClosestEnemy))))
   (define dt (+ laserTime 0))
-  (define heading (headingToClosestShipIn dt))
+  (define heading (headingToClosestEnemyIn dt))
 
   (define turnTime (/ (headingDiff h heading) maxDH))
   (define dt (+ laserTime turnTime))
-  (define laserTime (/ (distToClosestShipIn dt)
-		(+ laserSpeed (closingToClosestShip))))
+  (define laserTime (/ (distToClosestEnemyIn dt)
+		(+ laserSpeed (closingToClosestEnemy))))
   (define dt (+ laserTime turnTime))
 
   (define timeToMid (+ dt .1))
-  (define heading (headingToClosestShipIn timeToMid))
+  (define heading (headingToClosestEnemyIn timeToMid))
 
   (turnTo heading))
 
 
-(defn aimOfGov (type)
-  (define dt (/ (distToClosestOfGov type)
-		(+ laserSpeed (closingToClosestOfGov type))))
-  (define heading (headingToClosestOfGovIn type dt))
+(defn aim ()
+  (define laserTime (/ (distToClosestEnemy)
+      (+ laserSpeed (closingToClosestEnemy))))
+  (define heading (headingToClosestEnemyIn laserTime))
+
   (define turnTime (/ (headingDiff h heading) maxDH))
+  (define dt (+ laserTime turnTime))
+  (define laserTime (/ (distToClosestEnemyIn dt)
+		(+ laserSpeed (closingToClosestEnemy))))
+  (define dt (+ laserTime turnTime))
 
-  (define dt (+ dt turnTime))
-  (define heading (headingToClosestOfGovIn type dt))
+  (define heading (headingToClosestEnemyIn (+ dt .3)))
   (turnTo heading))
 
-(defn hunt (type)
-  (aimOfGov type)
-  (if (> (distToClosestOfGov type) 500)
+(defn hunt ()
+  (aim)
+  (if (> (distToClosestEnemy) 500)
       (thrustFor .4)
       (thrustFor .1)))
 

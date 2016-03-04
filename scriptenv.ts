@@ -214,16 +214,23 @@ function makeCommands():MakeCommandsReturnType{
         new Command('headingToNthPlanet', function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); }),
         new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
 
-        new Command('distToClosestOfGov', function(name: string){ return e.distFrom(w.findClosestOfGov(e, name)); }),
-        new Command('headingToClosestOfGov', function(name: string):any{ return e.towards(w.findClosestOfGov(e, name)); }),
-        new Command('closingToClosestOfGov', function(name: string):any{
-            var o = w.findClosestOfGov(e, name)
+        new Command('distToClosestEnemy', function(){ return e.distFrom(w.findClosestEnemy(e)); }),
+        new Command('headingToClosestEnemy', function():any{ return e.towards(w.findClosesEnemy(e)); }),
+        new Command('closingToClosestEnemy', function():any{
+            var o = w.findClosestEnemy(e)
             return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
         }),
-        new Command('headingToClosestOfGovIn', function(name: string, dt: number): any{
-            var closest = w.findClosestOfGov(e, name)
+        new Command('headingToClosestEnemyIn', function(dt: number): any{
+            var closest = w.findClosestEnemy(e)
             if (closest === undefined){ return e.towards(undefined); }
-            return e.towards(closest.xIn(dt), closest.yIn(dt));
+            return e.towardsIn(closest, dt);
+        }),
+        new Command('distToClosestEnemyIn', function(dt: number): any{
+            if (dt === undefined){ throw Error('needs arg'); }
+            //TODO do this arg checking generally
+            var closest = w.findClosestEnemy(e)
+            if (closest === undefined){ return e.towards(undefined); }
+            return e.distFromIn(closest, dt);
         }),
 
         new Command('headingToClosestShipIn', function(dt: number): any{
@@ -245,7 +252,7 @@ function makeCommands():MakeCommandsReturnType{
             return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
         }),
 
-        new Command('countOfGov', function(name: string): any{ return w.countOfGov(e, name); }),
+        new Command('enemyCount', function(name: string): any{ return w.enemyCount(e); }),
 
         new AsyncCommand('chargeFor', function(n: number){
             var timeFinished = t + n;

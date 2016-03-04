@@ -3,6 +3,7 @@ import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
+import { isEnemy } from './governments';
 
 var deepcopy = (<any>window).deepcopy;
 
@@ -251,16 +252,10 @@ export class System{
         return [new Event(EventType.Provoke, this.entities[0], this.entities[0])];
     }
     // doesn't include passed in entity
-    countOfGov = function(e1: Entity, gov: string){
-        if (gov === undefined){ throw Error("countOfGov needs two arguments"); }
+    enemyCount = function(e1: Entity){
         return this.entities.filter(function(x: Entity){
-            return x.government === gov && x !== e1;
+            return isEnemy(e1, x);
         }).length
-    }
-    findClosestOfGov = function(e1: Entity, gov: string){
-        return this.findClosest(e1, this.ships().filter(function(x: Entity){
-            return x.government === gov;
-        }));
     }
     findClosestShip = function(e1: Entity){
         return this.findClosest(e1, this.ships());
@@ -272,6 +267,11 @@ export class System{
         return this.findClosest(e1, this.entities.filter(
             function(x:Entity){ return x.isComponent; }));
     };
+    findClosestEnemy = function(e1: Entity){
+        return this.findClosest(e1, this.ships().filter(function(x: Entity){
+            return isEnemy(e1, x);
+        }));
+    }
     findClosest = function(e1: Entity, candidates?: Entity[]){
         if (candidates === undefined){
             candidates = this.entities;

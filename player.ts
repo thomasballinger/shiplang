@@ -22,6 +22,9 @@ var pilotScriptSource = require("raw!./scripts/pilot.js");
 // Killed alien digeridoo
 // Landed on tolok
 //
+// Actions: 
+// need current missions
+//
 // For debugging there should be a way to view this log
 //
 // When loading player, location accessors can be accessors
@@ -82,6 +85,7 @@ export class Player{
             location: 'Sol',
             name: 'Slippy',
             script: pilotScriptSource,
+            missions: [],
             //script: 'while (true){ thrustFor(.1); leftFor(.1); }'
         })
     }

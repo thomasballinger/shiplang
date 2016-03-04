@@ -107,4 +107,4 @@ export interface Scenario {
     (): WorldBuilder;
 }
 
-export type Gov = "player" | "civilian" | "pirate" | "military" | "debris";
+export type Gov = "player" | "civilian" | "pirate" | "military" | "debris" | "cleanup";

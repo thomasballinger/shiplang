@@ -98,7 +98,7 @@ export var Holder = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
-    government: 'military'
+    government: 'cleanup',
 });
 
 export var DroneMissile = {
