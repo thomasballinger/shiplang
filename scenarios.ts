@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import { System, makeShip, makeBoid, makePlanet, makeComponent } from './system';
 import { SLgetScripts } from './scriptenv';
-import { WorldBuilder, ShipSpec } from './interfaces';
+import { WorldBuilder, ShipSpec, Gov } from './interfaces';
 import * as objectivebar from './objectivebar';
 import { Player } from './player';
 import * as ships from './ships';
@@ -54,7 +54,7 @@ export var gunner = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
-        ship.government = 'player'
+        ship.government = Gov.Player
         world.addBackgroundEntity(makePlanet(1400, 1300, 40, '#ab43af'));
         world.addBackgroundEntity(makePlanet(-1600, -1800, 60, '#3bd951'));
         world.addBackgroundEntity(makePlanet(-1800, 1600, 80, '#8b2141'));
@@ -104,7 +104,7 @@ export var scenario1 = function():any{
         (<any>window).ship = ship;
         var ship2 = makeShip(ships.Triangle, -300, 350, 270, enemyScript);
         ship.imtheplayer = true;
-        ship.government = 'player'
+        ship.government = Gov.Player
         world.addEntity(ship);
         world.addEntity(ship2);
         world.addEntity(makeShip(ships.Astroid, -100, 350, 270, builtinScripts.wander));
@@ -134,7 +134,7 @@ export var sol = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
-        ship.government = 'player'
+        ship.government = Gov.Player
         var earth = makePlanet(100, 100, 50, '#004000');
         earth.onLand = function(){
             putMessage('landed on earth');
@@ -183,7 +183,7 @@ export var robo = function():any{
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
-        ship.government = 'player'
+        ship.government = Gov.Player
         var tolok = makePlanet(200, -100, 200, '#420209');
         tolok.onLand = function(){
             putMessage('landed on the alien planet of Tolok');

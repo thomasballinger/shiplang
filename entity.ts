@@ -4,7 +4,7 @@ import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 
-import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context, JSInterpFunction } from './interfaces';
+import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context, JSInterpFunction, Gov } from './interfaces';
 
 var SHIELDS_RECHARGE_RATE = 1;
 
@@ -52,7 +52,7 @@ export class Entity{
     randomSeed: number;
     weaponCharge: number;
     damage: number;
-    government: string;
+    government: Gov;
 
     // some bookkeeping props for System
     dead: boolean;     // will be cleaned up this tick

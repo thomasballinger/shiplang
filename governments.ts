@@ -4,15 +4,15 @@ import { Entity, Ship } from './entity';
 
 
 export function isEnemy(e1: Entity, e2: Entity){
-    if (e1.government === 'player'){
+    if (e1.government === Gov.Player){
         //TODO make this a reputation-based check
-        return (e2.government === 'pirate' || e2.government === 'debris');
-    } else if (e1.government === 'pirate'){
-        return e2.government !== 'pirate';
-    } else if (e1.government === 'cleanup'){
-        return e2.government === 'debris';
+        return (e2.government === Gov.Pirate || e2.government === Gov.Debris);
+    } else if (e1.government === Gov.Pirate){
+        return e2.government !== Gov.Pirate;
+    } else if (e1.government === Gov.Cleanup){
+        return e2.government === Gov.Debris;
     } else {
-        return e2.government === 'pirate';
+        return e2.government === Gov.Pirate;
     }
 
 }

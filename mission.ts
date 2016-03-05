@@ -1,4 +1,5 @@
 import { Entity } from './entity';
+import { Gov } from './interfaces';
 
 // Events exist only within a tick and therefore don't
 // need to be serializable. They can reference entities
@@ -61,8 +62,8 @@ export var missions = <moduleOfMissions>{
         }
         processEvent(e: Event){
             if (e.type === EventType.Kill &&
-                e.actor.government === 'player' &&
-                e.target.government === 'debris'){
+                e.actor.government === Gov.Player &&
+                e.target.government === Gov.Debris){
                 this.data['killed'] += 1
             }
         }
@@ -73,8 +74,8 @@ export var missions = <moduleOfMissions>{
         }
         processEvent(e: Event){
             if (e.type === EventType.Provoke &&
-                e.actor.government === 'player' &&
-                e.target.government === 'citizen'){
+                e.actor.government === Gov.Player &&
+                e.target.government === Gov.Trader){
                 //TODO clean up civilian -> civilian or something
                 this.data['killed'] += 1
             }

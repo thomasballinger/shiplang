@@ -29,7 +29,7 @@ var SimpleShip: ShipSpec= {
     explosionSize: 20,
     armorMax: 1,
     shieldsMax: 0,
-    government: 'civilian',
+    government: Gov.Trader,
     isMunition: false,
     isInertialess: false,
     lifespan: <number>undefined,
@@ -43,7 +43,7 @@ export var Boid = shipWithChanges(SimpleShip, {
     maxSpeed: 100,
     explosionSize: 20,
     armorMax: 4,
-    government: 'civilian',
+    government: Gov.Trader,
 });
 
 export var Shuttle = shipWithChanges(SimpleShip, {
@@ -54,7 +54,7 @@ export var Shuttle = shipWithChanges(SimpleShip, {
     maxSpeed: 100,
     explosionSize: 20,
     armorMax: 3,
-    government: 'civilian',
+    government: Gov.Trader,
 });
 
 export var Triangle = shipWithChanges(SimpleShip, {
@@ -65,7 +65,7 @@ export var Triangle = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
-    government: 'pirate'
+    government: Gov.Pirate,
 });
 
 export var FatTriangle = shipWithChanges(SimpleShip, {
@@ -76,7 +76,7 @@ export var FatTriangle = shipWithChanges(SimpleShip, {
     maxSpeed: 500,
     explosionSize: 40,
     armorMax: 100,
-    government: 'pirate'
+    government: Gov.Pirate
 });
 
 export var Gunship = shipWithChanges(SimpleShip, {
@@ -87,7 +87,7 @@ export var Gunship = shipWithChanges(SimpleShip, {
     maxSpeed: 0,
     explosionSize: 12,
     armorMax: 20,
-    government: 'player'
+    government: Gov.Player
 });
 
 export var Holder = shipWithChanges(SimpleShip, {
@@ -98,7 +98,7 @@ export var Holder = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
-    government: 'cleanup',
+    government: Gov.Cleanup,
 });
 
 export var DroneMissile = {
@@ -140,6 +140,6 @@ export var Astroid = shipWithChanges(SimpleShip, {
     explosionSize: 100,
     armorMax: 20,
     shieldsMax: 0,
-    government: 'debris',
+    government: Gov.Debris,
 });
 

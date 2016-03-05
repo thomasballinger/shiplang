@@ -1,4 +1,5 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
+import { Gov } from './interfaces';
 
 // Plan:
 // Get rid of Player, replace with Profile
@@ -48,6 +49,16 @@ var pilotScriptSource = require("raw!./scripts/pilot.js");
 // Player should be deepcopied so it can be restored on reset.
 // Therefore it should be stored on the system somewhere.
 
+
+interface ReputationTable {
+    [government: number]: number;
+    // wish I could write
+    // [government: Gov]: number;
+}
+interface AnnoyedTable {
+    [government: number]: boolean;
+}
+
 export class Player{
     constructor(data: any){
         for (var prop of Object.keys(data)){
@@ -91,13 +102,22 @@ export class Player{
     };
 
     static newPlayer(): Player{
+        var reputation: ReputationTable = {};
+        for (var i=0; i<Gov.LAST; i++){
+            reputation[i] = 1;
+        }
+        var annoyed: AnnoyedTable= {};
+        for (var i=0; i<Gov.LAST; i++){
+            annoyed[i] = false;
+        }
         return new Player({
             spaceLocation: [100, 100],
             location: 'Sol',
             name: 'Slippy',
             script: pilotScriptSource,
-            missions: [],
             //script: 'while (true){ thrustFor(.1); leftFor(.1); }'
+            missions: [],
+            reputations: {},
         })
     }
     // schema for objects:
@@ -105,5 +125,6 @@ export class Player{
     name: string;
     location: string;
     script: string;
-    missions: [string, any][]
+    missions: [string, any][];
+    reputation: ReputationTable;
 }

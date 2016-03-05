@@ -51,6 +51,7 @@ function fireMissile(e:Entity, ship: ShipSpec, script: Script, t:GameTime){
                               e.h, ship, script);
     missile.firedBy = e;
     missile.firedAt = t;
+    missile.government = e.government;
     return missile;
 }
 
@@ -65,6 +66,7 @@ function fireLaser(e:Entity, gameTime:GameTime){
     laser.firedAt = Number.MAX_VALUE;  // never damages owner
     laser.timeToDie = gameTime + 1.5;
     laser.isMunition = true;
+    laser.government = e.government;
     return laser;
 }
 
@@ -343,6 +345,6 @@ export class System{
     deepCopyPopulate = function(copy: System, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
         copy.gameTime = this.gameTime;
-        copy.player = innerDeepCopy(this.player);
+        copy.player = innerDeepCopy(this.player, memo);
     };
 }

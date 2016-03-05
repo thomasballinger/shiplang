@@ -27,9 +27,9 @@ function ProNav(){
   thrustFor(1);
   while (true){
     thrustFor(0.1);
-    var initial = headingToClosestOfGov('pirate');
+    var initial = headingToClosestEnemy();
     waitFor(0.1);
-    var newHeading = headingToClosestOfGov('pirate');
+    var newHeading = headingToClosestEnemy();
     if (headingToLeft(initial, newHeading)){
       rightFor(0.01 * headingDiff(initial, newHeading));
     } else {
@@ -41,8 +41,8 @@ function ProNav(){
 function towardExpected(){
   thrustFor(1);
   while(true){
-    var dt = distToClosestOfGov('pirate') / 300;
-    var dir = headingToClosestOfGovIn('pirate', dt);
+    var dt = distToClosestEnemy() / 300;
+    var dir = headingToClosestEnemyIn(dt);
     turnTo(dir);
     thrustFor(.1);
   }

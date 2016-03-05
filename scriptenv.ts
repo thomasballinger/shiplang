@@ -218,7 +218,7 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
 
         new Command('distToClosestEnemy', function(){ return e.distFrom(w.findClosestEnemy(e)); }),
-        new Command('headingToClosestEnemy', function():any{ return e.towards(w.findClosesEnemy(e)); }),
+        new Command('headingToClosestEnemy', function():any{ return e.towards(w.findClosestEnemy(e)); }),
         new Command('closingToClosestEnemy', function():any{
             var o = w.findClosestEnemy(e)
             return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);

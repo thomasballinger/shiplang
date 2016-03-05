@@ -107,4 +107,12 @@ export interface Scenario {
     (): WorldBuilder;
 }
 
-export type Gov = "player" | "civilian" | "pirate" | "military" | "debris" | "cleanup";
+export enum Gov {
+    Player,
+    Trader,
+    Pirate,
+    Military,
+    Debris,
+    Cleanup,
+    LAST,
+}
