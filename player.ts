@@ -117,7 +117,7 @@ export class Player{
             script: pilotScriptSource,
             //script: 'while (true){ thrustFor(.1); leftFor(.1); }'
             missions: [],
-            reputations: {},
+            reputation: {},
         })
     }
     // schema for objects:

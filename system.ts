@@ -3,7 +3,7 @@ import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
-import { isEnemy } from './governments';
+import { isEnemy, govModReputation } from './governments';
 import { Player } from './player';
 
 var deepcopy = (<any>window).deepcopy;
@@ -252,7 +252,7 @@ export class System{
             }
             return x.dead !== true;
         });
-        return [new Event(EventType.Provoke, this.entities[0], this.entities[0])];
+        return events;
     }
     // doesn't include passed in entity
     enemyCount = function(e1: Entity){
@@ -316,6 +316,8 @@ export class System{
 
         this.entities.map(function(x: Entity){ x.move(dt); });
         var events = this.checkCollisions();
+        var player = this.player;
+        events.map(function(e: Event){ govModReputation(e, player); });
         //console.log(events)
         // Tell missions about events
         // Tell governments about events
