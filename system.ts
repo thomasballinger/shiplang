@@ -90,18 +90,16 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 
 
 export class System{
-    constructor(player: Player){
+    constructor(public player?: Player){
         this.entities = [];
         this.bgEntities = [];
         this.gameTime = 0;
         this.inTick = false;
-        this.player = player
     }
     entities: Entity[];
     bgEntities: Entity[];
     gameTime: GameTime;
     inTick: boolean;
-    player: Player;
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);
     }

@@ -83,6 +83,12 @@ export class Player{
         (<any>this)[prop] = value;
         return this
     }
+    deepCopyCreate(): Player{
+        return Player.fromJson(this.toJson());
+    };
+    deepCopyPopulate = function(copy: Player, memo:any, innerDeepCopy:any){
+        //NOP because simple JSON copy works
+    };
 
     static newPlayer(): Player{
         return new Player({

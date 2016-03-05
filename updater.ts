@@ -162,7 +162,7 @@ export class Updater{
         this.viewedEntity = this.player;
         this.onReset()
         this.debugData();
-        scriptEnv.setPlayer(Player.current())
+        scriptEnv.setPlayer(Player.fromStorage())
     }
     restartFromSave(world: System){
         this.world = world;
@@ -170,6 +170,7 @@ export class Updater{
         this.viewedEntity = this.player;
         this.onReset();
         this.debugData();
+        scriptEnv.setPlayer(world.player)
     }
 
     // please advance world state one tick and update displays

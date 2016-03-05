@@ -8,7 +8,7 @@ import { assert } from 'chai';
 describe('System', () => {
     describe('#copy', () => {
         it("shouldn't create copies that share entities", () => {
-            var s1 = new System()
+            var s1 = new System();
             var l1 = [1,2,3];
             s1.addEntity(<Entity><any>l1)
             var s2 = s1.copy()
