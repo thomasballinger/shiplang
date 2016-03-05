@@ -164,6 +164,7 @@ type MakeCommandsReturnType = [(e: any)=>void,
                                (t: any)=>void,
                                (w: any)=>void,
                                (k: any)=>void,
+                               (p: any)=>void,
                                NamespaceInit[]];
 
 var DEBUG_REPORT_CONTINUE = false;
@@ -181,10 +182,12 @@ function makeCommands():MakeCommandsReturnType{
     var t = <GameTime>undefined;
     var w = <any>undefined;
     var keys = <any>undefined;
+    var p = <any>undefined;
     function setCurrentEntity(ent:any){ e = ent; }
     function setGameTime(time:GameTime){ t = time; }
     function setGameWorld(world: any){ w = world; }
     function setKeyControls(keyControls: any){ keys = keyControls; }
+    function setPlayer(player: Player){ p = player; }
     var keygen = <any>undefined;
 
     var commands = [
@@ -323,7 +326,7 @@ function makeCommands():MakeCommandsReturnType{
                 putMessage("Can't land on this planet yet, sorry!");
                 return function(){ return true; };
             }
-            Player.fromStorage().set('spaceLocation', [e.x, e.y]);
+            Player.fromStorage().set('spaceLocation', [e.x, e.y]).save();
             closest.onLand();
             return 'done';
         }),
@@ -338,7 +341,7 @@ function makeCommands():MakeCommandsReturnType{
                 putMessage('Moving too quickly to make the jump into hyperspace');
                 return function(){ return true; };
             }
-            Player.fromStorage().set('spaceLocation', [0, 0]);
+            Player.fromStorage().set('spaceLocation', [0, 0]).save();
             var current = Player.fromStorage().location;
             var next = current === 'Sol' ? 'robo' : 'Sol';
             Player.fromStorage().set('location', next).go();
@@ -458,7 +461,7 @@ function makeCommands():MakeCommandsReturnType{
 
         new Data('laserSpeed', function(){ return 600; }),
     ];
-    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, commands];
+    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, setPlayer, commands];
 }
 
 function makeControls(commands: any): any{
@@ -474,7 +477,7 @@ function makeControls(commands: any): any{
 }
 
 export var [setCurrentEntity, setGameTime, setGameWorld,
-     setKeyControls, commands] = makeCommands();
+     setKeyControls, setPlayer, commands] = makeCommands();
 export var controls = makeControls(commands);
 
 export function SLgetScripts(s: string){

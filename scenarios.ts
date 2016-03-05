@@ -50,7 +50,7 @@ export var gunner = function():any{
     });
 
     var reset = <WorldBuilder>function reset(script: any): System {
-        var world = new System();
+        var world = new System(Player.fromStorage());
         var p = Player.fromStorage().spaceLocation;
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
@@ -98,7 +98,7 @@ export var scenario1 = function():any{
         var playerScript = script;
         var enemyScript = builtinScripts.enemyScript;
 
-        var world = new System();
+        var world = new System(Player.fromStorage());
 
         var ship = makeShip(ships.Triangle, -200, 350, 270, playerScript);
         (<any>window).ship = ship;
@@ -130,7 +130,7 @@ export var sol = function():any{
     or travel with J`);
 
     var reset = <WorldBuilder>function reset(script: any): System {
-        var world = new System();
+        var world = new System(Player.fromStorage());
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
@@ -176,11 +176,10 @@ export var sol = function():any{
 export var robo = function():any{
     objectivebar.set(`
     Cosmic interference causes manual controls to be unresponsive in this region.<br />
-    You'll be best equipped if you let your ship's computer do the piloting.
-`);
+    You'll be best equipped if you let your ship's computer do the piloting.`);
 
     var reset = <WorldBuilder>function reset(script: any): System {
-        var world = new System();
+        var world = new System(Player.fromStorage());
         var p = Player.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;

@@ -43,6 +43,10 @@ var pilotScriptSource = require("raw!./scripts/pilot.js");
 // how to deal with living systems where people jump in and out?
 // how to create conditions like "if this mission, spawn these ships"
 // on-ship-death triggers, or 
+//
+//
+// Player should be deepcopied so it can be restored on reset.
+// Therefore it should be stored on the system somewhere.
 
 export class Player{
     constructor(data: any){
@@ -64,6 +68,7 @@ export class Player{
         return JSON.stringify(this);
     }
     go(){
+        this.save();
         (<any>window).location.reload();
     }
     save(): Player{
@@ -76,7 +81,7 @@ export class Player{
     }
     set(prop: string, value: any): Player{
         (<any>this)[prop] = value;
-        return this.save()
+        return this
     }
 
     static newPlayer(): Player{
@@ -96,4 +101,3 @@ export class Player{
     script: string;
     missions: [string, any][]
 }
-

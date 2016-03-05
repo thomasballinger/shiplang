@@ -22,7 +22,7 @@ routes = {
   'earth': earth,
   'outfitter?': function(){'nop';},
   'level1': function(){
-    Player.fromStorage().set('script', gunnerScript);
+    Player.fromStorage().set('script', gunnerScript).save();
     outerspace(scenarios.gunner);},
   'tolok': tolok,
   'robo': function(){outerspace(scenarios.robo);},
@@ -43,7 +43,7 @@ function main(){
     window.location = window.location.protocol + '//' + window.location.host;
   } else if (cmd === 'simulator'){
     Player.clear();
-    Player.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]);
+    Player.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]).save();
     window.location = window.location.protocol + '//' + window.location.host;
   } else {
     var player = Player.fromStorage();

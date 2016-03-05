@@ -162,6 +162,7 @@ export class Updater{
         this.viewedEntity = this.player;
         this.onReset()
         this.debugData();
+        scriptEnv.setPlayer(Player.current())
     }
     restartFromSave(world: System){
         this.world = world;

@@ -4,6 +4,7 @@ import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy } from './governments';
+import { Player } from './player';
 
 var deepcopy = (<any>window).deepcopy;
 
@@ -89,16 +90,18 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 
 
 export class System{
-    constructor(){
+    constructor(player: Player){
         this.entities = [];
         this.bgEntities = [];
         this.gameTime = 0;
         this.inTick = false;
+        this.player = player
     }
     entities: Entity[];
     bgEntities: Entity[];
     gameTime: GameTime;
     inTick: boolean;
+    player: Player;
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);
     }
@@ -320,6 +323,7 @@ export class System{
 
         // Run ai for each ship
         scriptEnv.setGameWorld(this);
+        scriptEnv.setPlayer(this.player);
         for (var i=0; i<this.entities.length; i++){
             var e = this.entities[i];
             if ((<any>e).context === undefined){ continue; }
@@ -336,10 +340,11 @@ export class System{
 
     deepCopyCreate():System{
         if (this.inTick){ throw Error("System can't be copied during a tick!"); }
-        return new System();
+        return new System(undefined);
     };
     deepCopyPopulate = function(copy: System, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
         copy.gameTime = this.gameTime;
+        copy.player = innerDeepCopy(this.player);
     };
 }
