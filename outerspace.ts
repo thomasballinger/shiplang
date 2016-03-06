@@ -1,6 +1,6 @@
 var setup = require('./setup');
 import { SpaceDisplay } from './display';
-import { Player } from './player';
+import { Profile } from './profile';
 import { Lerper, FPS } from './hud';
 import * as scenarios from './scenarios';
 import { Updater } from './updater';
@@ -25,7 +25,7 @@ export function outerspace(scenario: Scenario){
     (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
-    function(){ return Player.fromStorage().script; },
+    function(){ return Profile.fromStorage().script; },
     'canvas', // where to put key handlers
     scenario(), // how to contruct a new world
     'JavaScript',

@@ -240,8 +240,18 @@ export class Ship extends Entity{
         }
 
     }
+    detach(){}
     deepCopyCreate():Ship{
         return new Ship(<ShipSpec>{}, undefined, undefined, undefined);
+    }
+    /** Run a command (from the console, for debugging) */
+    //relies on some globals lying around that are only
+    //there in debug mode
+    run(s: string){
+        if((<any>window).DEBUGMODE){
+            scriptEnv.setCurrentEntity(this);
+            return scriptEnv.controls[s].apply(null, arguments);
+        }
     }
 }
 
@@ -253,6 +263,11 @@ export class Component extends Ship{
     }
     xOffset: number;
     yOffset: number;
+    detach(){
+        if (this.attachedTo){
+            this.attachedTo = undefined;
+        }
+    }
     move(dt: GameTime){
         this.shields = Math.min(this.shieldsMax, this.shields + SHIELDS_RECHARGE_RATE*dt);
         if (this.attachedTo && this.attachedTo.type !== 'explosion'){
@@ -271,6 +286,8 @@ export class Component extends Ship{
             this.x += this.dx * dt
             this.y += this.dy * dt
             this.h += this.dh * dt
+            this.dx = this.dx * .99;
+            this.dy = this.dy * .99;
         }
         if (this.type === 'explosion'){ //TODO factor this out, it's repeated code
             this.r = Math.max(this.r - 10*dt*this.r, 1);

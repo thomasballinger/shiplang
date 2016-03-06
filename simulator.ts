@@ -1,6 +1,6 @@
 var setup = require('./setup');
 import { SpaceDisplay } from './display';
-import { Player } from './player';
+import { Profile } from './profile';
 import { Lerper, FPS } from './hud';
 import * as scenarios from './scenarios';
 import { Updater } from './updater';
@@ -78,6 +78,6 @@ export function simulator(){
     setTimeout(tick, Math.max(5, 33.5-tickTime));
   }
 
-  editor.setCode(Player.fromStorage().script);
+  editor.setCode(Profile.fromStorage().script);
   tick();
 }

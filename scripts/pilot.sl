@@ -80,26 +80,30 @@
       (turnTo (headingToNthPlanet i))
       (if (< (distToNthPlanet i)
              (* speed (+ (stopTime) (reverseTime))))
-          (stop))
+          (do (stop)
+              (waitFor 3)))
       (thrustFor .1))))
 
 (defn holderScript ()
-  (seekGun)
-  (while (> (enemyCount) 0)
-    (hunt))
-  (visitPlanetsScript))
+  (while true
+    (seekGun)
+    (while (and (> (enemyCount) 0)
+                (> (numAttached) 0))
+      (hunt))
+    (while (> numAttached 0)
+       (visitPlanetsScript))))
 
 ; assumes a barrage of three lasers
 (defn aimAtClosestEnemy ()
   (define laserTime (/ (distToClosestEnemy)
-		(+ laserSpeed (closingToClosestEnemy))))
+                (+ laserSpeed (closingToClosestEnemy))))
   (define dt (+ laserTime 0))
   (define heading (headingToClosestEnemyIn dt))
 
   (define turnTime (/ (headingDiff h heading) maxDH))
   (define dt (+ laserTime turnTime))
   (define laserTime (/ (distToClosestEnemyIn dt)
-		(+ laserSpeed (closingToClosestEnemy))))
+                (+ laserSpeed (closingToClosestEnemy))))
   (define dt (+ laserTime turnTime))
 
   (define timeToMid (+ dt .1))
@@ -116,7 +120,8 @@
   (define turnTime (/ (headingDiff h heading) maxDH))
   (define dt (+ laserTime turnTime))
   (define laserTime (/ (distToClosestEnemyIn dt)
-		(+ laserSpeed (closingToClosestEnemy))))
+                       (+ laserSpeed
+                          (closingToClosestEnemy))))
   (define dt (+ laserTime turnTime))
 
   (define heading (headingToClosestEnemyIn (+ dt .3)))

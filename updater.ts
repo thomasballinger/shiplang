@@ -5,7 +5,7 @@ var manual = require('./manual');
 import * as scriptEnv from './scriptenv';
 import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
-import { Player } from './player';
+import { Profile } from './profile';
 var jsastdiff = require('./jsastdiff');
 
 import { WorldBuilder, Updateable, Selection } from './interfaces';
@@ -123,7 +123,7 @@ export class Updater{
             s = undefined;
         };
         if (s){
-            Player.fromStorage().set('script', s);
+            Profile.fromStorage().set('script', s);
             var changed = jsastdiff.changedNamedFunctions(
                 (<any>window).acorn.parse(this.lastValid), newAST);
             if (changed.hasOwnProperty('*main*')){
@@ -162,7 +162,7 @@ export class Updater{
         this.viewedEntity = this.player;
         this.onReset()
         this.debugData();
-        scriptEnv.setPlayer(Player.fromStorage())
+        scriptEnv.setProfile(Profile.fromStorage())
     }
     restartFromSave(world: System){
         this.world = world;
@@ -170,7 +170,7 @@ export class Updater{
         this.viewedEntity = this.player;
         this.onReset();
         this.debugData();
-        scriptEnv.setPlayer(world.player)
+        scriptEnv.setProfile(world.profile)
     }
 
     // please advance world state one tick and update displays

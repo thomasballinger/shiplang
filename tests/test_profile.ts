@@ -1,22 +1,25 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { Player } from '../player';
+import { Profile } from '../profile';
 import { Mission, MissionStatic, missions, Event } from '../mission';
 
 class SimpleMission extends Mission{
     processEvent(e: Event): void{}
 }
 
-describe('Player', () => {
+describe('Profile', () => {
     it("can be round-trip serialized", () => {
         (<any>missions).SimpleMission = SimpleMission;
-        var p = Player.newPlayer();
+
+        //TODO crap method name
+        var p = Profile.newProfile();
+
         p.script = '1 + 1';
         var l = [1, 2, 3];
         p.addMission(new SimpleMission({a: l}));
         p.set('name', 'Fred');
-        var p2 = Player.fromJson(p.toJson());
+        var p2 = Profile.fromJson(p.toJson());
         assert.deepEqual(p.toJson(), p2.toJson());
         l.push(4);
         assert.notDeepEqual(p.toJson(), p2.toJson());

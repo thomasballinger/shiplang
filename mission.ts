@@ -1,5 +1,6 @@
 import { Entity } from './entity';
 import { Gov } from './interfaces';
+import { putMessage } from './messagelog';
 
 // Events exist only within a tick and therefore don't
 // need to be serializable. They can reference entities
@@ -12,12 +13,21 @@ interface moduleOfMissions {
 export enum EventType {
     Provoke,
     Kill,
+    PlayerLand,
 }
 
 export class Event {
     constructor(public type: EventType,
                 public actor: Entity,
                 public target: Entity){}
+    planet: string;
+}
+
+export class PlanetEvent extends Event {
+    constructor(type: EventType, planet: string){
+        super(type, undefined, undefined);
+        this.planet = planet;
+    }
 }
 
 export interface MissionStatic {
@@ -45,6 +55,7 @@ export abstract class Mission {
     }
     data: any;
     abstract processEvent(e: Event): void;
+    instructions(): string{ return ""; }
     /** reasonable to have an implementation that does nothing */
     initializeData(){}
 }
@@ -64,7 +75,18 @@ export var missions = <moduleOfMissions>{
                 e.actor.government === Gov.Player &&
                 e.target.government === Gov.Debris){
                 this.data['killed'] += 1
+                putMessage(this.instructions());
+            } else if (e.type === EventType.PlayerLand &&
+                       e.target){
+
+
             }
+        }
+        instructions(): string{
+            if (this.data.killed === 5){
+                return "Good work. Detach and land at the red planet for payment.";
+            }
+            return "Kill "+(5-this.data.killed)+" more astroids";
         }
     },
     'DontAttackCiviliansMission': class DontAttackCiviliansMission extends Mission {
@@ -78,6 +100,9 @@ export var missions = <moduleOfMissions>{
                 //TODO clean up civilian -> civilian or something
                 this.data['killed'] += 1
             }
+        }
+        instructions(): string{
+            return "Don't attack civilians";
         }
     }
 }

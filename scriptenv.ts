@@ -1,6 +1,6 @@
 import * as evaluation from './eval';
 import { Ship } from './entity';
-import { Player } from './player';
+import { Profile } from './profile';
 var manual = require('./manual');
 import * as ships from './ships';
 import { putMessage } from './messagelog';
@@ -128,7 +128,6 @@ class AsyncCommand extends Command implements NamespaceInit{
         this.body.requiresYield = true;
         obj[this.name] = this.body;
     }
-
 }
 
 // Allow ShipLang programs to use JavaScript builtins
@@ -153,6 +152,8 @@ var funcs = {
     'or': function(a: boolean, b: boolean){ return a || b; },
     'opp': function(degrees: number){ return (degrees + 180) % 360; },
     'abs': function(degrees: number){ return Math.abs(degrees); },
+    'true': true,
+    'false': false,
 }
 // Even though it wouldn't hurt to copy this object, all the functions would
 // be deepCopy passthroughs anyway. If a way to *modify* this array were added,
@@ -187,7 +188,7 @@ function makeCommands():MakeCommandsReturnType{
     function setGameTime(time:GameTime){ t = time; }
     function setGameWorld(world: any){ w = world; }
     function setKeyControls(keyControls: any){ keys = keyControls; }
-    function setPlayer(player: Player){ p = player; }
+    function setProfile(profile: Profile){ p = profile; }
     var keygen = <any>undefined;
 
     var commands = [
@@ -264,6 +265,9 @@ function makeCommands():MakeCommandsReturnType{
             e.weaponCharge = Math.min(1, e.weaponCharge + n);
         }),
 
+        new Command('detach', function(){ e.detach(); }),
+        new Command('numAttached', function(){ return w.getAttached(e).length; }),
+
         new AsyncCommand('keypress', function(){
             keygen = manual.actOnKey(e, keys)
             var {value, done} = keygen.next()
@@ -326,7 +330,7 @@ function makeCommands():MakeCommandsReturnType{
                 putMessage("Can't land on this planet yet, sorry!");
                 return function(){ return true; };
             }
-            Player.fromStorage().set('spaceLocation', [e.x, e.y]).save();
+            Profile.fromStorage().set('spaceLocation', [e.x, e.y]).save();
             closest.onLand();
             return 'done';
         }),
@@ -341,10 +345,10 @@ function makeCommands():MakeCommandsReturnType{
                 putMessage('Moving too quickly to make the jump into hyperspace');
                 return function(){ return true; };
             }
-            Player.fromStorage().set('spaceLocation', [0, 0]).save();
-            var current = Player.fromStorage().location;
+            Profile.fromStorage().set('spaceLocation', [0, 0]).save();
+            var current = Profile.fromStorage().location;
             var next = current === 'Sol' ? 'robo' : 'Sol';
-            Player.fromStorage().set('location', next).go();
+            Profile.fromStorage().set('location', next).go();
             return 'done';
         }),
 
@@ -461,7 +465,7 @@ function makeCommands():MakeCommandsReturnType{
 
         new Data('laserSpeed', function(){ return 600; }),
     ];
-    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, setPlayer, commands];
+    return [setCurrentEntity, setGameTime, setGameWorld, setKeyControls, setProfile, commands];
 }
 
 function makeControls(commands: any): any{
@@ -477,7 +481,7 @@ function makeControls(commands: any): any{
 }
 
 export var [setCurrentEntity, setGameTime, setGameWorld,
-     setKeyControls, setPlayer, commands] = makeCommands();
+     setKeyControls, setProfile, commands] = makeCommands();
 export var controls = makeControls(commands);
 
 export function SLgetScripts(s: string){

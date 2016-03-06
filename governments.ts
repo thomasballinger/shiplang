@@ -1,7 +1,7 @@
 import { Gov } from './interfaces';
 import { Entity, Ship } from './entity';
 import { Event, EventType } from './mission';
-import { Player } from './player';
+import { Profile } from './profile';
 
 
 export function isEnemy(e1: Entity, e2: Entity){
@@ -17,7 +17,7 @@ export function isEnemy(e1: Entity, e2: Entity){
     }
 }
 
-export function govModReputation(e: Event, p: Player){
+export function govModReputation(e: Event, p: Profile){
     if (e.type === EventType.Kill){
         p.reputation[e.target.government] -= 1;
         console.log(Gov[e.actor.government], 'hit', Gov[e.target.government]);

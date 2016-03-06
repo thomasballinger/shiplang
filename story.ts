@@ -1,4 +1,4 @@
-import { Player } from './player';
+import { Profile } from './profile';
 
 var earthtexts = require("raw!./text/earth.txt").split(/\n---\n?/g);
 var toloktexts = require("raw!./text/tolok.txt").split(/\n---\n?/g);
@@ -25,12 +25,12 @@ function storyClicker(texts: string[], atEnd: ()=>void){
 
 export function earth(){
     storyClicker(earthtexts, function(){
-        Player.fromStorage().set('location', 'Sol').go();
+        Profile.fromStorage().set('location', 'Sol').go();
     })
 }
 
 export function tolok(){
     storyClicker(toloktexts, function(){
-        Player.fromStorage().set('location', 'robo').go();
+        Profile.fromStorage().set('location', 'robo').go();
     });
 }

@@ -4,7 +4,7 @@ import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
-import { Player } from './player';
+import { Profile } from './profile';
 
 var deepcopy = (<any>window).deepcopy;
 
@@ -92,7 +92,7 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 
 
 export class System{
-    constructor(public player?: Player){
+    constructor(public profile?: Profile){
         this.entities = [];
         this.bgEntities = [];
         this.gameTime = 0;
@@ -211,6 +211,7 @@ export class System{
             // munitions colliding with any other foreground entities
             // damages the armor of both entity and the munition
             for (var [e, m] of [[e1, e2], [e2, e1]]){
+                if (e.type === 'explosion'){ continue; }
                 e.takeDamage(Math.max(1, m.damage || 0));
                 if (m.firedBy){
                     events.push(new Event(
@@ -316,17 +317,21 @@ export class System{
 
         this.entities.map(function(x: Entity){ x.move(dt); });
         var events = this.checkCollisions();
-        var player = this.player;
-        events.map(function(e: Event){ govModReputation(e, player); });
-        events.map(function(e: Event){ player.missions})
+        var profile = this.profile;
+        events.map(function(e: Event){ govModReputation(e, profile); });
+        events.map(function(e: Event){
+            profile.missions.map(function(m){
+                m.processEvent(e);
+            });
+        });
         //console.log(events)
         // Tell missions about events
         // Tell governments about events
-        // (these are all to do with the player)
+        // (these are all to do with the profile)
 
         // Run ai for each ship
         scriptEnv.setGameWorld(this);
-        scriptEnv.setPlayer(this.player);
+        scriptEnv.setProfile(this.profile);
         for (var i=0; i<this.entities.length; i++){
             var e = this.entities[i];
             if ((<any>e).context === undefined){ continue; }
@@ -340,6 +345,9 @@ export class System{
     getPlayer():Ship{
         return <Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
     }
+    getAttached(e: Ship): Component[]{
+        return <Component[]>this.entities.filter(function(x){ return x.attachedTo === e; });
+    }
 
     deepCopyCreate():System{
         if (this.inTick){ throw Error("System can't be copied during a tick!"); }
@@ -348,6 +356,6 @@ export class System{
     deepCopyPopulate = function(copy: System, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
         copy.gameTime = this.gameTime;
-        copy.player = innerDeepCopy(this.player, memo);
+        copy.profile = innerDeepCopy(this.profile, memo);
     };
 }
