@@ -40,6 +40,9 @@ export abstract class Mission {
     load(data: any){
         this.data = data;
     };
+    static fromNameAndData(name: string, data: any): Mission{
+        return new (<moduleOfMissions><any>missions)[name](data);
+    }
     data: any;
     abstract processEvent(e: Event): void;
     /** reasonable to have an implementation that does nothing */
@@ -47,12 +50,8 @@ export abstract class Mission {
 }
 
 /** Loads current mission from saved data */
-function loadMission(name: string, data: any): Mission{
-    return new (<moduleOfMissions><any>missions)[name](data);
-}
-
 export function loadMissions(missionsData: [string, any][]){
-    return missionsData.map(function(x){ return loadMission(x[0], x[1]); })
+    return missionsData.map(function(x){ return Mission.fromNameAndData(x[0], x[1]); })
 }
 
 export var missions = <moduleOfMissions>{

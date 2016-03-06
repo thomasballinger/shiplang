@@ -1,5 +1,6 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
 import { Gov } from './interfaces';
+import { Mission, Event } from './mission';
 
 // Plan:
 // Get rid of Player, replace with Profile
@@ -59,6 +60,22 @@ interface AnnoyedTable {
     [government: number]: boolean;
 }
 
+function jsonPlayerReplacer(key: string, value: any){
+    if (key === 'missions'){
+        return value.map(function(x: Mission){ return x.save(); })
+    }
+    return value;
+}
+
+function jsonPlayerReviver(key: string, value: any){
+    if (key === 'missions'){
+        return value.map(function(x: any){
+            return Mission.fromNameAndData(x[0], x[1])
+        });
+    }
+    return value;
+}
+
 export class Player{
     constructor(data: any){
         for (var prop of Object.keys(data)){
@@ -73,10 +90,10 @@ export class Player{
         return player;
     }
     static fromJson(data: string): Player{
-        return new Player(JSON.parse(data));
+        return new Player(JSON.parse(data, jsonPlayerReviver));
     }
     toJson(): string{
-        return JSON.stringify(this);
+        return JSON.stringify(this, jsonPlayerReplacer);
     }
     go(){
         this.save();
@@ -100,13 +117,16 @@ export class Player{
     deepCopyPopulate = function(copy: Player, memo:any, innerDeepCopy:any){
         //NOP because simple JSON copy works
     };
+    addMission(m: Mission){
+        this.missions.push(m);
+    }
 
     static newPlayer(): Player{
         var reputation: ReputationTable = {};
         for (var i=0; i<Gov.LAST; i++){
             reputation[i] = 1;
         }
-        var annoyed: AnnoyedTable= {};
+        var annoyed: AnnoyedTable = {};
         for (var i=0; i<Gov.LAST; i++){
             annoyed[i] = false;
         }
@@ -125,6 +145,7 @@ export class Player{
     name: string;
     location: string;
     script: string;
-    missions: [string, any][];
+    missions: Mission[];
+    //missions: [string, any][];
     reputation: ReputationTable;
 }

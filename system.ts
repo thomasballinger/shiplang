@@ -318,6 +318,7 @@ export class System{
         var events = this.checkCollisions();
         var player = this.player;
         events.map(function(e: Event){ govModReputation(e, player); });
+        events.map(function(e: Event){ player.missions})
         //console.log(events)
         // Tell missions about events
         // Tell governments about events

@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { Boid } from '../ships';
 import { System, makeShip } from '../system';
 import {setCurrentEntity, setGameTime, setGameWorld,
-        setKeyControls, commands, controls} from '../scriptEnv';
+        setKeyControls, commands, controls} from '../scriptenv';
 
 
 describe('Commands', () => {
