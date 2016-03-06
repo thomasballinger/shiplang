@@ -66,7 +66,7 @@ body {
   pointer-events: none;
   position: absolute;
   top: 20;
-  left: 660;
+  left: 0;
   bottom: 0;
   right: 30;
   font-size: 1em;

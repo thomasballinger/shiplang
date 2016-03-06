@@ -45,7 +45,7 @@ export var gunner = function():any{
             Math.random()*2000 - 1000,
             Math.random()*2000 - 1000,
             Math.random() * 360,
-            builtinScripts.visitPlanetsScript,
+            builtinScripts.foreverVisitPlanetsScript,
         ];
     });
 
@@ -156,12 +156,12 @@ export var sol = function():any{
         world.addBackgroundEntity(mars);
 
         for (var y of [550, -2400, 1200, -1000]){
-            world.addEntity(makeShip(ships.Shuttle, -300, y, 270, builtinScripts.visitPlanetsScript));
-            world.addEntity(makeShip(ships.Shuttle, -200, y, 270, builtinScripts.visitPlanetsScript));
-            world.addEntity(makeShip(ships.Shuttle, -100, y, 270, builtinScripts.visitPlanetsScript));
-            world.addEntity(makeShip(ships.Shuttle,    0, y, 270, builtinScripts.visitPlanetsScript));
-            world.addEntity(makeShip(ships.Boid,     100, y, 270, builtinScripts.visitPlanetsScript));
-            world.addEntity(makeShip(ships.Boid,     200, y, 270, builtinScripts.visitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle, -300, y, 270, builtinScripts.foreverVisitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle, -200, y, 270, builtinScripts.foreverVisitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle, -100, y, 270, builtinScripts.foreverVisitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle,    0, y, 270, builtinScripts.foreverVisitPlanetsScript));
+            world.addEntity(makeShip(ships.Boid,     100, y, 270, builtinScripts.foreverVisitPlanetsScript));
+            world.addEntity(makeShip(ships.Boid,     200, y, 270, builtinScripts.foreverVisitPlanetsScript));
         }
 
         world.addEntity(makeShip(ships.Triangle, -300, -750, 270, builtinScripts.enemyScript));

@@ -132,16 +132,24 @@ class AsyncCommand extends Command implements NamespaceInit{
 
 // Allow ShipLang programs to use JavaScript builtins
 // Only used for ShipLang programs
+function isNum(x: number, y: number, op: string){
+    if (typeof x !== 'number'){
+        throw Error(x+(typeof x)+" in "+x+op+y+" is not a number");
+    }
+    if (typeof y !== 'number'){
+        throw Error(y+(typeof y)+" in "+x+op+y+" is not a number");
+    }
+}
 var funcs = {
     '+': function(){
       return Array.prototype.slice.call(arguments).reduce(function(a:number, b:number){
         return a + b;
       }, 0);
     },
-    '*': function(a:number, b:number){ return a * b; },
-    '/': function(a:number, b:number){ return a / b; },
-    '>': function(a:number, b:number){ return a > b; },
-    '<': function(a:number, b:number){ return a < b; },
+    '*': function(a:number, b:number){ isNum(a, b, '*'); return a * b; },
+    '/': function(a:number, b:number){ isNum(a, b, '/'); return a / b; },
+    '>': function(a:number, b:number){ isNum(a, b, '>'); return a > b; },
+    '<': function(a:number, b:number){ isNum(a, b, '<'); return a < b; },
     '=': function(a:any, b:any){
         if (typeof a === 'string' && typeof b === 'string'){
             return a.toLowerCase() === b.toLowerCase();
@@ -154,6 +162,7 @@ var funcs = {
     'abs': function(degrees: number){ return Math.abs(degrees); },
     'true': true,
     'false': false,
+    'not': function(a: any){ return !a; },
 }
 // Even though it wouldn't hurt to copy this object, all the functions would
 // be deepCopy passthroughs anyway. If a way to *modify* this array were added,
@@ -198,6 +207,10 @@ function makeCommands():MakeCommandsReturnType{
             return function(){ return DEBUG_REPORT_CONTINUE; }
         }),
         new Command('debugger', function(){ debugger; }),
+
+        new Command('tellPlayer', function(msg: string){
+            return putMessage(msg, e);
+        }),
 
         new Command('headingDiff', function(a: number, b: number){ return headingDiff(a, b); }),
         new Command('headingToLeft', function(a: number, b: number){ return headingToLeft(a, b); }),
@@ -283,7 +296,12 @@ function makeCommands():MakeCommandsReturnType{
             return keys.isPressed(name);
         }),
 
-        new Command('rand', function(){ return e.getRandom() }),
+        new Command('rand', function(){
+            if (e === undefined){
+                return Math.random();
+            }
+            return e.getRandom()
+        }),
         new Command('randInt', function(lower: number, upper: number){
             if (lower === undefined){
                 lower = 0
@@ -292,7 +310,8 @@ function makeCommands():MakeCommandsReturnType{
                 upper = lower;
                 lower = 0;
             }
-            return Math.floor(e.getRandom() * (upper - lower)) + lower;
+            var r = e === undefined ? Math.random() : e.getRandom();
+            return Math.floor(r * (upper - lower)) + lower;
         }),
 
         new AsyncCommand('waitFor', function(n: number):any{
@@ -316,9 +335,13 @@ function makeCommands():MakeCommandsReturnType{
         }),
 
         new AsyncCommand('land', function():any{
+            if (e.attachedTo){
+                putMessage("You can't land while attached to another ship");
+                return function(){ return true; };
+            }
             var closest = w.findClosestBackgroundEntity(e);
             if (!closest) { return function(){ return true; }; }
-            if (e.distFrom(closest) > closest.r){
+            if (e.distFrom(closest) > closest.r * 2){
                 putMessage('Not close enough to a planet to land');
                 return function(){ return true; };
             }

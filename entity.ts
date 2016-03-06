@@ -266,6 +266,8 @@ export class Component extends Ship{
     detach(){
         if (this.attachedTo){
             this.attachedTo = undefined;
+            this.dx+= Math.random() * 20 - 10;
+            this.dy+= Math.random() * 20 - 10;
         }
     }
     move(dt: GameTime){

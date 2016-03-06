@@ -1,14 +1,24 @@
+import { Profile } from './profile';
+
 var messagelog = document.getElementById('messagelog');
 var lastMessageTime = 0;
 
-export function putMessage(s: string){
-  messagelog.innerHTML = messagelog.innerHTML + '<br/>' + s;
-  lastMessageTime = new Date().getTime();
-  setTimeout(function(){
-      if (new Date().getTime() > lastMessageTime + 1000){
-          messagelog.innerHTML = '';
-      }
-  }, 2000);
+export function putMessage(s: string, e?: any){
+    if (e !== undefined){
+        s = e.type + ' says: '+s;
+    }
+    s = template(s);
+    messagelog.innerHTML = messagelog.innerHTML + '<br/>' + s;
+    lastMessageTime = new Date().getTime();
+    setTimeout(function(){
+        if (new Date().getTime() > lastMessageTime + 3000){
+            messagelog.innerHTML = '';
+        }
+    }, 5000);
+}
+
+function template(msg: string){
+    return msg.replace('NAME', Profile.fromStorage().name);
 }
 
 //TODO save these in player object

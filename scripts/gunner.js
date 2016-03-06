@@ -8,6 +8,7 @@ function manual(){
   if (keyPressed(' ')){ fireMissile(goAndExplode, '#aa1144'); }
   if (keyPressed('f')){ fireLaser('#aabbcc'); }
   if (keyPressed('d')){ detach(); }
+  if (keyPressed('l')){ land(); }
 }
 
 function goAndExplode(){
