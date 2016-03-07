@@ -1,0 +1,27 @@
+# vim :set ts=4 sw=4 sts=4 noexpandtab :
+
+system Sol
+	pos 0 0
+	government Trader
+	link Robo
+	fleet "Intrastellar Shuttles"
+	fleet "Triangle Patrol"
+	object Earth
+		color #004000
+		radius 40
+		period 365.25
+		distance 1000
+		object Luna
+			color #aa9922
+			radius 30
+			distance 200
+			period 27.3
+	object Mars
+		color #ee3333
+		distance 1400
+		period 687
+
+system Robo
+    object Tolok
+		radius 40
+		distance 300
