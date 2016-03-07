@@ -6,7 +6,7 @@ export var gunnerScript = require("raw!./scripts/gunner.js");
 export var manualShipScript = require("raw!./scripts/pilot.js");
 
 export function chooseScript(governments: Gov, personality: string[]){
-    for (var word in personality){
+    for (var word of personality){
         if (builtinScripts.hasOwnProperty(word)){
             return builtinScripts[word];
         }

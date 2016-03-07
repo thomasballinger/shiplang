@@ -6,6 +6,7 @@ system Sol
 	link Robo
 	fleet "Intrastellar Shuttles" 100
 	fleet "Triangle Patrol" 200
+	fleet "Pirates" 200
 	object Earth
 		color #004000
 		radius 40
@@ -42,6 +43,12 @@ fleet "Triangle Patrol"
 		Triangle 2
 	variant 5
 		FatTriangle
+
+fleet "Pirates"
+	government Pirate
+	variant 100
+		FatTriangle
+	personality attackScript
 
 fleet "Intrastellar Shuttles"
 	government Trader

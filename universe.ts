@@ -144,7 +144,7 @@ export class Fleet extends DataNode{
         if (Gov[this.government] === undefined){ throw Error('Bad government value: '+this.government); }
         //checkExists(data.name, 'phrases', global);
         this.name = new Phrase(); //TODO ignoring data for now
-        this.personality = data.personality ? data.personality[0] : []; //TODO no validation yet
+        this.personality = data.personality ? data.personality : []; //TODO no validation yet
         this.variants = data.variant.map(function(x: any){
             // variants aren't stored globally
             var v = new Variant();
