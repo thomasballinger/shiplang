@@ -1,5 +1,5 @@
 import { Entity, Ship } from './entity';
-import { System } from './system';
+import { Engine } from './engine';
 
 //TODO invert y axis
 
@@ -24,7 +24,7 @@ export class SpaceDisplay{
                     entityScaleFactor);
         this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
     }
-    update(center: Entity, w: System){
+    update(center: Entity, w: Engine){
         this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp);
     }
     canvas: HTMLCanvasElement;

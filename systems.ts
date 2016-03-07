@@ -1,2 +1,2 @@
-interface SystemSpec {
+interface System {
 }

@@ -54,7 +54,7 @@ export class Entity{
     damage: number;
     government: Gov;
 
-    // some bookkeeping props for System
+    // some bookkeeping props for the engine
     dead: boolean;     // will be cleaned up this tick
     inactive: boolean; // sticking around for a bit to look pretty
     imtheplayer: boolean; // world resets on player's death

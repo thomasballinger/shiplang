@@ -2,13 +2,13 @@
 import { assert } from 'chai';
 
 import { Boid } from '../ships';
-import { System, makeShip } from '../system';
+import { Engine, makeShip } from '../engine';
 import {setCurrentEntity, setGameTime, setGameWorld,
         setKeyControls, commands, controls} from '../scriptenv';
 
 
 describe('Commands', () => {
-    var world = new System();
+    var world = new Engine();
     var ship = makeShip(Boid, 1, 2, 3);
     world.addEntity(ship);
     setGameWorld(world)

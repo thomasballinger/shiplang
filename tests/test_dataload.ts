@@ -3,6 +3,8 @@ import { assert } from 'chai';
 
 import { loadData, parseLine } from '../dataload';
 
+var real = require('raw!../data/map.txt');
+
 var simple = `
 system Sol
 	government Trader
@@ -21,7 +23,7 @@ describe('data', () => {
         });
     });
     describe('loadData', () => {
-        it('should load data', () => {
+        it('should load data accurately', () => {
             var data = loadData(simple);
             var expected = {
                 system: {
@@ -42,11 +44,10 @@ describe('data', () => {
                     }
                 }
             }
-        console.log('---');
-        console.log(data);
-        console.log(expected);
-        console.log('---');
-        assert.deepEqual(data, expected);
+            assert.deepEqual(data, expected);
+        });
+        it('should load real data', () => {
+            console.log(loadData(real));
         });
     });
 });

@@ -1,5 +1,5 @@
 //Orchestrates stuff
-import { System } from './system';
+import { Engine } from './engine';
 import { Ship, Entity } from './entity';
 var manual = require('./manual');
 import * as scriptEnv from './scriptenv';
@@ -39,12 +39,12 @@ export class Updater{
         //this.viewedEntity = this.player;
         //this.lastValid = '1';
     }
-    world: System;
+    world: Engine;
     lastValid: string;
     codeHasChanged: boolean;
     controls: any;
     observers: Updateable[];
-    savedWorlds: System[];
+    savedWorlds: Engine[];
     player: Ship;
     _viewedEntity: Ship;
     userFunctionBodies: UserFunctionBodies;
@@ -164,7 +164,7 @@ export class Updater{
         this.debugData();
         scriptEnv.setProfile(Profile.fromStorage())
     }
-    restartFromSave(world: System){
+    restartFromSave(world: Engine){
         this.world = world;
         this.player = this.world.getPlayer();
         this.viewedEntity = this.player;

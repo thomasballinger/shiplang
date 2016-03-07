@@ -1,4 +1,4 @@
-import { System } from './system';
+import { Engine } from './engine';
 
 export class UserFunctionBodies{
     constructor(){
@@ -6,7 +6,7 @@ export class UserFunctionBodies{
     }
     bodies: {[name: string]: any}
     accessedThisTick: {[name: string]: boolean};
-    saves: {[name: string]: [number, System]};
+    saves: {[name: string]: [number, Engine]};
     tickNum: number;
     reset(){
         this.accessedThisTick = {};
@@ -25,7 +25,7 @@ export class UserFunctionBodies{
         this.bodies[name] = body;
     }
     // Ought to be called after a tick with pre-tick world state
-    save(world: System){
+    save(world: Engine){
         this.tickNum += 1;
         if (Object.keys(this.accessedThisTick).length === 0){ return; }
         for (var funcName of Object.keys(this.accessedThisTick)){
@@ -47,7 +47,7 @@ export class UserFunctionBodies{
     // nothing to update.
     getEarliestSave(functions: string[]){
         var earliestTime = Number.MAX_VALUE;
-        var earliestSave = <System>undefined;
+        var earliestSave = <Engine>undefined;
         for (var funcName of functions){
 
             // if function was never *stored* then start over

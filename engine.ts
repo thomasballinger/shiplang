@@ -91,7 +91,7 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 }
 
 
-export class System{
+export class Engine{
     constructor(public profile?: Profile){
         this.entities = [];
         this.bgEntities = [];
@@ -105,7 +105,7 @@ export class System{
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);
     }
-    copy():System{
+    copy():Engine{
         //var t0 = window.performance.now();
         var world = deepcopy(this);
         //console.log(window.performance.now() - t0);
@@ -349,11 +349,11 @@ export class System{
         return <Component[]>this.entities.filter(function(x){ return x.attachedTo === e; });
     }
 
-    deepCopyCreate():System{
-        if (this.inTick){ throw Error("System can't be copied during a tick!"); }
-        return new System(undefined);
+    deepCopyCreate():Engine{
+        if (this.inTick){ throw Error("Engine can't be copied during a tick!"); }
+        return new Engine(undefined);
     };
-    deepCopyPopulate = function(copy: System, memo:any, innerDeepCopy:any){
+    deepCopyPopulate = function(copy: Engine, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
         copy.gameTime = this.gameTime;
         copy.profile = innerDeepCopy(this.profile, memo);

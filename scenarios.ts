@@ -1,12 +1,13 @@
 import * as _ from 'lodash';
 
-import { System, makeShip, makeBoid, makePlanet, makeComponent } from './system';
+import { Engine, makeShip, makeBoid, makePlanet, makeComponent } from './engine';
 import { SLgetScripts } from './scriptenv';
 import { WorldBuilder, ShipSpec, Gov } from './interfaces';
 import * as objectivebar from './objectivebar';
 import { Profile } from './profile';
 import * as ships from './ships';
 import { putMessage } from './messagelog';
+import { gamedata } from './gamedata';
 
 
 var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
@@ -20,15 +21,19 @@ var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
 
 /*
 class ShipSpawner{
-    constructor(spec: SystemSpec){};
+    constructor(spec: System){};
     reset(seed: number);
     getRandom(){};
 }
 */
-// After this scenarios won't do so much work
-//
-//
-//
+
+export var fromStart = function():any{
+    var reset = <WorldBuilder>function reset(script: any): Engine {
+
+        return
+    }
+    return reset;
+}
 
 // Scenarios return a function that constructs a world when given
 // a dictionary of user-provided SL scripts
@@ -49,8 +54,8 @@ export var gunner = function():any{
         ];
     });
 
-    var reset = <WorldBuilder>function reset(script: any): System {
-        var world = new System(Profile.fromStorage());
+    var reset = <WorldBuilder>function reset(script: any): Engine {
+        var world = new Engine(Profile.fromStorage());
         var p = Profile.fromStorage().spaceLocation;
         var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
@@ -94,13 +99,13 @@ export var scenario1 = function():any{
                      Math.random() * 100 - 50]);
     }
 
-    var reset = <WorldBuilder>function reset(script: any): System {
+    var reset = <WorldBuilder>function reset(script: any): Engine {
 
         var boidScript = builtinScripts.enemyScript;
         var playerScript = script;
         var enemyScript = builtinScripts.enemyScript;
 
-        var world = new System(Profile.fromStorage());
+        var world = new Engine(Profile.fromStorage());
 
         var ship = makeShip(ships.Triangle, -200, 350, 270, playerScript);
         (<any>window).ship = ship;
@@ -131,8 +136,8 @@ export var sol = function():any{
     Land on a planet with L<br />
     or travel with J`);
 
-    var reset = <WorldBuilder>function reset(script: any): System {
-        var world = new System(Profile.fromStorage());
+    var reset = <WorldBuilder>function reset(script: any): Engine {
+        var world = new Engine(Profile.fromStorage());
         var p = Profile.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;
@@ -180,8 +185,8 @@ export var robo = function():any{
     Cosmic interference causes manual controls to be unresponsive in this region.<br />
     You'll be best equipped if you let your ship's computer do the piloting.`);
 
-    var reset = <WorldBuilder>function reset(script: any): System {
-        var world = new System(Profile.fromStorage());
+    var reset = <WorldBuilder>function reset(script: any): Engine {
+        var world = new Engine(Profile.fromStorage());
         var p = Profile.fromStorage().spaceLocation;
         var ship = makeShip(ships.Triangle, p[0], p[1], 270, script);
         ship.imtheplayer = true;

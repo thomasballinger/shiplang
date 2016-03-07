@@ -1,14 +1,14 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
-import { System, makeShip } from '../system';
+import { Engine, makeShip } from '../engine';
 import { Entity } from '../entity';
 import * as ships from '../ships';
 import { assert } from 'chai';
 
 
-describe('System', () => {
+describe('Engine', () => {
     describe('#copy', () => {
         it("shouldn't create copies that share entities", () => {
-            var s1 = new System();
+            var s1 = new Engine();
             var l1 = [1,2,3];
             s1.addEntity(<Entity><any>l1)
             var s2 = s1.copy()
@@ -18,7 +18,7 @@ describe('System', () => {
     });
     describe('#checkCollisions', () => {
         it("explosions from own missile should damage entities", () => {
-            var s1 = new System()
+            var s1 = new Engine()
             var ship = makeShip(ships.Gunship, 0, 0, 170);
             ship.shieldsMax = 0;
             s1.addEntity(ship);

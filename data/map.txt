@@ -22,6 +22,14 @@ system Sol
 		period 687
 
 system Robo
-    object Tolok
+	object Tolok
 		radius 40
 		distance 300
+
+
+start basic
+	day 1
+	system "Sol"
+	planet "Earth"
+	credits
+	mission

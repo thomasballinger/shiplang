@@ -61,7 +61,6 @@ export function loadData(text: string): Domains {
                         domains[object.domain] = {};
                     }
                     domains[object.domain][object.id] = object;
-                    // just use a link to the full object at the top level
                 }
                 if (stack.length > 0){
                     if (!stack[stack.length-1].hasOwnProperty(object.domain)){
