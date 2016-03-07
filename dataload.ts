@@ -1,7 +1,11 @@
 /** Loads data into JSON*/
 
-interface Domains{
+export interface Domains{
     [domain: string]: {[id: string]: any};
+}
+
+function isNumber(n: string) {
+  return !isNaN(parseFloat(n)) && isFinite(<any>n);
 }
 
 export function loadData(text: string): Domains {
@@ -32,7 +36,14 @@ export function loadData(text: string): Domains {
             if (lastTokens.length === 0){ throw Error('huh?'+lastLine)}
             stack.push({domain: lastTokens[0]});
             if (lastTokens.length === 2){
-                stack[stack.length-1].id = lastTokens[1];
+                // Probably a name, but some headings have two members
+                // where the second isn't a name, but a data number
+                // (namely "variant"
+                if (isNumber(lastTokens[1])){
+                    stack[stack.length-1].weight = parseInt(lastTokens[1]);
+                } else {
+                    stack[stack.length-1].id = lastTokens[1];
+                }
             }
 
         // The same or less indentation as the previous line
@@ -56,7 +67,7 @@ export function loadData(text: string): Domains {
                 }
 
                 if (object.id){
-                    console.log('going to save', object, 'globally');
+                    //console.log('going to save', object, 'globally');
                     if (!domains.hasOwnProperty(object.domain)){
                         domains[object.domain] = {};
                     }
@@ -74,13 +85,13 @@ export function loadData(text: string): Domains {
         }
 
         if (line === 'ENDOFDATA'){
-            console.log('after line', line);
-            console.log(JSON.parse(JSON.stringify(stack)));
+            //console.log('after line', line);
+            //console.log(JSON.parse(JSON.stringify(stack)));
             return domains;
         }
         stack.push(parseLine(line))
-        console.log('after line', line);
-        console.log(JSON.parse(JSON.stringify(stack)));
+        //console.log('after line', line);
+        //console.log(JSON.parse(JSON.stringify(stack)));
         lastLine = line;
     }
 

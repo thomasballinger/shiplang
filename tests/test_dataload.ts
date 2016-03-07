@@ -2,6 +2,7 @@
 import { assert } from 'chai';
 
 import { loadData, parseLine } from '../dataload';
+import { createObjects } from '../system';
 
 var real = require('raw!../data/map.txt');
 
@@ -51,3 +52,11 @@ describe('data', () => {
         });
     });
 });
+
+describe('data objects', () => {
+    it('should create objects from full data', () => {
+        var data = loadData(real)
+        console.log(data);
+        console.log(createObjects(data));
+    })
+})

@@ -5,6 +5,11 @@ system Sol
 	government Trader
 	link Robo
 	fleet "Intrastellar Shuttles"
+		government Trader
+		variant 1
+			shuttle
+		variant 2
+			shuttle 10
 	fleet "Triangle Patrol"
 	object Earth
 		color #004000
@@ -22,14 +27,19 @@ system Sol
 		period 687
 
 system Robo
+	pos 20 30
+	government Pirate
 	object Tolok
 		radius 40
 		distance 300
+		period 2
 
 
 start basic
-	day 1
 	system "Sol"
 	planet "Earth"
-	credits
-	mission
+
+fleet "Triangle Patrol"
+	government Military
+	variant 1
+		triangle 2
