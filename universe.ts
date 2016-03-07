@@ -163,6 +163,7 @@ export class Fleet extends DataNode{
     /** A randomly-chosen list of ShipSpecs */
     getShipSpecs(): ShipSpec[]{
         var variant = chooseFromWeightedOptions(this.variants);
+        var shipSpecs = variant.getSpecs();
         return variant.getSpecs();
     }
 }
@@ -176,7 +177,6 @@ function chooseFromWeightedOptions<A>(options: [A, number][], r?: number): A{
     }, 0);
     r *= total;
     var cum = 0;
-    console.log(options);
     for(var [option, n] of options){
         cum += n
         if (r < cum){
@@ -197,7 +197,14 @@ export class Variant extends DataNode{
             if (ship === undefined){
                 throw Error("Can't find ship "+key);
             }
-            this.ships.push([shipspecs[key], parseInt(data[key])]);
+            if (data[key].length > 1){
+                throw Error('ship listed twice: '+key);
+            }
+            var num = data[key][0] === undefined ? 1: parseInt(data[key][0]);
+            if (!isFinite(num)){
+                throw Error('Bad number for variant: '+data[key]);
+            }
+            this.ships.push([shipspecs[key], num]);
         }
         if (this.ships.length === 0){
             throw Error("No ships entries found for variant");

@@ -19,11 +19,11 @@ var gamedata = loadData(require('raw!./data/map.txt'));
 // ships on a 30 times per second basis.
 // Needs to be deterministic given a seed.
 
-export var fromBasicStart = function():any{
+export var fromBasicStart = function(startName: string):any{
     var universe = createObjects(gamedata);
     var seed = Math.random();
     var reset = <WorldBuilder>function reset(playerScript: any): Engine {
-        var start = universe.starts['gunner']
+        var start = universe.starts[startName];
         start.setProfile()
         var profile = Profile.fromStorage()
 
@@ -36,7 +36,8 @@ export var fromBasicStart = function():any{
         }
 
         // Fleets
-        for (var [spec, script] of system.getFleet()){
+        var pairs = system.getFleet();
+        for (var [spec, script] of pairs){
             // TODO better start positions
             world.addEntity(makeShip(spec, Math.random()*1000,
                                      Math.random()*1000, 270, script));
@@ -44,7 +45,6 @@ export var fromBasicStart = function():any{
 
         // Player Ship
         var ship = makeShip(profile.ship, 0, 0, 270, playerScript);
-        console.log(playerScript);
         ship.imtheplayer = true;
         ship.government = Gov.Player
         world.addEntity(ship);

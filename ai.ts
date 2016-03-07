@@ -16,7 +16,6 @@ export function chooseScript(governments: Gov, personality: string[]){
 
 //TODO differentiate between JS and SL scripts
 export function getScriptByName(name: string): any{
-    console.log('asked for:', name);
     if (name === 'gunner'){ return gunnerScript; }
     if (name === 'manual'){ return manualShipScript; }
     if (builtinScripts.hasOwnProperty(name)){

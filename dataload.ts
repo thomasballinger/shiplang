@@ -18,10 +18,8 @@ export function loadData(text: string): Domains {
     lines.push([0, 'ENDOFDATA']);
 
     for (var [indent, line] of lines){
-        console.log('processing line: ', line);
-        console.log('stack state: ', JSON.parse(JSON.stringify(stack)));
-        //if (indent !== stack.length){ throw Error('wrong indent'); }
-        //if (tokens.length < 1 || tokens.length > 2){ throw Error('wrong lengths of tokens: '+tokens); }
+        //console.log('processing line: ', line);
+        //console.log('stack state: ', JSON.parse(JSON.stringify(stack)));
 
         if (stack.length === 0){
             if (indent){ throw Error('wrong indent for line: '+line); }
@@ -57,9 +55,9 @@ export function loadData(text: string): Domains {
             if (!stack[stack.length-1].hasOwnProperty(lastTokens[0])){
                 stack[stack.length-1][lastTokens[0]] = [];
             }
-            stack[stack.length-1][lastTokens[0]].push(lastTokens.length == 2 ?
-                                                      lastTokens[1] :
-                                                      lastTokens.slice(1));
+            var value = (lastTokens.length === 2 ? lastTokens[1] :
+                        (lastTokens.length === 1 ? undefined : lastTokens.slice(1)))
+            stack[stack.length-1][lastTokens[0]].push(value);
 
             // less indentation that previous line
             while (stack.length > indent){

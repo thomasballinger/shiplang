@@ -47,7 +47,7 @@ function main(){
     Profile.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]).save();
     window.location = window.location.protocol + '//' + window.location.host;
   } else if (cmd === 'start'){
-    outerspace(scenarios.fromBasicStart);
+    outerspace(function(){ return scenarios.fromBasicStart('gunner'); });
   } else {
     Profile.clear();
     Profile.fromStorage().set('location', 'level1').addMission(new missions.KillFiveAstroidsMission()).save();
