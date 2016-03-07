@@ -9,6 +9,7 @@ function isNumber(n: string) {
 }
 
 export function loadData(text: string): Domains {
+    if (text.search('    ') > -1){ throw Error("Found 4 spaces instead of tabs in file!"); }
     var domains: Domains = {};
 
     var stack: any[] = [];
@@ -17,6 +18,8 @@ export function loadData(text: string): Domains {
     lines.push([0, 'ENDOFDATA']);
 
     for (var [indent, line] of lines){
+        console.log('processing line: ', line);
+        console.log('stack state: ', JSON.parse(JSON.stringify(stack)));
         //if (indent !== stack.length){ throw Error('wrong indent'); }
         //if (tokens.length < 1 || tokens.length > 2){ throw Error('wrong lengths of tokens: '+tokens); }
 
@@ -45,7 +48,6 @@ export function loadData(text: string): Domains {
                     stack[stack.length-1].id = lastTokens[1];
                 }
             }
-
         // The same or less indentation as the previous line
         } else if (indent < stack.length){
             // add previous line as data element

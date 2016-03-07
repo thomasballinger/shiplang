@@ -4,13 +4,8 @@ system Sol
 	pos 0 0
 	government Trader
 	link Robo
-	fleet "Intrastellar Shuttles"
-		government Trader
-		variant 1
-			shuttle
-		variant 2
-			shuttle 10
-	fleet "Triangle Patrol"
+	fleet "Intrastellar Shuttles" 100
+	fleet "Triangle Patrol" 200
 	object Earth
 		color #004000
 		radius 40
@@ -18,7 +13,7 @@ system Sol
 		distance 1000
 		object Luna
 			color #aa9922
-			radius 30
+			radius 20
 			distance 200
 			period 27.3
 	object Mars
@@ -35,11 +30,22 @@ system Robo
 		period 2
 
 
-start basic
+start gunner
 	system "Sol"
 	planet "Earth"
+	script manual
+	ship Triangle
 
 fleet "Triangle Patrol"
 	government Military
+	variant 10
+		Triangle 2
+	variant 5
+		FatTriangle
+
+fleet "Intrastellar Shuttles"
+	government Trader
 	variant 1
-		triangle 2
+		Shuttle
+	variant 2
+		Shuttle 10

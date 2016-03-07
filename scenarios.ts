@@ -1,16 +1,16 @@
 import * as _ from 'lodash';
 
 import { Engine, makeShip, makeBoid, makePlanet, makeComponent } from './engine';
-import { SLgetScripts } from './scriptenv';
 import { WorldBuilder, ShipSpec, Gov } from './interfaces';
 import * as objectivebar from './objectivebar';
 import { Profile } from './profile';
 import * as ships from './ships';
 import { putMessage } from './messagelog';
-import { gamedata } from './gamedata';
+import { createObjects, System, Fleet, Spob, Start } from './universe';
+import { loadData } from './dataload';
+import { builtinScripts } from './ai';
 
-
-var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
+var gamedata = loadData(require('raw!./data/map.txt'));
 (<any>window).normalScript = require("raw!./scripts/pilot.js");
 
 // A ship builder object should be built that uses a random seed
@@ -19,18 +19,40 @@ var builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
 // ships on a 30 times per second basis.
 // Needs to be deterministic given a seed.
 
-/*
-class ShipSpawner{
-    constructor(spec: System){};
-    reset(seed: number);
-    getRandom(){};
-}
-*/
+export var fromBasicStart = function():any{
+    var universe = createObjects(gamedata);
+    var seed = Math.random();
+    var reset = <WorldBuilder>function reset(playerScript: any): Engine {
+        var start = universe.starts['gunner']
+        start.setProfile()
+        var profile = Profile.fromStorage()
 
-export var fromStart = function():any{
-    var reset = <WorldBuilder>function reset(script: any): Engine {
+        var world = new Engine(profile);
+        var system = start.system
 
-        return
+        // Planets
+        for (var [spob, [x, y]] of system.spobSpots(profile.day)){
+            world.addBackgroundEntity(makePlanet(x, y, spob.radius, spob.color));
+        }
+
+        // Fleets
+        for (var [spec, script] of system.getFleet()){
+            // TODO better start positions
+            world.addEntity(makeShip(spec, Math.random()*1000,
+                                     Math.random()*1000, 270, script));
+        }
+
+        // Player Ship
+        var ship = makeShip(profile.ship, 0, 0, 270, playerScript);
+        console.log(playerScript);
+        ship.imtheplayer = true;
+        ship.government = Gov.Player
+        world.addEntity(ship);
+
+        putMessage(profile.missionsSummary());
+
+        if ((<any>window).DEBUGMODE){ (<any>window).world = world; }
+        return world;
     }
     return reset;
 }

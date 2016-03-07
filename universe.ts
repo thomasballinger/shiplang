@@ -1,13 +1,16 @@
 import { Gov, ShipSpec } from './interfaces';
 import { Domains } from './dataload';
+import * as ships from './ships';
+import { Profile } from './profile';
+import { Ship } from './entity';
+import { chooseScript, getScriptByName } from './ai';
 
+var shipspecs: {[name: string]: ShipSpec} = <any>ships
 
 // Building blocks of the world like this should be read-only for now
 // Changes to them would be written to the player's profile so support
 // for multiple data files
-// 
- 
-/** A solar system, the setting for a game engine */
+
 
 interface AllObjects{
     systems: {[name: string]: System};
@@ -78,18 +81,6 @@ interface DataStatic {
     fieldName: string;
 }
 
-var dataKeys: {[name: string]: DataStatic} = {
-    'system': System,
-    'fleet': Fleet,
-    'variant': Variant,
-    'spob': Spob,
-    'phrase': Phrase,
-    'planet': Planet,
-    'start': Start,
-}
-
-
-
 function checkExists(name: string, domain: string, global: AllObjects){
     if (global[domain] === undefined){ throw Error('bad domain: '+domain); }
     if (!global[domain].hasOwnProperty(name)){
@@ -97,6 +88,7 @@ function checkExists(name: string, domain: string, global: AllObjects){
     }
 }
 
+/** A solar system, the setting for a game engine */
 export class System extends DataNode{
     // Can be instantiated without any data because component data might
     // not have been instantiated yet.
@@ -113,8 +105,9 @@ export class System extends DataNode{
             return global.systems[x];
         });
         this.fleets = (data.fleet || []).map(function(x: string){
-            checkExists(x, 'fleets', global);
-            return global.fleets[x];
+            if (x.length != 2){ throw Error("fleet entry of wrong structure: "+x); }
+            checkExists(x[0], 'fleets', global);
+            return [global.fleets[x[0]], parseInt(x[1])];
         });
         this.spobs = (data.object || []).map(function(x: string){
             checkExists(x, 'spobs', global);
@@ -126,6 +119,21 @@ export class System extends DataNode{
     links: System[];
     fleets: [Fleet, number][];
     spobs: Spob[];
+    getFleet():[ShipSpec, any][]{
+        if (this.fleets.length === 0){ return []; }
+        var fleet = chooseFromWeightedOptions(this.fleets);
+        var script = chooseScript(fleet.government, fleet.personality);
+        return fleet.getShipSpecs().map(function(spec: ShipSpec): [ShipSpec, any]{
+            return [spec, script];
+        });
+    }
+    spobSpots(day: number):[Spob, [number, number]][]{
+        var spots: [Spob, [number, number]][] = [];
+        for (var spob of this.spobs){
+            spots = [].concat(spots, spob.treeSpots([0, 0], day))
+        }
+        return spots;
+    }
 }
 System.fieldName = 'systems';
 
@@ -149,15 +157,62 @@ export class Fleet extends DataNode{
     government: Gov;
     name: Phrase;
     personality: string[];
-    variants: [Variant, number];
+    variants: [Variant, number][];
+
+    //TODO use deterministic randomness here
+    /** A randomly-chosen list of ShipSpecs */
+    getShipSpecs(): ShipSpec[]{
+        var variant = chooseFromWeightedOptions(this.variants);
+        return variant.getSpecs();
+    }
 }
 Fleet.fieldName = 'fleets';
 
+function chooseFromWeightedOptions<A>(options: [A, number][], r?: number): A{
+    if (r === undefined){ r = Math.random(); }
+
+    var total = options.reduce(function(acc: number, option: [A, number]){
+        return acc + option[1];
+    }, 0);
+    r *= total;
+    var cum = 0;
+    console.log(options);
+    for(var [option, n] of options){
+        cum += n
+        if (r < cum){
+            return option;
+        }
+    }
+    throw Error("logic error, shouldn't reach this");
+}
+
 export class Variant extends DataNode{
     populate(data: any, global: AllObjects){
-
+        this.ships = [];
+        for (var key of Object.keys(data)){
+            if (key === 'domain'){ continue; }
+            if (key === 'weight'){ continue; }
+            // no ids for variants
+            var ship = shipspecs[key];
+            if (ship === undefined){
+                throw Error("Can't find ship "+key);
+            }
+            this.ships.push([shipspecs[key], parseInt(data[key])]);
+        }
+        if (this.ships.length === 0){
+            throw Error("No ships entries found for variant");
+        }
     }
-    ships: [ShipSpec[], number];
+    getSpecs(): ShipSpec[]{
+        var specs: ShipSpec[] = [];
+        this.ships.map(function(x: [ShipSpec, number]){
+            for (var i=0; i<x[1]; i++){
+                specs.push(x[0]);
+            }
+        });
+        return specs;
+    }
+    ships: [ShipSpec, number][];
 }
 Variant.fieldName = 'variants';
 
@@ -185,11 +240,29 @@ export class Spob extends DataNode{
             this.color = data.color[0];
             if (!/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(this.color)){ throw Error("Color doesn't look like a hex color: "+this.color); }
         }
+        this.spobs = (data.object || []).map(function(x: string){
+            checkExists(x, 'spobs', global);
+            return global.spobs[x];
+        })
+        this.offset = Math.random(); //TODO is this ok? each time loaded planets will be in different positions.
     }
     distance: number;
     period: number;
     radius: number;
     color: string;
+    offset: number;
+    spobs: Spob[];
+    position(center: [number, number], day: number): [number, number]{
+        var angle = (this.offset * this.period + day) * 2 * Math.PI / this.period;
+        return [center[0] + Math.cos(angle) * this.distance, center[1] + Math.sin(angle) * this.distance];
+    }
+    treeSpots(center: [number, number], day: number): [Spob, [number, number]][]{
+        var innerCenter = this.position(center, day);
+        return [].concat.apply([[this, innerCenter]],
+                                this.spobs.map(function(s){
+                                    return s.treeSpots(innerCenter, day);
+                                }));
+    }
 }
 Spob.fieldName = 'spobs';
 
@@ -213,12 +286,27 @@ export class Start extends DataNode{
         checkExists(data.system[0], 'systems', global);
         this.system = global.systems[data.system[0]];
         checkExists(data.planet[0], 'spobs', global);
-        this.planet = global.planets[data.planet[0]];
+        this.planet = global.spobs[data.planet[0]];
+        this.script = data.script ? data.script[0] : 'console.log("no script specified");';
+        this.ship = shipspecs[data.ship]
+        if (this.ship === undefined){
+            throw Error("Can't find ship "+data.ship);
+        }
     }
     day: number;
     system: System;
     planet: Planet;
     credits: number;
     missions: [string, any][];
+    script: string;
+    ship: ShipSpec;
+    setProfile(){
+        Profile.clear();
+        Profile.fromStorage()
+        .set('location', this.system)
+        .set('script', getScriptByName(this.script))
+        .set('ship', this.ship)
+        .save();
+    }
 }
 Start.fieldName = 'starts'

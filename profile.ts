@@ -1,7 +1,8 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
-import { Gov } from './interfaces';
+import { Gov, ShipSpec } from './interfaces';
 import { Mission, Event } from './mission';
 import { putMessage } from './messagelog';
+import * as ships from './ships';
 
 // Plan:
 // Profile is a serializable object that only gets saved on landing.
@@ -113,6 +114,8 @@ export class Profile{
             //script: 'while (true){ thrustFor(.1); leftFor(.1); }'
             missions: [],
             reputation: {},
+            day: 0,
+            ship: ships.Triangle,
         })
     }
     // schema for objects:
@@ -121,6 +124,8 @@ export class Profile{
     location: string;
     script: string;
     missions: Mission[];
+    day: number;
     //missions: [string, any][];
     reputation: ReputationTable;
+    ship: ShipSpec;
 }

@@ -2,7 +2,7 @@
 import { assert } from 'chai';
 
 import { loadData, parseLine } from '../dataload';
-import { createObjects } from '../system';
+import { createObjects } from '../universe';
 
 var real = require('raw!../data/map.txt');
 
@@ -60,3 +60,12 @@ describe('data objects', () => {
         console.log(createObjects(data));
     })
 })
+
+describe('Spobs', () => {
+    it('should calculate positions of descendents', () => {
+        var Sol = createObjects(loadData(real)).systems['Sol'];
+        console.log(Sol.spobSpots(0));
+        var spots = Sol.spobSpots(0);
+        assert.equal(spots.length, 3);
+    });
+});
