@@ -50,7 +50,6 @@ start adventure
 	planet "Earth"
 	script manual
 	ship Triangle
-	mission KillFiveAstroidsMission
 
 start gunner
 	system "Sol"

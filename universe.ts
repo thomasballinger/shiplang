@@ -51,8 +51,6 @@ export function createObjects(domains: Domains): AllObjects{
     for (var dataKey of Object.keys(dataKeys)){
         var dataClass = dataKeys[dataKey]
         for (var name of Object.keys(domains[dataKey] || {})){
-            //TODO map dataKeys to AllObject properties in a better
-            // way than just adding an s to the end
             allObjects[dataClass.fieldName][name] = new dataClass(name);
         }
     }
@@ -153,7 +151,6 @@ export class System extends DataNode{
         return spots;
     }
     createPlanets(world: Engine, profile: Profile){
-        // Planets
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
             world.addBackgroundEntity(makePlanet(x, y, spob.radius, spob.color));
         }
@@ -299,7 +296,8 @@ export class Spob extends DataNode{
             checkExists(x, 'spobs', global);
             return global.spobs[x];
         })
-        this.offset = Math.random(); //TODO is this ok? each time loaded planets will be in different positions.
+        // each time loaded planets will be in different positions.
+        this.offset = Math.random();
         Object.freeze(this);
     }
     distance: number;

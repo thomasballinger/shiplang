@@ -112,12 +112,6 @@ export class Engine{
     inTick: boolean;
     playerAdded: boolean;
     initialize(){
-        //TOMHERE currently making initialization happen here.
-        //Then for resets we'll just make a copy and then swap out
-        //the user script. Need to write an accessor for the user script for this.
-        //Instead of WorldBuilders, a copy of this object will be stored after
-        //instanciation
-
         // for deepcopy instantiation with undefined
         if (this.system === undefined){ return; }
 
@@ -138,6 +132,9 @@ export class Engine{
         if (start === undefined){ throw Error("can't find start "+startName+" in "+Object.keys(universe.starts)); }
         Profile.clear()
         return new Engine(start.system, start.buildProfile().save());
+    }
+    static fromProfile(profile: Profile){
+
     }
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);
@@ -409,6 +406,7 @@ export class Engine{
     };
     deepCopyPopulate = function(copy: Engine, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
+        copy.bgEntities = innerDeepCopy(this.bgEntities, memo);
         copy.gameTime = this.gameTime;
         copy.profile = innerDeepCopy(this.profile, memo);
         copy.system = this.system;
