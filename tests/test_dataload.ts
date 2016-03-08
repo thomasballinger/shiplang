@@ -66,6 +66,7 @@ describe('Spobs', () => {
         var Sol = createObjects(loadData(real)).systems['Sol'];
         console.log(Sol.spobSpots(0));
         var spots = Sol.spobSpots(0);
-        assert.equal(spots.length, 3);
+        // earth has a moon that should also be in the list
+        assert(spots.length > Sol.spobs.length);
     });
 });

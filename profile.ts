@@ -82,7 +82,7 @@ export class Profile{
         //NOP because simple JSON copy works
     };
     initiateMission(m: MissionStatic, data: any){
-        this.missions.push(new m)
+        this.missions.push(new m(data))
         return this;
     }
     initiateMissions(m: [MissionStatic, any][]){

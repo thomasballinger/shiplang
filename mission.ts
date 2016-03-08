@@ -46,6 +46,7 @@ export abstract class Mission {
         }
     }
     save(): [string, any]{
+        console.log('saving...', this.constructor.name, this.data);
         return [this.constructor.name, this.data];
     }
     /** could be overriden to do some validation */
@@ -58,10 +59,9 @@ export abstract class Mission {
     data: any;
     abstract processEvent(e: Event): void;
     instructions(): string{ return ""; }
-    /** reasonable to have an implementation that does nothing */
-    initializeData(){}
+    initializeData(){ this.data = {} }
     getShips(): [ShipSpec, any][]{
-        return []
+        return [];
     }
 }
 

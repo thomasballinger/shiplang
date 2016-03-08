@@ -362,7 +362,10 @@ export class Engine{
         this.inTick = true;
         this.gameTime += dt;
 
-        this.system.createFleets(this, dt);
+        if (this.system){
+            // can be created without a system for testing
+            this.system.createFleets(this, dt);
+        }
 
         this.entities.map(function(x: Entity){ x.move(dt); });
         var events = this.checkCollisions();
