@@ -70,6 +70,17 @@ function stealZoomKeys(display){
   });
 }
 
+function stealPauseKey(cb){
+  window.addEventListener('keydown', function(e){
+    // stealing right command
+    if (e.keyCode === 80){ //p
+      cb();
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  });
+}
+
 function waitForWindow(func){
   // useful for iframes, for which window.innerWidth is 0 for a while
   function waiter(){
@@ -95,4 +106,5 @@ exports.waitForWindow = waitForWindow;
 exports.stealSimulatorKeys = stealSimulatorKeys;
 exports.stealDebugKeys = stealDebugKeys;
 exports.stealZoomKeys = stealZoomKeys;
+exports.stealPauseKey = stealPauseKey;
 exports.makeFullscreen = makeFullscreen;

@@ -36,6 +36,7 @@ export class Updater{
         this.savedWorlds = [];
         this.codeHasChanged = false;
         this.userFunctionBodies = new UserFunctionBodies();
+        this.paused = false;
     }
     world: Engine;
     lastValid: string;
@@ -46,6 +47,7 @@ export class Updater{
     player: Ship;
     _viewedEntity: Ship;
     userFunctionBodies: UserFunctionBodies;
+    paused: boolean;
 
     get viewedEntity(): Ship{
         return this._viewedEntity;
@@ -66,6 +68,9 @@ export class Updater{
         var world = new Engine(system, Profile.fromStorage());
         return world;
     }
+
+    pause(){ this.paused = true; }
+    unpause(){ this.paused = false; }
 
     toggleView(){
         var viewable = this.world.entities.filter(function(x){ return x.viewable })

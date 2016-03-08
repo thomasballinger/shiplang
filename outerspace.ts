@@ -5,6 +5,7 @@ import { Lerper, FPS } from './hud';
 import { Updater } from './updater';
 import { Engine } from './engine';
 import * as errorbar from './errorbar';
+import { showMenu, hideMenu } from './pausemenu';
 
 import { Updateable, Selection, Scenario } from './interfaces';
 
@@ -61,8 +62,21 @@ export function outerspace(originalWorld: Engine){
   var fastForward = [false];
   setup.stealDebugKeys(updater, fastForward);
   setup.stealZoomKeys(mainDisplay)
+  setup.stealPauseKey(function(){
+      if (updater.paused){
+          hideMenu();
+          updater.unpause();
+      } else {
+          updater.pause();
+          showMenu(Profile.fromStorage());
+      }
+  })
 
   function tick(){
+    if (updater.paused){
+        setTimeout(tick, 33.5); // 30fps
+        return;
+    }
     var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
     if (fastForward[0]){
         setTimeout(tick, 1);

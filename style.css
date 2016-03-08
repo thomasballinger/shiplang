@@ -88,6 +88,16 @@ body {
   background-color: #ddff99;
   color: #2222aa;
 }
+#pausemenu {
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  bottom: 100px;
+  right: 100px;
+  text-align: center;
+  font-size: 2em;
+  background-color: #123456;
+}
 .running-code{
   position:absolute;
   background:rgba(10,100,200,0.5);
