@@ -1,4 +1,9 @@
-//Orchestrates stuff
+/**
+ * Orchestrates controls, updates to game engine, displays, etc.
+ * Should change so that it can load engines from systems.
+ *
+ * Has a origWorld, an untouched original version of the current system
+ */
 import { Engine } from './engine';
 import { Ship, Entity } from './entity';
 var manual = require('./manual');
@@ -6,9 +11,13 @@ import * as scriptEnv from './scriptenv';
 import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Profile } from './profile';
+import { createObjects, Start, System } from './universe';
+import { loadData } from './dataload';
 var jsastdiff = require('./jsastdiff');
 
-import { WorldBuilder, Updateable, Selection } from './interfaces';
+import { Updateable, Selection } from './interfaces';
+
+var gamedata = loadData(require('raw!./data/map.txt'));
 
 export class Updater{
     constructor(public setError: (msg: string)=>void,
@@ -16,7 +25,7 @@ export class Updater{
                 public queueWarning: (msg: string)=>void,
                 public getCode: ()=>string, // gets updated code
                 public keyHandlerId: string, // where to set key handlers
-                public worldBuilder: WorldBuilder,
+                public origWorld: Engine,
                 public language: string,
                 public onReset?: ()=>void,
                 public highlight?: (id: string, selections: Selection[])=>void,
@@ -24,20 +33,12 @@ export class Updater{
                 public onChangeViewedEntity?: (e: Ship)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
-        this.controls = new manual.Controls(keyHandlerTarget, this.worldBuilder.controlsDelay);
+        this.controls = new manual.Controls(keyHandlerTarget, 0); //TODO
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
-        //console.log(this.worldBuilder.instructions);
         this.savedWorlds = [];
         this.codeHasChanged = false;
         this.userFunctionBodies = new UserFunctionBodies();
-
-        //TODO unnecessary? These will be triggered on code change,
-        //     which currently has to happen.
-        //this.world = this.worldBuilder(['1', this.userFunctionBodies, highlight]);
-        //this.player = this.world.getPlayer();
-        //this.viewedEntity = this.player;
-        //this.lastValid = '1';
     }
     world: Engine;
     lastValid: string;
@@ -57,6 +58,17 @@ export class Updater{
             this.onChangeViewedEntity(value);
         }
         this._viewedEntity = value;
+    }
+
+    getWorld(startName: string): Engine{
+        var universe = createObjects(gamedata);
+        var seed = Math.random();
+        var start = universe.starts[startName];
+        Profile.clear()
+        start.buildProfile().save()
+        var system = start.system
+        var world = new Engine(system, Profile.fromStorage());
+        return world;
     }
 
     toggleView(){
@@ -99,7 +111,8 @@ export class Updater{
             }
             if (userScripts){
                 this.lastValid = s;
-                this.world = this.worldBuilder(this.lastValid);
+                this.world = this.origWorld.copy();
+                this.world.addPlayer(this.lastValid);
                 this.player = this.world.getPlayer();
                 this.viewedEntity = this.player;
             }
@@ -157,7 +170,8 @@ export class Updater{
 
     reset(s?: string){
         if (s === undefined){ s = this.lastValid; }
-        this.world = this.worldBuilder([s, this.userFunctionBodies, this.highlight]);
+        this.world = this.origWorld.copy()
+        this.world.addPlayer([s, this.userFunctionBodies, this.highlight]);
         this.player = this.world.getPlayer();
         this.viewedEntity = this.player;
         this.onReset()

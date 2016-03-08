@@ -2,14 +2,14 @@ var setup = require('./setup');
 import { SpaceDisplay } from './display';
 import { Profile } from './profile';
 import { Lerper, FPS } from './hud';
-import * as scenarios from './scenarios';
 import { Updater } from './updater';
+import { Engine } from './engine';
 import * as errorbar from './errorbar';
 
 import { Updateable, Selection, Scenario } from './interfaces';
 
 
-export function outerspace(scenario: Scenario){
+export function outerspace(originalWorld: Engine){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -27,7 +27,7 @@ export function outerspace(scenario: Scenario){
     function(msg){}, // queue warning
     function(){ return Profile.fromStorage().script; },
     'canvas', // where to put key handlers
-    scenario(), // how to contruct a new world
+    originalWorld, // updater holds on to a copy of this to reset
     'JavaScript',
     function(){"cleanup";},
     undefined,
@@ -70,5 +70,7 @@ export function outerspace(scenario: Scenario){
         setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
     }
   }
+
+  if ((<any>window).DEBUGMODE){ (<any>window).reset = function(){ updater.reset(); }}
   tick();
 }

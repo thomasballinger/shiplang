@@ -127,7 +127,7 @@ export class Entity{
     }
 }
 
-export class Spob extends Entity{ // Spob stands for "space object" as per the EV Bible
+export class SpobEntity extends Entity{ // Spob stands for "space object" as per the EV Bible
     onLand: ()=>void;
 }
 

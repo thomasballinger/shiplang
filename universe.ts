@@ -5,6 +5,7 @@ import { Profile } from './profile';
 import { Ship } from './entity';
 import { chooseScript, getScriptByName, getJSByName } from './ai';
 import { missions, MissionStatic } from './mission';
+import { Engine, makeShip, makeBoid, makePlanet } from './engine';
 
 var shipspecs: {[name: string]: ShipSpec} = <any>ships
 
@@ -123,6 +124,7 @@ export class System extends DataNode{
                 this.delay = parseFloat(rest[0]);
             }
         }
+        Object.freeze(this);
     }
     position: [number, number];
     government: Gov
@@ -150,6 +152,34 @@ export class System extends DataNode{
         }
         return spots;
     }
+    createPlanets(world: Engine, profile: Profile){
+        // Planets
+        for (var [spob, [x, y]] of this.spobSpots(profile.day)){
+            world.addBackgroundEntity(makePlanet(x, y, spob.radius, spob.color));
+        }
+    }
+    createInitialFleets(world: Engine, profile: Profile){
+        // System Fleets
+        for (var fleet of this.getFleets(5)){
+            world.addFleet(fleet);
+        }
+        // Mission fleets
+        for (var [spec, script] of profile.getMissionShips()){
+            world.addEntity(makeShip(spec, Math.random()*1000,
+                                     Math.random()*1000, 270, script));
+        }
+    }
+    createFleets(world: Engine, dt: number){
+        for (var fleet of this.getFleets(dt)){
+            world.addFleet(fleet);
+        }
+    }
+    createPlayerShip(world: Engine, profile: Profile, script: any){
+        var ship = makeShip(profile.ship, 0, 0, 270, script);
+        ship.imtheplayer = true;
+        ship.government = Gov.Player
+        world.addEntity(ship);
+    }
 }
 System.fieldName = 'systems';
 
@@ -169,6 +199,7 @@ export class Fleet extends DataNode{
             return [v, x.weight];
         })
         if (this.variants.length === 0){ throw Error("No variants found for fleet "+this.id); }
+        Object.freeze(this);
     }
     government: Gov;
     name: Phrase;
@@ -225,6 +256,7 @@ export class Variant extends DataNode{
         if (this.ships.length === 0){
             throw Error("No ships entries found for variant");
         }
+        Object.freeze(this);
     }
     getSpecs(): ShipSpec[]{
         var specs: ShipSpec[] = [];
@@ -268,6 +300,7 @@ export class Spob extends DataNode{
             return global.spobs[x];
         })
         this.offset = Math.random(); //TODO is this ok? each time loaded planets will be in different positions.
+        Object.freeze(this);
     }
     distance: number;
     period: number;
@@ -291,7 +324,9 @@ Spob.fieldName = 'spobs';
 
 /** Will implement random names */
 export class Phrase extends DataNode{
-    populate(data: any, global: AllObjects){}
+    populate(data: any, global: AllObjects){
+        Object.freeze(this);
+    }
     choose(){
         return 'Redbeard';
     }
@@ -300,7 +335,9 @@ Phrase.fieldName = 'phrases';
 
 /** Planets should have a corresponding object to make them accessible */
 export class Planet extends DataNode{
-    populate(data: any, global: AllObjects){}
+    populate(data: any, global: AllObjects){
+        Object.freeze(this);
+    }
 }
 Planet.fieldName = 'planets';
 
@@ -320,6 +357,7 @@ export class Start extends DataNode{
             if (missions[name] === undefined) { throw Error("Can't find mission "+name); }
             return [missions[name], undefined];
         })
+        Object.freeze(this);
     }
     day: number;
     system: System;

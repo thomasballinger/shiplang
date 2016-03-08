@@ -1,17 +1,19 @@
-import { Entity, Ship, Spob, Component } from './entity';
+import { Entity, Ship, SpobEntity, Component } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
 import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
-import { Fleet, System } from './universe';
+import { Fleet, System, createObjects } from './universe';
 import { chooseScript } from './ai';
+import { loadData } from './dataload';
 
 var deepcopy = (<any>window).deepcopy;
 
 import { GameTime, Script, ShipSpec } from './interfaces';
 
+var gamedata = loadData(require('raw!./data/map.txt'));
 
 var IMMUNITY_TIME_S = 1;
 
@@ -73,7 +75,7 @@ function fireLaser(e:Entity, gameTime:GameTime){
 }
 
 export function makePlanet(x: number, y: number, r: number, color?: string){
-    var planet = new Spob('planet', x, y, 0, 0, r);
+    var planet = new SpobEntity('planet', x, y, 0, 0, r);
     planet.drawStatus['color'] = color
     return planet
 }
@@ -100,11 +102,43 @@ export class Engine{
         this.gameTime = 0;
         this.inTick = false;
         this.profile = profile
+        this.system = system
+        this.playerAdded = false;
+        this.initialize();
     }
     entities: Entity[];
     bgEntities: Entity[];
     gameTime: GameTime;
     inTick: boolean;
+    playerAdded: boolean;
+    initialize(){
+        //TOMHERE currently making initialization happen here.
+        //Then for resets we'll just make a copy and then swap out
+        //the user script. Need to write an accessor for the user script for this.
+        //Instead of WorldBuilders, a copy of this object will be stored after
+        //instanciation
+
+        // for deepcopy instantiation with undefined
+        if (this.system === undefined){ return; }
+
+        this.system.createPlanets(this, this.profile);
+        this.system.createInitialFleets(this, this.profile);
+    }
+    addPlayer(script: any){
+        if (this.playerAdded){
+            throw Error("Player already added");
+        }
+        this.system.createPlayerShip(this, this.profile, script);
+        this.playerAdded = true;
+    }
+    static fromStart(startName: string){
+        var universe = createObjects(gamedata);
+        var seed = Math.random();
+        var start = universe.starts[startName];
+        if (start === undefined){ throw Error("can't find start "+startName+" in "+Object.keys(universe.starts)); }
+        Profile.clear()
+        return new Engine(start.system, start.buildProfile().save());
+    }
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);
     }
@@ -152,12 +186,8 @@ export class Engine{
             this.addEntity(makeShip(spec, Math.random()*1000,
                                     Math.random()*1000, 270, script));
         }
-        // choose a location based on current System
-        // make entity objects
+        //TODO choose a location based on current System
         // set personality fields on entities
-        //
-        // engine should know its current system
-        // scenario code should be in engine!
     }
 
     getCollisionPairs(entities: Entity[]){
@@ -382,5 +412,6 @@ export class Engine{
         copy.gameTime = this.gameTime;
         copy.profile = innerDeepCopy(this.profile, memo);
         copy.system = this.system;
+        copy.playerAdded = this.playerAdded;
     };
 }

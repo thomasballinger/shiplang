@@ -6,8 +6,8 @@ import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';
 import { Profile } from './profile';
 import { earth, tolok } from './story';
-import * as scenarios from './scenarios';
 import { missions } from './mission';
+import { Engine } from './engine';
 
 window.Profile = Profile; // for convenience in onClicks of links
 
@@ -28,9 +28,9 @@ function getLocation(){
 function main(){
   cmd = getLocation();
   if (cmd === 'simulator'){
-    return simulator(function(){ return scenarios.fromStart('simulator'); });
+    return simulator(Engine.fromStart('simulator'));
   }
-  outerspace(function(){ return scenarios.fromStart(cmd); });
+  outerspace(Engine.fromStart(cmd));
 }
 
 main();

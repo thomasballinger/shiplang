@@ -2,8 +2,8 @@ var setup = require('./setup');
 import { SpaceDisplay } from './display';
 import { Profile } from './profile';
 import { Lerper, FPS } from './hud';
-import * as scenarios from './scenarios';
 import { Updater } from './updater';
+import { Engine } from './engine';
 import * as errorbar from './errorbar';
 import { AceJS } from './editors';
 
@@ -11,7 +11,7 @@ import { Updateable, Selection, Scenario } from './interfaces';
 import { Ship } from './entity';
 
 
-export function simulator(scenario: Scenario){
+export function simulator(originalWorld: Engine){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -31,7 +31,7 @@ export function simulator(scenario: Scenario){
     function(msg){}, // queue warning
     function(){ return editor.getCode(); },
     'canvas', // where to put key handlers
-    scenario(), // how to contruct a new world
+    originalWorld, // updater holds on to a copy of this to reset
     'JavaScript',
     function(){ editor.clearAllHighlights(); },
     function(id: string, selections: Selection[]){
