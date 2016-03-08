@@ -11,7 +11,6 @@ import { Updateable, Selection, Scenario } from './interfaces';
 import { Ship } from './entity';
 
 
-
 export function simulator(scenario: Scenario){
 
 // document body fullscreen

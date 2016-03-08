@@ -13,21 +13,9 @@ window.Profile = Profile; // for convenience in onClicks of links
 
 // errors resulting from running user's script
 // are throw instead of displayed and ignored
+// and player, world, and a few other things
+// are made available globally on window
 window.DEBUGMODE = true;
-
-var gunnerScript = require("raw!./scripts/gunner.js");
-
-routes = {
-  'simulator': simulator,
-  'Sol': function(){outerspace(scenarios.sol);},
-  'earth': earth,
-  'outfitter?': function(){'nop';},
-  'level1': function(){
-    Profile.fromStorage().set('script', gunnerScript).save();
-    outerspace(scenarios.gunner);},
-  'tolok': tolok,
-  'robo': function(){outerspace(scenarios.robo);},
-};
 
 function getLocation(){
   if(window.location.search) {
@@ -39,24 +27,14 @@ function getLocation(){
 
 function main(){
   cmd = getLocation();
-  if (cmd === 'reset'){
-    Profile.clear();
-    window.location = window.location.protocol + '//' + window.location.host;
-  } else if (cmd === 'simulator'){
-    Profile.clear();
-    Profile.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]).save();
-    window.location = window.location.protocol + '//' + window.location.host;
+  if (cmd === 'simulator'){
+    simulator(function(){ return scenarios.fromStart('simulator'); });
   } else if (cmd === 'gunner'){
     outerspace(function(){ return scenarios.fromStart('gunner'); });
   } else if (cmd === 'adventure'){
     outerspace(function(){ return scenarios.fromStart('adventure'); });
-  } else if (cmd === 'simulation'){
-    outerspace(function(){ return scenarios.fromStart('simulator'); });
   } else {
-    Profile.clear();
-    Profile.fromStorage().set('location', 'level1').initiateMission(missions.KillFiveAstroidsMission, []).save();
-    var profile = Profile.fromStorage();
-    routes[profile.location]();
+    //TODO restore from saved profile
   }
 }
 

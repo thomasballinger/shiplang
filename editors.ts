@@ -1,10 +1,10 @@
 var acorn = (<any>window).acorn;
 
 import { Editor, Selection } from './interfaces';
-//import { makeReactEditor } from './reacteditor';
+import { makeReactEditor } from './reacteditor';
 
-//var brace = require('brace');
-//var Range = <any>(<any>brace).acequire('ace/range').Range
+var brace = require('brace');
+var Range = <any>(<any>brace).acequire('ace/range').Range
 
 export class AceSL {
     constructor(){
@@ -46,7 +46,7 @@ export class AceJS {
                 self.codeToLoad = undefined;
             }
         }
-        //makeReactEditor(delayedInit, function(s: string){ self.onChange(); });
+        makeReactEditor(delayedInit, function(s: string){ self.onChange(); });
     }
     callbacks: any[];
     editor: any;
