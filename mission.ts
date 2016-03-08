@@ -1,6 +1,8 @@
 import { Entity } from './entity';
-import { Gov } from './interfaces';
+import { Gov, ShipSpec } from './interfaces';
 import { putMessage } from './messagelog';
+import * as ships from './ships';
+import { getScriptByName } from './ai';
 
 // Events exist only within a tick and therefore don't
 // need to be serializable. They can reference entities
@@ -58,6 +60,9 @@ export abstract class Mission {
     instructions(): string{ return ""; }
     /** reasonable to have an implementation that does nothing */
     initializeData(){}
+    getFleet(): [ShipSpec, any][]{
+        return []
+    }
 }
 
 /** Loads current mission from saved data */
@@ -87,6 +92,15 @@ export var missions = <moduleOfMissions>{
                 return "Good work. Detach and land at the red planet for payment.";
             }
             return "Kill "+(5-this.data.killed)+" more astroids";
+        }
+        getFleet(): [ShipSpec, any][]{
+            return [[ships.Holder, getScriptByName('HolderScript')],
+                    [ships.Astroid, getScriptByName('wander')],
+                    [ships.Astroid, getScriptByName('wander')],
+                    [ships.Astroid, getScriptByName('wander')],
+                    [ships.Astroid, getScriptByName('wander')],
+                    [ships.Astroid, getScriptByName('wander')],
+                   ];
         }
     },
     'DontAttackCiviliansMission': class DontAttackCiviliansMission extends Mission {

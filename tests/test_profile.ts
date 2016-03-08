@@ -17,7 +17,7 @@ describe('Profile', () => {
 
         p.script = '1 + 1';
         var l = [1, 2, 3];
-        p.addMission(new SimpleMission({a: l}));
+        p.initiateMission(SimpleMission, {a: l});
         p.set('name', 'Fred');
         var p2 = Profile.fromJson(p.toJson());
         assert.deepEqual(p.toJson(), p2.toJson());

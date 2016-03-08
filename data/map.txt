@@ -30,12 +30,19 @@ system Robo
 		distance 300
 		period 2
 
+start adventure
+	system "Sol"
+	planet "Earth"
+	script manual
+	ship Triangle
+	mission KillFiveAstroidsMission
 
 start gunner
 	system "Sol"
 	planet "Earth"
 	script manual
 	ship Triangle
+	mission KillFiveAstroidsMission
 
 fleet "Triangle Patrol"
 	government Military

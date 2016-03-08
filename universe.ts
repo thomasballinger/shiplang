@@ -4,6 +4,7 @@ import * as ships from './ships';
 import { Profile } from './profile';
 import { Ship } from './entity';
 import { chooseScript, getScriptByName } from './ai';
+import { missions, MissionStatic } from './mission';
 
 var shipspecs: {[name: string]: ShipSpec} = <any>ships
 
@@ -299,21 +300,24 @@ export class Start extends DataNode{
         if (this.ship === undefined){
             throw Error("Can't find ship "+data.ship);
         }
+        this.missions = (data.mission || []).map(function(name: string){
+            if (missions[name] === undefined) { throw Error("Can't find mission "+name); }
+            return [missions[name], undefined];
+        })
     }
     day: number;
     system: System;
     planet: Planet;
     credits: number;
-    missions: [string, any][];
+    missions: [MissionStatic, any][];
     script: string;
     ship: ShipSpec;
-    setProfile(){
-        Profile.clear();
-        Profile.fromStorage()
+    buildProfile(): Profile{
+        return Profile.newProfile()
         .set('location', this.system)
         .set('script', getScriptByName(this.script))
         .set('ship', this.ship)
-        .save();
+        .initiateMissions(this.missions);
     }
 }
 Start.fieldName = 'starts'

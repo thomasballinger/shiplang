@@ -1,6 +1,6 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
 import { Gov, ShipSpec } from './interfaces';
-import { Mission, Event } from './mission';
+import { Mission, Event, MissionStatic } from './mission';
 import { putMessage } from './messagelog';
 import * as ships from './ships';
 
@@ -81,8 +81,15 @@ export class Profile{
     deepCopyPopulate = function(copy: Profile, memo:any, innerDeepCopy:any){
         //NOP because simple JSON copy works
     };
-    addMission(m: Mission){
-        this.missions.push(m);
+    initiateMission(m: MissionStatic, data: any){
+        this.missions.push(new m)
+        return this;
+    }
+    initiateMissions(m: [MissionStatic, any][]){
+        var self = this;
+        m.map(function(x: [MissionStatic, any]){
+            self.initiateMission(x[0], x[1]);
+        });
         return this;
     }
     missionsSummary(): string{

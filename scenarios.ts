@@ -8,7 +8,7 @@ import * as ships from './ships';
 import { putMessage } from './messagelog';
 import { createObjects, System, Fleet, Spob, Start } from './universe';
 import { loadData } from './dataload';
-import { builtinScripts } from './ai';
+import { getScriptByName } from './ai';
 
 var gamedata = loadData(require('raw!./data/map.txt'));
 (<any>window).normalScript = require("raw!./scripts/pilot.js");
@@ -22,11 +22,13 @@ var gamedata = loadData(require('raw!./data/map.txt'));
 export var fromBasicStart = function(startName: string):any{
     var universe = createObjects(gamedata);
     var seed = Math.random();
-    var reset = <WorldBuilder>function reset(playerScript: any): Engine {
-        var start = universe.starts[startName];
-        start.setProfile()
-        var profile = Profile.fromStorage()
+    var start = universe.starts[startName];
+    Profile.clear()
+    start.buildProfile().save()
 
+    var reset = <WorldBuilder>function reset(playerScript: any): Engine {
+
+        var profile = Profile.fromStorage()
         var world = new Engine(profile);
         var system = start.system
 
@@ -39,6 +41,8 @@ export var fromBasicStart = function(startName: string):any{
         var pairs = system.getFleet();
         for (var [spec, script] of pairs){
             // TODO better start positions
+            // * between planets
+            // * on the way to and from other systems
             world.addEntity(makeShip(spec, Math.random()*1000,
                                      Math.random()*1000, 270, script));
         }
@@ -52,6 +56,7 @@ export var fromBasicStart = function(startName: string):any{
         putMessage(profile.missionsSummary());
 
         if ((<any>window).DEBUGMODE){ (<any>window).world = world; }
+        if ((<any>window).DEBUGMODE){ (<any>window).player = world.getPlayer(); }
         return world;
     }
     return reset;
@@ -72,7 +77,7 @@ export var gunner = function():any{
             Math.random()*2000 - 1000,
             Math.random()*2000 - 1000,
             Math.random() * 360,
-            builtinScripts.foreverVisitPlanetsScript,
+            getScriptByName('foreverVisitPlanetsScript'),
         ];
     });
 
@@ -85,14 +90,14 @@ export var gunner = function():any{
         world.addBackgroundEntity(makePlanet(1400, 1300, 40, '#ab43af'));
         world.addBackgroundEntity(makePlanet(-1600, -1800, 60, '#3bd951'));
         world.addBackgroundEntity(makePlanet(-1800, 1600, 80, '#8b2141'));
-        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Astroid,  300, 350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Astroid, -300, -350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Astroid, -200, -350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.Astroid, -100, -350, 270, builtinScripts.wander));
+        world.addEntity(makeShip(ships.Astroid, -300, 350, 270, getScriptByName('wander')));
+        world.addEntity(makeShip(ships.Astroid,  300, 350, 270, getScriptByName('wander')));
+        world.addEntity(makeShip(ships.Astroid, -300, -350, 270, getScriptByName('wander')));
+        world.addEntity(makeShip(ships.Astroid, -200, -350, 270, getScriptByName('wander')));
+        world.addEntity(makeShip(ships.Astroid, -100, -350, 270, getScriptByName('wander')));
 
         civilianArgs.map(function(x){ world.addEntity(makeShip.apply(null, x)) })
-        world.addEntity(makeShip(ships.Holder, 0, 200, 270, builtinScripts.holderScript));
+        world.addEntity(makeShip(ships.Holder, 0, 200, 270, getScriptByName('holderScript')));
         world.addEntity(ship); // adding the ship last means it goes in front
 
         putMessage(Profile.fromStorage().missionsSummary());
@@ -123,9 +128,9 @@ export var scenario1 = function():any{
 
     var reset = <WorldBuilder>function reset(script: any): Engine {
 
-        var boidScript = builtinScripts.enemyScript;
+        var boidScript = getScriptByName('enemyScript');
         var playerScript = script;
-        var enemyScript = builtinScripts.enemyScript;
+        var enemyScript = getScriptByName('enemyScript');
 
         var world = new Engine(Profile.fromStorage());
 
@@ -136,8 +141,8 @@ export var scenario1 = function():any{
         ship.government = Gov.Player
         world.addEntity(ship);
         world.addEntity(ship2);
-        world.addEntity(makeShip(ships.Astroid, -100, 350, 270, builtinScripts.wander));
-        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
+        world.addEntity(makeShip(ships.Astroid, -100, 350, 270, getScriptByName('wander')));
+        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, getScriptByName('attackScript')));
         //world.addEntity(makeShip(ships.Triangle, 70, 190, 270, scripts.pilotScript));
         for (var i=0; i<boidArgs.length; i++){
             world.addEntity(makeBoid(boidArgs[i][0], boidArgs[i][1], boidArgs[i][2],
@@ -183,17 +188,17 @@ export var sol = function():any{
         world.addBackgroundEntity(mars);
 
         for (var y of [550, -2400, 1200, -1000]){
-            world.addEntity(makeShip(ships.Shuttle, -300, y, 270, builtinScripts.foreverVisitPlanetsScript));
-            world.addEntity(makeShip(ships.Shuttle, -200, y, 270, builtinScripts.foreverVisitPlanetsScript));
-            world.addEntity(makeShip(ships.Shuttle, -100, y, 270, builtinScripts.foreverVisitPlanetsScript));
-            world.addEntity(makeShip(ships.Shuttle,    0, y, 270, builtinScripts.foreverVisitPlanetsScript));
-            world.addEntity(makeShip(ships.Boid,     100, y, 270, builtinScripts.foreverVisitPlanetsScript));
-            world.addEntity(makeShip(ships.Boid,     200, y, 270, builtinScripts.foreverVisitPlanetsScript));
+            world.addEntity(makeShip(ships.Shuttle, -300, y, 270, getScriptByName('foreverVisitPlanetsScript')));
+            world.addEntity(makeShip(ships.Shuttle, -200, y, 270, getScriptByName('foreverVisitPlanetsScript')));
+            world.addEntity(makeShip(ships.Shuttle, -100, y, 270, getScriptByName('foreverVisitPlanetsScript')));
+            world.addEntity(makeShip(ships.Shuttle,    0, y, 270, getScriptByName('foreverVisitPlanetsScript')));
+            world.addEntity(makeShip(ships.Boid,     100, y, 270, getScriptByName('foreverVisitPlanetsScript')));
+            world.addEntity(makeShip(ships.Boid,     200, y, 270, getScriptByName('foreverVisitPlanetsScript')));
         }
 
-        world.addEntity(makeShip(ships.Triangle, -300, -750, 270, builtinScripts.enemyScript));
-        world.addEntity(makeShip(ships.Triangle, -500, -750, 270, builtinScripts.enemyScript));
-        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
+        world.addEntity(makeShip(ships.Triangle, -300, -750, 270, getScriptByName('enemyScript')));
+        world.addEntity(makeShip(ships.Triangle, -500, -750, 270, getScriptByName('enemyScript')));
+        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, getScriptByName('attackScript')));
         world.addEntity(ship); // adding the ship last means it goes in front
         if ((<any>window).DEBUGMODE){ (<any>window).world = world; }
         return world;
@@ -219,9 +224,9 @@ export var robo = function():any{
             Profile.fromStorage().set('location', 'tolok').go();
         }
         world.addBackgroundEntity(tolok);
-        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, builtinScripts.attackScript));
-        world.addEntity(makeShip(ships.FatTriangle, -1300, 1200, 170, builtinScripts.attackScript));
-        world.addEntity(makeShip(ships.FatTriangle, 1000, 400, 170, builtinScripts.attackScript));
+        world.addEntity(makeShip(ships.FatTriangle, -300, 2000, 170, getScriptByName('attackScript')));
+        world.addEntity(makeShip(ships.FatTriangle, -1300, 1200, 170, getScriptByName('attackScript')));
+        world.addEntity(makeShip(ships.FatTriangle, 1000, 400, 170, getScriptByName('attackScript')));
         world.addEntity(ship); // adding the ship last means it goes in front
         if ((<any>window).DEBUGMODE){ (<any>window).world = world; }
         return world;
