@@ -6,6 +6,7 @@ var keyCodeFor = require('./keyboardmap').keyCodeFor;
 function Controls(obj, delay){
   this.events = [];
   this.pressed = {};
+  console.log('delay:', delay);
   this.delay = delay || 0;
   this.initialize(obj);
 }

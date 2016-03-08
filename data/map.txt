@@ -36,6 +36,10 @@ system Simulator
 system Robo
 	pos 20 30
 	government Pirate
+	hazard delay 3000
+	fleet "Mean Pirate" 1
+	fleet "Mean Pirate" 1
+	fleet "Mean Pirate" 1
 	object Tolok
 		radius 40
 		distance 300
@@ -58,6 +62,12 @@ start gunner
 start simulator
 	system "Simulator"
 	planet "Earth"
+	script manual
+	ship Triangle
+
+start robo
+	system Robo
+	planet Tolok
 	script manual
 	ship Triangle
 

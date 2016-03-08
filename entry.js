@@ -28,14 +28,9 @@ function getLocation(){
 function main(){
   cmd = getLocation();
   if (cmd === 'simulator'){
-    simulator(function(){ return scenarios.fromStart('simulator'); });
-  } else if (cmd === 'gunner'){
-    outerspace(function(){ return scenarios.fromStart('gunner'); });
-  } else if (cmd === 'adventure'){
-    outerspace(function(){ return scenarios.fromStart('adventure'); });
-  } else {
-    //TODO restore from saved profile
+    return simulator(function(){ return scenarios.fromStart('simulator'); });
   }
+  outerspace(function(){ return scenarios.fromStart(cmd); });
 }
 
 main();

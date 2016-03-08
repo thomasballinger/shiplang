@@ -24,12 +24,12 @@ export var fromStart = function(startName: string):any{
     var start = universe.starts[startName];
     Profile.clear()
     start.buildProfile().save()
+    var system = start.system
 
     var reset = <WorldBuilder>function reset(playerScript: any): Engine {
 
         console.log(playerScript)
         var profile = Profile.fromStorage()
-        var system = start.system
         var world = new Engine(system, profile);
 
         // Planets
@@ -39,6 +39,7 @@ export var fromStart = function(startName: string):any{
 
         // Fleets
         for (var fleet of system.getFleets(5)){
+            console.log('fleet added:', fleet);
             world.addFleet(fleet);
         }
         // Mission fleets
@@ -59,6 +60,8 @@ export var fromStart = function(startName: string):any{
         if ((<any>window).DEBUGMODE){ (<any>window).player = world.getPlayer(); }
         return world;
     }
+    reset.controlsDelay = system.delay || 0;
+
     return reset;
 }
 

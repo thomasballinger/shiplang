@@ -118,12 +118,18 @@ export class System extends DataNode{
             checkExists(x, 'spobs', global);
             return global.spobs[x];
         })
+        for (var [kind, ...rest] of data.hazard || []){
+            if (kind === 'delay'){
+                this.delay = parseFloat(rest[0]);
+            }
+        }
     }
     position: [number, number];
     government: Gov
     links: System[];
     fleets: [Fleet, number][];
     spobs: Spob[];
+    delay: number;
 
     getFleets(dt: number):Fleet[]{
         if (this.fleets.length === 0){ return []; }
@@ -305,6 +311,7 @@ export class Start extends DataNode{
         checkExists(data.planet[0], 'spobs', global);
         this.planet = global.spobs[data.planet[0]];
         this.script = data.script ? data.script[0] : 'console.log("no script specified");';
+        if (data.ship === undefined){ throw Error("No ship provided for start "+this.id)}
         this.ship = shipspecs[data.ship]
         if (this.ship === undefined){
             throw Error("Can't find ship "+data.ship);

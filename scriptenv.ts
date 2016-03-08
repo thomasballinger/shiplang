@@ -235,6 +235,7 @@ function makeCommands():MakeCommandsReturnType{
         new Command('headingToClosestEnemy', function():any{ return e.towards(w.findClosestEnemy(e)); }),
         new Command('closingToClosestEnemy', function():any{
             var o = w.findClosestEnemy(e)
+            if (o === undefined){ return 0; }
             return closingSpeed(e.x, e.y, e.dx, e.dy, o.x, o.y, o.dy, o.dy);
         }),
         new Command('headingToClosestEnemyIn', function(dt: number): any{

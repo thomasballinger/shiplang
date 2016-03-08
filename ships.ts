@@ -1,20 +1,11 @@
 import { ShipSpec, ShipSpecChanges, Gov } from './interfaces';
 
-declare module "./interfaces" {
-    interface ShipSpec {
-        [prop: string]: any;
-    }
-    interface ShipSpecChanges {
-        [prop: string]: any;
-    }
-}
-
 //Order matters in this file: Ships can only
 //inherit with this function using ships defined above them.
 function shipWithChanges(parent: ShipSpec, changes: ShipSpecChanges): ShipSpec{
-    for (var prop of Object.keys(parent)){
+    for (var prop of Object.keys(<any>parent)){
         if (!changes.hasOwnProperty(prop)){
-            changes[prop] = parent[prop];
+            (<any>changes)[prop] = (<any>parent)[prop];
         }
     }
     return <ShipSpec>changes;
@@ -65,6 +56,7 @@ export var Triangle = shipWithChanges(SimpleShip, {
     maxSpeed: 300,
     explosionSize: 20,
     armorMax: 20,
+    shieldsMax: 20,
     government: Gov.Pirate,
 });
 
