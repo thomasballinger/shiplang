@@ -22,6 +22,11 @@ system Sol
 				color #aa9922
 				distance 50
 				period 10
+			object
+				radius 10
+				color #aa9922
+				distance 50
+				period 10
 	object Mars
 		color #ee3333
 		distance 1400

@@ -11,13 +11,10 @@ import * as scriptEnv from './scriptenv';
 import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Profile } from './profile';
-import { createObjects, Start, System } from './universe';
-import { loadData } from './dataload';
+import { createObjects, Start, System, universe } from './universe';
 var jsastdiff = require('./jsastdiff');
 
 import { Updateable, Selection } from './interfaces';
-
-var gamedata = loadData(require('raw!./data/map.txt'));
 
 export class Updater{
     constructor(public setError: (msg: string)=>void,
@@ -61,7 +58,6 @@ export class Updater{
     }
 
     getWorld(startName: string): Engine{
-        var universe = createObjects(gamedata);
         var seed = Math.random();
         var start = universe.starts[startName];
         Profile.clear()

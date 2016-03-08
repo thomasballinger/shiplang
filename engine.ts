@@ -5,15 +5,12 @@ import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
-import { Fleet, System, createObjects } from './universe';
+import { Fleet, System, universe } from './universe';
 import { chooseScript } from './ai';
-import { loadData } from './dataload';
 
 var deepcopy = (<any>window).deepcopy;
 
 import { GameTime, Script, ShipSpec } from './interfaces';
-
-var gamedata = loadData(require('raw!./data/map.txt'));
 
 var IMMUNITY_TIME_S = 1;
 
@@ -126,7 +123,6 @@ export class Engine{
         this.playerAdded = true;
     }
     static fromStart(startName: string){
-        var universe = createObjects(gamedata);
         var seed = Math.random();
         var start = universe.starts[startName];
         if (start === undefined){ throw Error("can't find start "+startName+" in "+Object.keys(universe.starts)); }

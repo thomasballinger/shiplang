@@ -6,13 +6,18 @@ import { Ship } from './entity';
 import { chooseScript, getScriptByName, getJSByName } from './ai';
 import { missions, MissionStatic } from './mission';
 import { Engine, makeShip, makeBoid, makePlanet } from './engine';
+import { loadData } from './dataload';
 
 var shipspecs: {[name: string]: ShipSpec} = <any>ships
 
-/** Building blocks of the universe. Should be read-only, and certainly
+/** Building blocks of the universe. Read-only, and certainly
  *  won't change while an engine is running.
  *  Eventually changes to them will be written to the player's profile,
  *  and loaded by loading normal data then loading the player's changes.
+ *  Once this happens, planet offsets (the only currently nondeterministic data)
+ *  will need to be stored on the player's Profile object because this patching
+ *  will take place at the data level, not the objects level so the universe
+ *  will need to be rebuilt each these changes are applied.
  */
 
 interface AllObjects{
@@ -67,6 +72,8 @@ export function createObjects(domains: Domains): AllObjects{
     return allObjects;
 }
 //TODO deal with anonymous objects by allowing them in populate methods
+// * spobs allow them
+// * anyone else?
 
 export abstract class DataNode{
     constructor(id?: string){
@@ -113,9 +120,15 @@ export class System extends DataNode{
             var inSeconds = parseInt(x[1]) / 60
             return [global.fleets[x[0]], inSeconds];
         });
-        this.spobs = (data.object || []).map(function(x: string){
-            checkExists(x, 'spobs', global);
-            return global.spobs[x];
+        this.spobs = (data.object || []).map(function(x: any){
+            if (typeof x === 'string'){
+                checkExists(x, 'spobs', global);
+                return global.spobs[x];
+            } else {
+                var s = new Spob()
+                s.populate(x, global);
+                return s
+            }
         })
         for (var [kind, ...rest] of data.hazard || []){
             if (kind === 'delay'){
@@ -292,9 +305,15 @@ export class Spob extends DataNode{
             this.color = data.color[0];
             if (!/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(this.color)){ throw Error("Color doesn't look like a hex color: "+this.color); }
         }
-        this.spobs = (data.object || []).map(function(x: string){
-            checkExists(x, 'spobs', global);
-            return global.spobs[x];
+        this.spobs = (data.object || []).map(function(x: any){
+            if (typeof x === 'string'){
+                checkExists(x, 'spobs', global);
+                return global.spobs[x];
+            } else {
+                var s = new Spob()
+                s.populate(x, global);
+                return s
+            }
         })
         // each time loaded planets will be in different positions.
         this.offset = Math.random();
@@ -373,3 +392,12 @@ export class Start extends DataNode{
     }
 }
 Start.fieldName = 'starts'
+
+
+
+
+// Go ahead and load all data here so everyone
+// can use the same copy
+var gamedata = loadData(require('raw!./data/map.txt'));
+export var universe = createObjects(gamedata);
+
