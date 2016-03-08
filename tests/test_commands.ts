@@ -8,7 +8,7 @@ import {setCurrentEntity, setGameTime, setGameWorld,
 
 
 describe('Commands', () => {
-    var world = new Engine();
+    var world = new Engine(undefined, undefined);
     var ship = makeShip(Boid, 1, 2, 3);
     world.addEntity(ship);
     setGameWorld(world)

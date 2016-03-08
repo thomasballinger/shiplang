@@ -8,10 +8,11 @@ import { missions, MissionStatic } from './mission';
 
 var shipspecs: {[name: string]: ShipSpec} = <any>ships
 
-// Building blocks of the world like this should be read-only for now
-// Changes to them would be written to the player's profile so support
-// for multiple data files
-
+/** Building blocks of the universe. Should be read-only, and certainly
+ *  won't change while an engine is running.
+ *  Eventually changes to them will be written to the player's profile,
+ *  and loaded by loading normal data then loading the player's changes.
+ */
 
 interface AllObjects{
     systems: {[name: string]: System};

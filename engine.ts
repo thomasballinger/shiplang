@@ -5,7 +5,7 @@ import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
-import { Fleet } from './universe';
+import { Fleet, System } from './universe';
 import { chooseScript } from './ai';
 
 var deepcopy = (<any>window).deepcopy;
@@ -94,11 +94,12 @@ function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boole
 
 
 export class Engine{
-    constructor(public profile?: Profile){
+    constructor(public system: System, public profile: Profile){
         this.entities = [];
         this.bgEntities = [];
         this.gameTime = 0;
         this.inTick = false;
+        this.profile = profile
     }
     entities: Entity[];
     bgEntities: Entity[];
@@ -374,11 +375,12 @@ export class Engine{
 
     deepCopyCreate():Engine{
         if (this.inTick){ throw Error("Engine can't be copied during a tick!"); }
-        return new Engine(undefined);
+        return new Engine(undefined, undefined);
     };
     deepCopyPopulate = function(copy: Engine, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
         copy.gameTime = this.gameTime;
         copy.profile = innerDeepCopy(this.profile, memo);
+        copy.system = this.system;
     };
 }

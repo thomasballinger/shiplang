@@ -1,5 +1,5 @@
 import { Environment, CompiledFunctionObject, initialize, runBytecodeOneStep } from './eval';
-import { Entity, Ship } from './entity';
+import { Entity, Ship } from './entity';  // just for the types
 import { initShipEnv } from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Selection, Interpreter, Generator, ByteCode, Context, JSInterpFunction } from './interfaces'

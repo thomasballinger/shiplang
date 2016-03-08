@@ -27,6 +27,12 @@ system Sol
 		distance 1400
 		period 687
 
+system Simulator
+	pos 100 100
+	government Trader
+	fleet "Missile Boids" 100
+	fleet "Mean Pirate" 100
+
 system Robo
 	pos 20 30
 	government Pirate
@@ -49,6 +55,12 @@ start gunner
 	ship Gunship
 	mission KillFiveAstroidsMission
 
+start simulator
+	system "Simulator"
+	planet "Earth"
+	script manual
+	ship Triangle
+
 fleet "Triangle Patrol"
 	government Military
 	variant 10
@@ -68,3 +80,16 @@ fleet "Intrastellar Shuttles"
 		Shuttle
 	variant 2
 		Shuttle 10
+
+fleet "Missile Boids"
+	government Pirate
+	personality enemyScript
+	variant 1
+		Boid 3
+		Triangle 1
+
+fleet "Mean Pirate"
+	government Pirate
+	personality attackScript
+	variant 1
+		FatTriangle 1

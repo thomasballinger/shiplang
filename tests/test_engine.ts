@@ -8,7 +8,7 @@ import { assert } from 'chai';
 describe('Engine', () => {
     describe('#copy', () => {
         it("shouldn't create copies that share entities", () => {
-            var s1 = new Engine();
+            var s1 = new Engine(undefined, undefined);
             var l1 = [1,2,3];
             s1.addEntity(<Entity><any>l1)
             var s2 = s1.copy()
@@ -18,7 +18,7 @@ describe('Engine', () => {
     });
     describe('#checkCollisions', () => {
         it("explosions from own missile should damage entities", () => {
-            var s1 = new Engine()
+            var s1 = new Engine(undefined, undefined)
             var ship = makeShip(ships.Gunship, 0, 0, 170);
             ship.shieldsMax = 0;
             s1.addEntity(ship);

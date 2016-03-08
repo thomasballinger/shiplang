@@ -50,6 +50,8 @@ function main(){
     outerspace(function(){ return scenarios.fromStart('gunner'); });
   } else if (cmd === 'adventure'){
     outerspace(function(){ return scenarios.fromStart('adventure'); });
+  } else if (cmd === 'simulation'){
+    outerspace(function(){ return scenarios.fromStart('simulator'); });
   } else {
     Profile.clear();
     Profile.fromStorage().set('location', 'level1').initiateMission(missions.KillFiveAstroidsMission, []).save();

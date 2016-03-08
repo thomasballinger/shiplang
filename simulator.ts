@@ -7,12 +7,12 @@ import { Updater } from './updater';
 import * as errorbar from './errorbar';
 import { AceJS } from './editors';
 
-import { Updateable, Selection } from './interfaces';
+import { Updateable, Selection, Scenario } from './interfaces';
 import { Ship } from './entity';
 
 
 
-export function simulator(){
+export function simulator(scenario: Scenario){
 
 // document body fullscreen
 //document.body.addEventListener('click', function(e){
@@ -32,7 +32,7 @@ export function simulator(){
     function(msg){}, // queue warning
     function(){ return editor.getCode(); },
     'canvas', // where to put key handlers
-    scenarios.scenario1(), // how to contruct a new world
+    scenario(), // how to contruct a new world
     'JavaScript',
     function(){ editor.clearAllHighlights(); },
     function(id: string, selections: Selection[]){
