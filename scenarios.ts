@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { Engine, makeShip, makeBoid, makePlanet, makeComponent } from './engine';
+import { Engine, makeShip, makeBoid, makePlanet } from './engine';
 import { WorldBuilder, ShipSpec, Gov } from './interfaces';
 import * as objectivebar from './objectivebar';
 import { Profile } from './profile';
@@ -11,7 +11,6 @@ import { loadData } from './dataload';
 import { getScriptByName } from './ai';
 
 var gamedata = loadData(require('raw!./data/map.txt'));
-(<any>window).normalScript = require("raw!./scripts/pilot.js");
 
 // A ship builder object should be built that uses a random seed
 // (for reproducibility) to create ships with random probability.
@@ -19,7 +18,7 @@ var gamedata = loadData(require('raw!./data/map.txt'));
 // ships on a 30 times per second basis.
 // Needs to be deterministic given a seed.
 
-export var fromBasicStart = function(startName: string):any{
+export var fromStart = function(startName: string):any{
     var universe = createObjects(gamedata);
     var seed = Math.random();
     var start = universe.starts[startName];
@@ -28,6 +27,7 @@ export var fromBasicStart = function(startName: string):any{
 
     var reset = <WorldBuilder>function reset(playerScript: any): Engine {
 
+        console.log(playerScript)
         var profile = Profile.fromStorage()
         var world = new Engine(profile);
         var system = start.system
@@ -38,11 +38,11 @@ export var fromBasicStart = function(startName: string):any{
         }
 
         // Fleets
-        var pairs = system.getFleet();
-        for (var [spec, script] of pairs){
-            // TODO better start positions
-            // * between planets
-            // * on the way to and from other systems
+        for (var fleet of system.getFleets(5)){
+            world.addFleet(fleet);
+        }
+        // Mission fleets
+        for (var [spec, script] of profile.getMissionShips()){
             world.addEntity(makeShip(spec, Math.random()*1000,
                                      Math.random()*1000, 270, script));
         }
@@ -84,7 +84,7 @@ export var gunner = function():any{
     var reset = <WorldBuilder>function reset(script: any): Engine {
         var world = new Engine(Profile.fromStorage());
         var p = Profile.fromStorage().spaceLocation;
-        var ship = makeComponent(ships.Gunship, p[0], p[1], 270, script);
+        var ship = makeShip(ships.Gunship, p[0], p[1], 270, script);
         ship.imtheplayer = true;
         ship.government = Gov.Player
         world.addBackgroundEntity(makePlanet(1400, 1300, 40, '#ab43af'));

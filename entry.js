@@ -46,11 +46,13 @@ function main(){
     Profile.clear();
     Profile.fromStorage().set('location', 'simulator').set('spaceLocation', [-200, 1300]).save();
     window.location = window.location.protocol + '//' + window.location.host;
-  } else if (cmd === 'start'){
-    outerspace(function(){ return scenarios.fromBasicStart('gunner'); });
+  } else if (cmd === 'gunner'){
+    outerspace(function(){ return scenarios.fromStart('gunner'); });
+  } else if (cmd === 'adventure'){
+    outerspace(function(){ return scenarios.fromStart('adventure'); });
   } else {
     Profile.clear();
-    Profile.fromStorage().set('location', 'level1').addMission(new missions.KillFiveAstroidsMission()).save();
+    Profile.fromStorage().set('location', 'level1').initiateMission(missions.KillFiveAstroidsMission, []).save();
     var profile = Profile.fromStorage();
     routes[profile.location]();
   }

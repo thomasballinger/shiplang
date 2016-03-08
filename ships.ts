@@ -87,7 +87,8 @@ export var Gunship = shipWithChanges(SimpleShip, {
     maxSpeed: 0,
     explosionSize: 12,
     armorMax: 20,
-    government: Gov.Player
+    government: Gov.Player,
+    isComponent: true,
 });
 
 export var Holder = shipWithChanges(SimpleShip, {

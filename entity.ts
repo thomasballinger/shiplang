@@ -162,7 +162,7 @@ export class Ship extends Entity{
         } else if (probablyReturnsGenerators(script)) {
             this.context = new codetypes.JSGeneratorContext(script);
         } else if (typeof script === 'string'){
-                throw Error('please compile a function object first instead of passing a string');
+                throw Error('please compile a function object first instead of passing a string, got: '+script);
                 //this.context = new codetypes.SLContext(script, scriptEnv.buildShipEnv());
         } else {
             throw Error('whoops:' + script)

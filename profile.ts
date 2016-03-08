@@ -103,7 +103,13 @@ export class Profile{
         }
         return msg;
     }
-
+    getMissionShips(): [ShipSpec, any][]{
+        return [].concat.apply([],
+            this.missions.map(function(mission){
+                return mission.getShips();
+            })
+       );
+    }
     static newProfile(): Profile{
         var reputation: ReputationTable = {};
         for (var i=0; i<Gov.LAST; i++){

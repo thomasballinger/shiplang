@@ -9,7 +9,7 @@ export function isEnemy(e1: Entity, e2: Entity){
         //TODO make this a reputation-based check
         return (e2.government === Gov.Pirate || e2.government === Gov.Debris);
     } else if (e1.government === Gov.Pirate){
-        return e2.government !== Gov.Pirate;
+        return e2.government !== Gov.Pirate && e2.government !== Gov.Debris;
     } else if (e1.government === Gov.Cleanup){
         return e2.government === Gov.Debris;
     } else {

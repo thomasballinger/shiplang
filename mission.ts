@@ -60,7 +60,7 @@ export abstract class Mission {
     instructions(): string{ return ""; }
     /** reasonable to have an implementation that does nothing */
     initializeData(){}
-    getFleet(): [ShipSpec, any][]{
+    getShips(): [ShipSpec, any][]{
         return []
     }
 }
@@ -93,8 +93,8 @@ export var missions = <moduleOfMissions>{
             }
             return "Kill "+(5-this.data.killed)+" more astroids";
         }
-        getFleet(): [ShipSpec, any][]{
-            return [[ships.Holder, getScriptByName('HolderScript')],
+        getShips(): [ShipSpec, any][]{
+            return [[ships.Holder, getScriptByName('holderScript')],
                     [ships.Astroid, getScriptByName('wander')],
                     [ships.Astroid, getScriptByName('wander')],
                     [ships.Astroid, getScriptByName('wander')],

@@ -4,9 +4,9 @@ system Sol
 	pos 0 0
 	government Trader
 	link Robo
-	fleet "Intrastellar Shuttles" 100
-	fleet "Triangle Patrol" 200
-	fleet "Pirates" 200
+	fleet "Intrastellar Shuttles" 1000
+	fleet "Triangle Patrol" 60
+	fleet "Pirates" 60000
 	object Earth
 		color #004000
 		radius 40
@@ -17,6 +17,11 @@ system Sol
 			radius 20
 			distance 200
 			period 27.3
+			object MadeUpMoonSatellite
+				radius 2
+				color #aa9922
+				distance 50
+				period 10
 	object Mars
 		color #ee3333
 		distance 1400
@@ -40,8 +45,8 @@ start adventure
 start gunner
 	system "Sol"
 	planet "Earth"
-	script manual
-	ship Triangle
+	script gunner
+	ship Gunship
 	mission KillFiveAstroidsMission
 
 fleet "Triangle Patrol"

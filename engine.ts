@@ -5,6 +5,8 @@ import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
+import { Fleet } from './universe';
+import { chooseScript } from './ai';
 
 var deepcopy = (<any>window).deepcopy;
 
@@ -13,6 +15,8 @@ import { GameTime, Script, ShipSpec } from './interfaces';
 
 var IMMUNITY_TIME_S = 1;
 
+
+// move these helpers to something to do with entities - engine is more top-level.
 export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:number, script: Script){
     var boid = new Ship(ships.Boid, x, y, script);
     boid.dx = dx;
@@ -23,15 +27,13 @@ export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:
 }
 
 export function makeShip(kind: ShipSpec, x: number, y: number, h: number, script?: Script){
-    var ship = new Ship(kind, x, y, script);
+    if (kind.isComponent){
+        var ship = <Ship>(new Component(kind, x, y, script));
+    } else {
+        var ship = new Ship(kind, x, y, script);
+    }
     ship.h = h;
     return ship;
-}
-
-export function makeComponent(kind: ShipSpec, x: number, y: number, h: number, script: Script): Ship{
-    var ship = new Component(kind, x, y, script);
-    ship.h = h;
-    return <Ship>ship;
 }
 
 function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: ShipSpec, script: Script){
@@ -127,6 +129,11 @@ export class Engine{
     addEntity(entity: Entity){
         this.entities.push(entity);
     }
+    addEntities(entities: Entity[]){
+        entities.map(function(e){
+            this.entities.push(e);
+        });
+    }
     addBackgroundEntity(entity: Entity){
         this.bgEntities.push(entity);
     }
@@ -136,6 +143,22 @@ export class Engine{
     munitions(): Entity[]{
         return this.entities.filter(function(x){return x.isMunition;});
     };
+
+    addFleet(fleet: Fleet){
+        var script = chooseScript(fleet.government, fleet.personality);
+        var specs: ShipSpec[] = fleet.getShipSpecs();
+        for (var spec of specs){
+            this.addEntity(makeShip(spec, Math.random()*1000,
+                                    Math.random()*1000, 270, script));
+        }
+        // choose a location based on current System
+        // make entity objects
+        // set personality fields on entities
+        //
+        // engine should know its current system
+        // scenario code should be in engine!
+    }
+
     getCollisionPairs(entities: Entity[]){
         var collisions = <[Entity, Entity][]>[];
         for (var i=0; i<entities.length; i++){

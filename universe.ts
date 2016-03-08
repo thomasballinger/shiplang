@@ -3,7 +3,7 @@ import { Domains } from './dataload';
 import * as ships from './ships';
 import { Profile } from './profile';
 import { Ship } from './entity';
-import { chooseScript, getScriptByName } from './ai';
+import { chooseScript, getScriptByName, getJSByName } from './ai';
 import { missions, MissionStatic } from './mission';
 
 var shipspecs: {[name: string]: ShipSpec} = <any>ships
@@ -108,7 +108,10 @@ export class System extends DataNode{
         this.fleets = (data.fleet || []).map(function(x: string){
             if (x.length != 2){ throw Error("fleet entry of wrong structure: "+x); }
             checkExists(x[0], 'fleets', global);
-            return [global.fleets[x[0]], parseInt(x[1])];
+
+            //converts periods in 60fps frams to seconds
+            var inSeconds = parseInt(x[1]) / 60
+            return [global.fleets[x[0]], inSeconds];
         });
         this.spobs = (data.object || []).map(function(x: string){
             checkExists(x, 'spobs', global);
@@ -120,13 +123,18 @@ export class System extends DataNode{
     links: System[];
     fleets: [Fleet, number][];
     spobs: Spob[];
-    getFleet():[ShipSpec, any][]{
+
+    getFleets(dt: number):Fleet[]{
         if (this.fleets.length === 0){ return []; }
-        var fleet = chooseFromWeightedOptions(this.fleets);
-        var script = chooseScript(fleet.government, fleet.personality);
-        return fleet.getShipSpecs().map(function(spec: ShipSpec): [ShipSpec, any]{
-            return [spec, script];
-        });
+
+        var fleets: Fleet[] = [];
+        for (var [fleet, period] of this.fleets){
+            var r = Math.random()
+            if (r*period < dt){
+                fleets.push(fleet);
+            }
+        }
+        return fleets;
     }
     spobSpots(day: number):[Spob, [number, number]][]{
         var spots: [Spob, [number, number]][] = [];
@@ -165,7 +173,7 @@ export class Fleet extends DataNode{
     getShipSpecs(): ShipSpec[]{
         var variant = chooseFromWeightedOptions(this.variants);
         var shipSpecs = variant.getSpecs();
-        return variant.getSpecs();
+        return shipSpecs;
     }
 }
 Fleet.fieldName = 'fleets';
@@ -315,7 +323,7 @@ export class Start extends DataNode{
     buildProfile(): Profile{
         return Profile.newProfile()
         .set('location', this.system)
-        .set('script', getScriptByName(this.script))
+        .set('script', getJSByName(this.script))
         .set('ship', this.ship)
         .initiateMissions(this.missions);
     }

@@ -8,7 +8,7 @@ var gunnerScript = require("raw!./scripts/gunner.js");
 var manualShipScript = require("raw!./scripts/pilot.js");
 
 export function chooseScript(governments: Gov, personality: string[]){
-    initialize();
+    initializeSL();
     for (var word of personality){
         if (builtinScripts.hasOwnProperty(word)){
             return builtinScripts[word];
@@ -19,17 +19,20 @@ export function chooseScript(governments: Gov, personality: string[]){
 
 //TODO differentiate between JS and SL scripts
 export function getScriptByName(name: string): any{
-    initialize();
-    if (name === 'gunner'){ return gunnerScript; }
-    if (name === 'manual'){ return manualShipScript; }
+    initializeSL();
     if (builtinScripts.hasOwnProperty(name)){
         return builtinScripts[name];
     }
-    return 'log("could not find script")';
-
+    throw Error("can't find script "+name);
 }
 
-function initialize(){
+export function getJSByName(name: string): any{
+    if (name === 'gunner'){ return gunnerScript; }
+    if (name === 'manual'){ return manualShipScript; }
+    throw Error("can't find script "+name);
+}
+
+function initializeSL(){
     if (builtinScripts === undefined){
         builtinScripts = SLgetScripts(require("raw!./scripts/pilot.sl"));
     }
