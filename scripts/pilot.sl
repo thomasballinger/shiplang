@@ -73,10 +73,9 @@
 (defn foreverVisitPlanetsScript ()
   (while true (visitPlanetsWhile (lambda () true))))
 
-(define i (randInt 3))
 (defn visitPlanetsWhile (condition)
   (stop)
-  (define i (+ i (randInt 0 3)))
+  (define i (randInt 0 100))
   (while (and (condition)
               (or (> (distToNthPlanet i) 50)
                   (> speed 100)))

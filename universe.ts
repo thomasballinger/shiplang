@@ -181,6 +181,7 @@ export class System extends DataNode{
     }
     createFleets(world: Engine, dt: number){
         for (var fleet of this.getFleets(dt)){
+            console.log('adding a fleet');
             world.addFleet(fleet);
         }
     }
