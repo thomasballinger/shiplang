@@ -176,8 +176,11 @@ export class Engine{
         var script = chooseScript(fleet.government, fleet.personality);
         var specs: ShipSpec[] = fleet.getShipSpecs();
         for (var spec of specs){
-            this.addEntity(makeShip(spec, Math.random()*1000,
-                                    Math.random()*1000, 270, script));
+            var ship = makeShip(spec, Math.random()*1000,
+                                Math.random()*1000, 270, script);
+            ship.government = fleet.government;
+            this.addEntity(ship);
+
         }
         //TODO choose a location based on current System
         // set personality fields on entities

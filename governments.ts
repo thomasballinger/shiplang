@@ -12,6 +12,8 @@ export function isEnemy(e1: Entity, e2: Entity){
         return e2.government !== Gov.Pirate && e2.government !== Gov.Debris;
     } else if (e1.government === Gov.Cleanup){
         return e2.government === Gov.Debris;
+    } else if (e1.government === Gov.Military){
+        return e2.government === Gov.Pirate;
     } else {
         return e2.government === Gov.Pirate;
     }
@@ -20,6 +22,8 @@ export function isEnemy(e1: Entity, e2: Entity){
 export function govModReputation(e: Event, p: Profile){
     if (e.type === EventType.Kill){
         p.reputation[e.target.government] -= 1;
+        console.log(Gov[e.actor.government], 'killed', Gov[e.target.government]);
+    } else if (e.type === EventType.Provoke){
         console.log(Gov[e.actor.government], 'hit', Gov[e.target.government]);
     }
 }

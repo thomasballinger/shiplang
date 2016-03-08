@@ -177,6 +177,8 @@ export class System extends DataNode{
         for (var [spec, script] of profile.getMissionShips()){
             world.addEntity(makeShip(spec, Math.random()*1000,
                                      Math.random()*1000, 270, script));
+            //TODO use world.addFleet because it's correctly
+            //sets the government of a ship
         }
     }
     createFleets(world: Engine, dt: number){
@@ -197,7 +199,7 @@ System.fieldName = 'systems';
 export class Fleet extends DataNode{
     populate(data: any, global: AllObjects){
         if (data.government === undefined){ throw Error('No government value for fleet '+this.id); }
-        this.government = data.government[0];
+        this.government = <Gov><any>Gov[data.government[0]];
         if (Gov[this.government] === undefined){ throw Error('Bad government value: '+this.government); }
         //checkExists(data.name, 'phrases', global);
         this.name = new Phrase(); //TODO ignoring data for now

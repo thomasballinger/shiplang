@@ -4,9 +4,9 @@ system Sol
 	pos 0 0
 	government Trader
 	link Robo
-	fleet "Intrastellar Shuttles" 1000
-	fleet "Triangle Patrol" 60
-	fleet "Pirates" 60000
+	fleet "Intrastellar Shuttles" 300
+	fleet "Triangle Patrol" 600
+	fleet "Pirates" 300
 	object Earth
 		color #004000
 		radius 40
@@ -31,6 +31,16 @@ system Sol
 		color #ee3333
 		distance 1400
 		period 687
+	object Jupiter
+		color #aa3333
+		distance 3000
+		period 4332
+		radius 100
+		object Europa
+			radius 20
+			distance 180
+			color #3355bb
+			period 3.5
 
 system Simulator
 	pos 100 100
@@ -77,16 +87,17 @@ start robo
 
 fleet "Triangle Patrol"
 	government Military
+	personality patrol
 	variant 10
 		Triangle 2
-	variant 5
+	variant 0
 		FatTriangle
 
 fleet "Pirates"
 	government Pirate
+	personality attackScript
 	variant 100
 		FatTriangle
-	personality attackScript
 
 fleet "Intrastellar Shuttles"
 	government Trader

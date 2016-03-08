@@ -9,7 +9,7 @@ function isNumber(n: string) {
 }
 
 export function loadData(text: string): Domains {
-    if (text.search('    ') > -1){ throw Error("Found 4 spaces instead of tabs in file!"); }
+    if (text.search('  ') > -1){ throw Error("Found 2 spaces instead of tabs in file!"); }
     var domains: Domains = {};
 
     var stack: any[] = [];

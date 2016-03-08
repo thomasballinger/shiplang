@@ -24,17 +24,27 @@
     (turnTo targetHeading)))
 
 (defn attackScript ()
-  (forever
-    (if (> (distToClosestShip) 300)
-      (do
-        (turnTo (headingToClosestShip))
-        (thrustFor .1)))
-    (if (< (distToClosestShip) 800)
-      (do
-        (aimAtClosestEnemy)
-        (fireLaser "#cccc21")
-        (fireLaser "#cccc21")
-        (fireLaser "#cccc21")))))
+  (forever (attack)))
+
+(defn attack ()
+  (if (> (distToClosestEnemy) 300)
+    (do
+      (turnTo (headingToClosestEnemy))
+      (thrustFor .1)))
+  (if (< (distToClosestEnemy) 800)
+    (do
+      (aimAtClosestEnemy)
+      (fireLaser "#cccc21")
+      (fireLaser "#cccc21")
+      (fireLaser "#cccc21"))))
+
+(defn patrol ()
+  (define noEnemiesAbout (lambda () (log (enemyCount)) (< (enemyCount) 1)))
+  (while true
+    (log (noEnemiesAbout))
+    (if (noEnemiesAbout)
+        (visitPlanetsWhile noEnemiesAbout))
+    (attack)))
 
 (defn enemyScript ()
   (leftFor .6)
