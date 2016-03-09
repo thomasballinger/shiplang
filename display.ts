@@ -4,7 +4,7 @@ import { Engine } from './engine';
 //TODO invert y axis
 
 export class SpaceDisplay{
-    constructor(id: string, public psfOrig: number, public esfOrig: number, public bgp: number){
+    constructor(id: string, public psfOrig: number, public esfOrig: number, public bgp: number, public hud=false){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
@@ -14,29 +14,30 @@ export class SpaceDisplay{
     esf: number;
     renderCentered(centered: Entity, entities: Entity[],
                    positionScaleFactor:number, entityScaleFactor:number,
-                   backgroundParallax:number){
+                   backgroundParallax:number, hud=false){
         this.render(entities,
                     centered.x-this.canvas.width/2/positionScaleFactor,
                     centered.y-this.canvas.height/2/positionScaleFactor,
                     centered.x+this.canvas.width/2/positionScaleFactor,
                     centered.y+this.canvas.height/2/positionScaleFactor,
                     positionScaleFactor,
-                    entityScaleFactor);
+                    entityScaleFactor,
+                    hud);
         this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
     }
     update(center: Entity, w: Engine){
-        this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp);
+        this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp, this.hud);
     }
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     render(entities: Entity[], left: number, top: number, right: number, bottom: number,
-           position_scale_factor: number, entity_scale_factor: number){
+           position_scale_factor: number, entity_scale_factor: number, hud=false){
         var onscreen = this.visibleEntities(entities, left, top, right, bottom); //TODO profile: does this make a difference?
         //var onscreen = entities;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (var i=0; i<onscreen.length; i++){
             var entity = onscreen[i];
-            entityDraw(entity, this.ctx, left, top, position_scale_factor, entity_scale_factor);
+            entityDraw(entity, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
             // Given the world-space
         }
     };
@@ -53,14 +54,14 @@ export class SpaceDisplay{
     zoomOut(){ this.psf *= 8/6; this.esf *= 8/6; }
 }
 
-function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number):void{
+function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number, hud=false):void{
   //dx and dy are offsets in world space for panning
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions
   if (e instanceof Ship){
-      shipDraws[e.type](e, ctx, dx, dy, psf, esf);
+      shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
   } else {
-      entityDraws[e.type](e, ctx, dx, dy, psf, esf);
+      entityDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
   }
   ctx.fillStyle="#222222";
   ctx.strokeStyle="#222222";
@@ -88,8 +89,8 @@ function drawPoly(ctx:CanvasRenderingContext2D, x:number, y:number, points:numbe
   ctx.fill();
 }
 
-type EntityDrawFunc = (e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number)=>void;
-type ShipDrawFunc = (e: Ship, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number)=>void;
+type EntityDrawFunc = (e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number, hud?: boolean)=>void;
+type ShipDrawFunc = (e: Ship, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number, hud?: boolean)=>void;
 
 var entityDraws = <{[type:string]: EntityDrawFunc}>{
   'laser': function(e, ctx, dx, dy, psf, esf){
@@ -98,14 +99,15 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
     ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
     ctx.fill(); //TODO prettier lasers
   },
-  'planet': function(e, ctx, dx, dy, psf, esf){
-    ctx.drawImage(<HTMLImageElement>document.getElementById('earth'), (e.x-dx-e.r)*psf, (e.y-dy-e.r)*psf, e.r*psf*2, e.r*psf*2);
-    /*
-    ctx.fillStyle = e.drawStatus['color'] || "#11ff55";
-    ctx.beginPath();
-    ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
-    ctx.fill();
-    */
+  'planet': function(e, ctx, dx, dy, psf, esf, hud=false){
+    if (hud){
+        ctx.fillStyle = e.drawStatus['color'] || "#11ff55";
+        ctx.beginPath();
+        ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
+        ctx.fill();
+    } else {
+        ctx.drawImage(<HTMLImageElement>document.getElementById('earth'), (e.x-dx-e.r)*psf, (e.y-dy-e.r)*psf, e.r*psf*2, e.r*psf*2);
+    }
   }
 };
 var shipDraws = <{[type:string]: ShipDrawFunc}>{
