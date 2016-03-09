@@ -1,14 +1,10 @@
-import { Gov, ShipSpec } from './interfaces';
+import { Gov } from './interfaces';
 import { Domains } from './dataload';
-import * as ships from './ships';
 import { Profile } from './profile';
-import { Ship } from './entity';
 import { chooseScript, getScriptByName, getJSByName } from './ai';
 import { missions, MissionStatic } from './mission';
-import { Engine, makeShip, makeBoid, makePlanet } from './engine';
+import { Engine, makeShipEntity, makePlanet } from './engine';
 import { loadData } from './dataload';
-
-var shipspecs: {[name: string]: ShipSpec} = <any>ships
 
 /** Building blocks of the universe. Read-only, and certainly
  *  won't change while an engine is running.
@@ -28,6 +24,7 @@ interface AllObjects{
     phrases: {[name: string]: Phrase};
     planets: {[name: string]: Planet};
     starts: {[name: string]: Start};
+    ships: {[name: string]: Ship};
 
     [domain: string]: {[name: string]: any};
 }
@@ -41,6 +38,7 @@ export function createObjects(domains: Domains): AllObjects{
         'phrase': Phrase,
         'planet': Planet,
         'start': Start,
+        'ship': Ship,
     }
     var allObjects: AllObjects = {
         systems: {},
@@ -50,7 +48,7 @@ export function createObjects(domains: Domains): AllObjects{
         phrases: {},
         planets: {},
         starts: {},
-        names: {},
+        ships: {},
     };
     // create the objects
     for (var dataKey of Object.keys(dataKeys)){
@@ -77,7 +75,7 @@ export function createObjects(domains: Domains): AllObjects{
 
 export abstract class DataNode{
     constructor(id?: string){
-        this.id = id || "anonymous "+this.constructor.toString();
+        this.id = id || "anonymous "+this.constructor.name;
     }
     abstract populate(data: any, global: AllObjects): void;
     id: string;
@@ -175,7 +173,7 @@ export class System extends DataNode{
         }
         // Mission fleets
         for (var [spec, script] of profile.getMissionShips()){
-            world.addEntity(makeShip(spec, Math.random()*1000,
+            world.addEntity(makeShipEntity(spec, Math.random()*1000,
                                      Math.random()*1000, 270, script));
             //TODO use world.addFleet because it's correctly
             //sets the government of a ship
@@ -187,8 +185,8 @@ export class System extends DataNode{
             world.addFleet(fleet);
         }
     }
-    createPlayerShip(world: Engine, profile: Profile, script: any){
-        var ship = makeShip(profile.ship, 0, 0, 270, script);
+    createPlayerShipEntity(world: Engine, profile: Profile, script: any){
+        var ship = makeShipEntity(profile.ship, 0, 0, 270, script);
         ship.imtheplayer = true;
         ship.government = Gov.Player
         world.addEntity(ship);
@@ -220,11 +218,11 @@ export class Fleet extends DataNode{
     variants: [Variant, number][];
 
     //TODO use deterministic randomness here
-    /** A randomly-chosen list of ShipSpecs */
-    getShipSpecs(): ShipSpec[]{
+    /** A randomly-chosen list of Ships */
+    getShips(): Ship[]{
         var variant = chooseFromWeightedOptions(this.variants);
-        var shipSpecs = variant.getSpecs();
-        return shipSpecs;
+        var ships = variant.getShips();
+        return ships;
     }
 }
 Fleet.fieldName = 'fleets';
@@ -253,10 +251,8 @@ export class Variant extends DataNode{
             if (key === 'domain'){ continue; }
             if (key === 'weight'){ continue; }
             // no ids for variants
-            var ship = shipspecs[key];
-            if (ship === undefined){
-                throw Error("Can't find ship "+key);
-            }
+            checkExists(key, 'ships', global);
+            var ship = global.ships[key]
             if (data[key].length > 1){
                 throw Error('ship listed twice: '+key);
             }
@@ -264,23 +260,23 @@ export class Variant extends DataNode{
             if (!isFinite(num)){
                 throw Error('Bad number for variant: '+data[key]);
             }
-            this.ships.push([shipspecs[key], num]);
+            this.ships.push([ship, num]);
         }
         if (this.ships.length === 0){
             throw Error("No ships entries found for variant");
         }
         Object.freeze(this);
     }
-    getSpecs(): ShipSpec[]{
-        var specs: ShipSpec[] = [];
-        this.ships.map(function(x: [ShipSpec, number]){
+    getShips(): Ship[]{
+        var ships: Ship[] = [];
+        this.ships.map(function(x: [Ship, number]){
             for (var i=0; i<x[1]; i++){
-                specs.push(x[0]);
+                ships.push(x[0]);
             }
         });
-        return specs;
+        return ships;
     }
-    ships: [ShipSpec, number][];
+    ships: [Ship, number][];
 }
 Variant.fieldName = 'variants';
 
@@ -359,7 +355,8 @@ export class Start extends DataNode{
         this.planet = global.spobs[data.planet[0]];
         this.script = data.script ? data.script[0] : 'console.log("no script specified");';
         if (data.ship === undefined){ throw Error("No ship provided for start "+this.id)}
-        this.ship = shipspecs[data.ship]
+        checkExists(data.ship[0], 'ships', global);
+        this.ship = global.ships[data.ship]
         if (this.ship === undefined){
             throw Error("Can't find ship "+data.ship);
         }
@@ -367,6 +364,7 @@ export class Start extends DataNode{
             if (missions[name] === undefined) { throw Error("Can't find mission "+name); }
             return [missions[name], undefined];
         })
+        //this.missions = []; // TODO circular dependency with building a mission requiring the universe.
         Object.freeze(this);
     }
     day: number;
@@ -375,7 +373,7 @@ export class Start extends DataNode{
     credits: number;
     missions: [MissionStatic, any][];
     script: string;
-    ship: ShipSpec;
+    ship: Ship;
     buildProfile(): Profile{
         return Profile.newProfile()
         .set('location', this.system)
@@ -386,6 +384,41 @@ export class Start extends DataNode{
 }
 Start.fieldName = 'starts'
 
+export class Ship extends DataNode{
+    populate(data: any, global: AllObjects){
+        this.drawStatus = {};
+        this.drawStatus['sprite'] = data.sprite[0];
+        this.shieldsMax = parseInt(data.attributes[0].shields[0]);
+        this.armorMax = parseInt(data.attributes[0].hull[0]);
+        this.maxThrust = parseInt(data.attributes[0].maxThrust[0]);
+        this.maxSpeed = parseInt(data.attributes[0].maxSpeed[0]);
+        this.maxDH = parseInt(data.attributes[0].maxDH[0]);
+
+        this.r = 10; //TODO
+        this.isMunition = false;
+        this.isInertialess = false;
+        this.lifespan = undefined;
+        this.type = this.id.toLowerCase();
+        this.explosionSize = 20;
+        this.isComponent = false; //TODO
+    }
+    drawStatus: {[name: string]: any};
+    shieldsMax: number;
+    armorMax: number;
+    maxThrust: number;
+    maxDH: number;
+    maxSpeed: number;
+
+    r: number;
+    isMunition: boolean;
+    isInertialess: boolean;
+    lifespan: number;
+    type: string;
+    explosionSize: number;
+    isComponent: boolean;
+
+}
+Ship.fieldName = 'ships'
 
 
 

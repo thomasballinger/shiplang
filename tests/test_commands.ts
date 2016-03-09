@@ -1,15 +1,15 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { Boid } from '../ships';
-import { Engine, makeShip } from '../engine';
+import { universe } from '../universe';
+import { Engine, makeShipEntity } from '../engine';
 import {setCurrentEntity, setGameTime, setGameWorld,
         setKeyControls, commands, controls} from '../scriptenv';
 
 
 describe('Commands', () => {
     var world = new Engine(undefined, undefined);
-    var ship = makeShip(Boid, 1, 2, 3);
+    var ship = makeShipEntity(universe.ships['Boid'], 1, 2, 3);
     world.addEntity(ship);
     setGameWorld(world)
     setCurrentEntity(ship)

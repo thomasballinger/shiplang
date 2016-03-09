@@ -59,7 +59,26 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions
   if (e instanceof Ship){
-      shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
+      if (hud || !e.drawStatus['sprite']){
+          shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
+      } else {
+        //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
+        var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
+        var w = sprite.naturalWidth;
+
+        var h = e.h + 90;
+
+        var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
+        var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
+        var rotatedX = onscreenX * Math.cos(h * Math.PI / 180) - onscreenY * Math.sin(h * Math.PI / 180);
+        var rotatedY = onscreenX * Math.sin(h * Math.PI / 180) + onscreenY * Math.cos(h * Math.PI / 180);
+
+        ctx.save();
+        ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
+        ctx.rotate(h*Math.PI/180);
+        ctx.drawImage(sprite, -w/2, -w/2, w*psf, w*psf);
+        (<any>ctx).restore();
+      }
   } else {
       entityDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
   }
@@ -114,52 +133,33 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
 };
 var shipDraws = <{[type:string]: ShipDrawFunc}>{
   'triangle': function(e, ctx, dx, dy, psf, esf, hud=false){
-    if (hud){
-        ctx.fillStyle="#eeaa22";
-        if (e.thrust > 0){
-        drawPoly(ctx,
-                 (e.x-dx)*psf,
-                 (e.y-dy)*psf,
-                 [[-13, -10],
-                  [-9, -10],
-                  [-9, 10],
-                  [-13, 10]],
-                 e.h,
-                 esf);
-        }
-        if (e.drawStatus['scanning']){
-          ctx.strokeStyle="#ffeeff";
-          ctx.beginPath();
-          ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*10*psf, 0, 2*Math.PI);
-          ctx.stroke();
-        }
-        ctx.fillStyle="#aaeebb";
-        drawPoly(ctx,
-                 (e.x-dx)*psf,
-                 (e.y-dy)*psf,
-                 [[15, 0],
-                  [-10, -12],
-                  [-10, 12]],
-                 e.h,
-                 esf);
-    } else {
-        //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
-        var sprite = <HTMLImageElement>document.getElementById('ship/wasp');
-        var w = sprite.naturalWidth;
-
-        var h = e.h + 90;
-
-        var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
-        var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
-        var rotatedX = onscreenX * Math.cos(h * Math.PI / 180) - onscreenY * Math.sin(h * Math.PI / 180);
-        var rotatedY = onscreenX * Math.sin(h * Math.PI / 180) + onscreenY * Math.cos(h * Math.PI / 180);
-
-        ctx.save();
-        ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
-        ctx.rotate(h*Math.PI/180);
-        ctx.drawImage(sprite, -w/2, -w/2, w*psf, w*psf);
-        (<any>ctx).restore();
+    ctx.fillStyle="#eeaa22";
+    if (e.thrust > 0){
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[-13, -10],
+              [-9, -10],
+              [-9, 10],
+              [-13, 10]],
+             e.h,
+             esf);
     }
+    if (e.drawStatus['scanning']){
+      ctx.strokeStyle="#ffeeff";
+      ctx.beginPath();
+      ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*10*psf, 0, 2*Math.PI);
+      ctx.stroke();
+    }
+    ctx.fillStyle="#aaeebb";
+    drawPoly(ctx,
+             (e.x-dx)*psf,
+             (e.y-dy)*psf,
+             [[15, 0],
+              [-10, -12],
+              [-10, 12]],
+             e.h,
+             esf);
   },
   'fattriangle': function(e, ctx, dx, dy, psf, esf){
     ctx.fillStyle="#335599";

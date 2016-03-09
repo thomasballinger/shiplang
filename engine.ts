@@ -1,11 +1,10 @@
-import { Entity, Ship, SpobEntity, Component } from './entity';
+import { Entity, Ship as ShipEntity, SpobEntity, Component } from './entity';
 import { x_comp, y_comp, dist } from './shipmath';
-import * as ships from './ships';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
-import { Fleet, System, universe } from './universe';
+import { Fleet, System, Ship, universe } from './universe';
 import { chooseScript } from './ai';
 
 var deepcopy = (<any>window).deepcopy;
@@ -16,27 +15,18 @@ var IMMUNITY_TIME_S = 1;
 
 
 // move these helpers to something to do with entities - engine is more top-level.
-export function makeBoid(x:number, y:number, dx:number, dy:number, h:number, dh:number, script: Script){
-    var boid = new Ship(ships.Boid, x, y, script);
-    boid.dx = dx;
-    boid.dy = dy;
-    boid.dh = dh;
-    boid.h = h;
-    return boid;
-}
-
-export function makeShip(kind: ShipSpec, x: number, y: number, h: number, script?: Script){
+export function makeShipEntity(kind: Ship, x: number, y: number, h: number, script?: Script){
     if (kind.isComponent){
-        var ship = <Ship>(new Component(kind, x, y, script));
+        var ship = <ShipEntity>(new Component(kind, x, y, script));
     } else {
-        var ship = new Ship(kind, x, y, script);
+        var ship = new ShipEntity(kind, x, y, script);
     }
     ship.h = h;
     return ship;
 }
 
-function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: ShipSpec, script: Script){
-    var missile = new Ship(ship, x, y, script);
+function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: Ship, script: Script){
+    var missile = new ShipEntity(ship, x, y, script);
     missile.dx = dx;
     missile.dy = dy;
     missile.r = 3;
@@ -44,7 +34,7 @@ function makeMissile(x: number, y: number, dx: number, dy: number, h: number, sh
     return missile;
 }
 
-function fireMissile(e:Entity, ship: ShipSpec, script: Script, t:GameTime){
+function fireMissile(e:Entity, ship: Ship, script: Script, t:GameTime){
     var missile = makeMissile(e.x + x_comp(e.h)*e.r,
                               e.y + y_comp(e.h)*e.r,
                               e.dx + x_comp(e.h) * 10,
@@ -119,7 +109,7 @@ export class Engine{
         if (this.playerAdded){
             throw Error("Player already added");
         }
-        this.system.createPlayerShip(this, this.profile, script);
+        this.system.createPlayerShipEntity(this, this.profile, script);
         this.playerAdded = true;
     }
     static fromStart(startName: string){
@@ -141,7 +131,7 @@ export class Engine{
         //console.log(window.performance.now() - t0);
         return world;
     }
-    fireMissile(entity:Entity, ship: ShipSpec, script: Script, color:string){
+    fireMissile(entity:Entity, ship: Ship, script: Script, color:string){
         var missile = fireMissile(entity, ship, script, this.gameTime);
         missile.drawStatus['color'] = color;
         this.addEntity(missile);
@@ -165,8 +155,8 @@ export class Engine{
     addBackgroundEntity(entity: Entity){
         this.bgEntities.push(entity);
     }
-    ships():Ship[]{
-        return <Ship[]>this.entities.filter(function(x){return !x.isMunition;});
+    ships():ShipEntity[]{
+        return <ShipEntity[]>this.entities.filter(function(x){return !x.isMunition;});
     };
     munitions(): Entity[]{
         return this.entities.filter(function(x){return x.isMunition;});
@@ -174,9 +164,9 @@ export class Engine{
 
     addFleet(fleet: Fleet){
         var script = chooseScript(fleet.government, fleet.personality);
-        var specs: ShipSpec[] = fleet.getShipSpecs();
+        var specs: Ship[] = fleet.getShips();
         for (var spec of specs){
-            var ship = makeShip(spec, Math.random()*1000,
+            var ship = makeShipEntity(spec, Math.random()*1000,
                                 Math.random()*1000, 270, script);
             ship.government = fleet.government;
             this.addEntity(ship);
@@ -298,7 +288,7 @@ export class Engine{
         }).map(function(x){ x.dead = true; });
 
         this.entities = this.entities.filter(function(x){
-            if (x.dead && (x instanceof Ship)){
+            if (x.dead && (x instanceof ShipEntity)){
                 x.context.cleanup();
             }
             return x.dead !== true;
@@ -397,10 +387,10 @@ export class Engine{
 
         this.inTick = false;
     }
-    getPlayer():Ship{
-        return <Ship>this.entities.filter(function(x){return x.imtheplayer;})[0];
+    getPlayer():ShipEntity{
+        return <ShipEntity>this.entities.filter(function(x){return x.imtheplayer;})[0];
     }
-    getAttached(e: Ship): Component[]{
+    getAttached(e: ShipEntity): Component[]{
         return <Component[]>this.entities.filter(function(x){ return x.attachedTo === e; });
     }
 

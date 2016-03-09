@@ -74,7 +74,6 @@ export interface ShipSpec {
     shieldsMax: number,
     isInertialess: boolean,
     lifespan: number,
-    government: Gov,
     isComponent?: boolean;
 }
 // New properties should be added both above and below
@@ -90,7 +89,6 @@ export interface ShipSpecChanges {
     shieldsMax?: number,
     isInertialess?: boolean,
     lifespan?: number,
-    government?: Gov,
     isComponent?: boolean;
 }
 

@@ -1,8 +1,10 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
-import { Engine, makeShip } from '../engine';
-import { Entity } from '../entity';
-import * as ships from '../ships';
 import { assert } from 'chai';
+
+import { Engine, makeShipEntity } from '../engine';
+import { Entity } from '../entity';
+import { universe } from '../universe';
+
 
 
 describe('Engine', () => {
@@ -19,10 +21,10 @@ describe('Engine', () => {
     describe('#checkCollisions', () => {
         it("explosions from own missile should damage entities", () => {
             var s1 = new Engine(undefined, undefined)
-            var ship = makeShip(ships.Gunship, 0, 0, 170);
+            var ship = makeShipEntity(universe.ships['Gunship'], 0, 0, 170);
             ship.shieldsMax = 0;
             s1.addEntity(ship);
-            s1.fireMissile(ship, ships.DroneMissile, undefined, '#abcdef')
+            s1.fireMissile(ship, universe.ships['DroneMissile'], undefined, '#abcdef')
             s1.tick(.2, function(e){ throw e; });
             s1.fireLaser(ship, '#abcdef')
             s1.tick(1, function(e){ throw e; });

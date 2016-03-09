@@ -2,9 +2,9 @@ import * as evaluation from './eval';
 import { Ship } from './entity';
 import { Profile } from './profile';
 var manual = require('./manual');
-import * as ships from './ships';
 import { putMessage } from './messagelog';
 import { headingDiff, headingToLeft, closingSpeed } from './shipmath';
+import { Ship as ShipPrototype, universe } from './universe';
 
 import { GameTime, Interpreter, JSInterpAsyncInput } from './interfaces';
 
@@ -403,10 +403,10 @@ function makeCommands():MakeCommandsReturnType{
                     // with that forked interpreter.
                     // TODO dispatch on context maybe?
                     if (script instanceof evaluation.CompiledFunctionObject){
-                        w.fireMissile(e, ships.DroneMissile, script, color);
+                        w.fireMissile(e, universe.ships['DroneMissile'], script, color);
                     } else {
                         var plsFork = [e.context, script]
-                        w.fireMissile(e, ships.DroneMissile, plsFork, color);
+                        w.fireMissile(e, universe.ships['DroneMissile'], plsFork, color);
                     }
                     missileFired = true;
                 } else if (t < startTime + .3){
@@ -424,7 +424,7 @@ function makeCommands():MakeCommandsReturnType{
                 if (t < startTime + .1){
                     return false;
                 } else if (!missileFired){
-                    w.fireMissile(e, ships.NeedleMissile, script, color);
+                    w.fireMissile(e, universe.ships['NeedleMissile'], script, color);
                     missileFired = true;
                 } else if (t < startTime + .2){
                     return false;

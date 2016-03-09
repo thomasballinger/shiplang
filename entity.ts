@@ -3,8 +3,9 @@ import * as ev from './eval';
 import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
+import { Ship as ShipPrototype } from './universe';
 
-import { GameTime, Generator, Interpreter, Selection, Script, ShipSpec, Context, JSInterpFunction, Gov } from './interfaces';
+import { GameTime, Generator, Interpreter, Selection, Script, Context, JSInterpFunction, Gov } from './interfaces';
 
 var SHIELDS_RECHARGE_RATE = 1;
 
@@ -137,7 +138,7 @@ function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
 
 // Things scripts can be run on, including missiles
 export class Ship extends Entity{
-    constructor(spec: ShipSpec, x: number, y: number, script?: Script){
+    constructor(spec: ShipPrototype, x: number, y: number, script?: Script){
         super(spec.type, x, y, 0, 0, spec.r);
         this.maxThrust = spec.maxThrust;
         this.maxDH = spec.maxDH;
@@ -178,7 +179,9 @@ export class Ship extends Entity{
         if (spec.lifespan !== undefined){
             this.timeToDie = -spec.lifespan;
         }
-        this.government = spec.government;
+        if (spec.drawStatus){
+            this.drawStatus['sprite'] = spec.drawStatus['sprite'];
+        }
     }
     maxThrust: number;
     maxDH: number;
@@ -242,7 +245,7 @@ export class Ship extends Entity{
     }
     detach(){}
     deepCopyCreate():Ship{
-        return new Ship(<ShipSpec>{}, undefined, undefined, undefined);
+        return new Ship(<ShipPrototype>{}, undefined, undefined, undefined);
     }
     /** Run a command (from the console, for debugging) */
     //relies on some globals lying around that are only
@@ -257,7 +260,7 @@ export class Ship extends Entity{
 
 // scripts can run on these, but movement matches that of another ship
 export class Component extends Ship{
-    constructor(spec: ShipSpec, x: number, y: number, script: Script){
+    constructor(spec: ShipPrototype, x: number, y: number, script: Script){
         super(spec, x, y, script);
         this.isComponent = true;
     }
@@ -296,6 +299,6 @@ export class Component extends Ship{
         }
     }
     deepCopyCreate():Ship{
-        return new Ship(<ShipSpec>{}, undefined, undefined, undefined);
+        return new Ship(<ShipPrototype>{}, undefined, undefined, undefined);
     } //TODO figure out the typescript way to use the correct constructor in the superclass
 }

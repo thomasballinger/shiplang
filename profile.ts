@@ -1,8 +1,8 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
-import { Gov, ShipSpec } from './interfaces';
+import { Gov } from './interfaces';
 import { Mission, Event, MissionStatic } from './mission';
 import { putMessage } from './messagelog';
-import * as ships from './ships';
+import { Ship, universe } from './universe';
 
 // Plan:
 // Profile is a serializable object that only gets saved on landing.
@@ -103,7 +103,7 @@ export class Profile{
         }
         return msg;
     }
-    getMissionShips(): [ShipSpec, any][]{
+    getMissionShips(): [Ship, any][]{
         return [].concat.apply([],
             this.missions.map(function(mission){
                 return mission.getShips();
@@ -128,7 +128,7 @@ export class Profile{
             missions: [],
             reputation: {},
             day: 0,
-            ship: ships.Triangle,
+            ship: universe.ships['Triangle'],
         })
     }
     // schema for objects:
@@ -140,5 +140,5 @@ export class Profile{
     day: number;
     //missions: [string, any][];
     reputation: ReputationTable;
-    ship: ShipSpec;
+    ship: Ship;
 }

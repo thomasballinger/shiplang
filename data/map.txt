@@ -132,3 +132,69 @@ fleet "Mean Pirate"
 	personality attackScript
 	variant 1
 		FatTriangle 1
+
+ship "FatTriangle"
+	sprite "ship/aerie"
+	attributes
+		"shields" 20
+		"hull" 20
+		"maxThrust" 100
+		"maxSpeed" 350
+		"maxDH" 200
+	engine -10 91
+	engine 10 91
+
+ship "Triangle"
+	sprite "ship/argosy"
+	attributes
+		"shields" 10
+		"hull" 10
+		"maxThrust" 300
+		"maxSpeed" 300
+		"maxDH" 200
+	engine -16 82
+	engine 16 82
+
+ship "Shuttle"
+	sprite "ship/shuttle"
+	attributes
+		"shields" 0
+		"hull" 3
+		"maxThrust" 40
+		"maxSpeed" 100
+		"maxDH" 100
+	engine 6 30
+	engine -6 30
+
+ship "Drone Missile"
+	sprite "ship/combat drone"
+	attributes
+		"shields" 0
+		"hull" 1
+		"maxThrust" 300
+		"maxSpeed" 350
+		"maxDH" 300
+	engine 6 30
+	engine -6 30
+
+ship "Gunship"
+	sprite "ship/combat drone"
+	attributes
+		"shields" 0
+		"hull" 1
+		"maxThrust" 300
+		"maxSpeed" 350
+		"maxDH" 300
+	engine 6 30
+	engine -6 30
+
+ship "Boid"
+	sprite "ship/combat drone"
+	attributes
+		"shields" 0
+		"hull" 1
+		"maxThrust" 300
+		"maxSpeed" 350
+		"maxDH" 300
+	engine 6 30
+	engine -6 30

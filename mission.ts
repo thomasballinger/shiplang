@@ -1,7 +1,6 @@
 import { Entity } from './entity';
-import { Gov, ShipSpec } from './interfaces';
+import { Gov } from './interfaces';
 import { putMessage } from './messagelog';
-import * as ships from './ships';
 import { getScriptByName } from './ai';
 
 // Events exist only within a tick and therefore don't
@@ -60,7 +59,7 @@ export abstract class Mission {
     abstract processEvent(e: Event): void;
     instructions(): string{ return ""; }
     initializeData(){ this.data = {} }
-    getShips(): [ShipSpec, any][]{
+    getShips(): [Ship, any][]{
         return [];
     }
 }
@@ -93,13 +92,13 @@ export var missions = <moduleOfMissions>{
             }
             return "Kill "+(5-this.data.killed)+" more astroids";
         }
-        getShips(): [ShipSpec, any][]{
-            return [[ships.Holder, getScriptByName('holderScript')],
-                    [ships.Astroid, getScriptByName('wander')],
-                    [ships.Astroid, getScriptByName('wander')],
-                    [ships.Astroid, getScriptByName('wander')],
-                    [ships.Astroid, getScriptByName('wander')],
-                    [ships.Astroid, getScriptByName('wander')],
+        getShips(): [Ship, any][]{
+            return [[universe.ships['Holder'], getScriptByName('holderScript')],
+                    [universe.ships['Astroid'], getScriptByName('wander')],
+                    [universe.ships['Astroid'], getScriptByName('wander')],
+                    [universe.ships['Astroid'], getScriptByName('wander')],
+                    [universe.ships['Astroid'], getScriptByName('wander')],
+                    [universe.ships['Astroid'], getScriptByName('wander')],
                    ];
         }
     },
@@ -121,3 +120,4 @@ export var missions = <moduleOfMissions>{
     }
 }
 
+import { Ship, universe } from './universe'
