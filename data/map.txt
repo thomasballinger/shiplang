@@ -151,7 +151,7 @@ ship "Triangle"
 		"hull" 10
 		"maxThrust" 300
 		"maxSpeed" 300
-		"maxDH" 200
+		"maxDH" 100
 	engine -16 82
 	engine 16 82
 
