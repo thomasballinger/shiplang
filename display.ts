@@ -148,8 +148,7 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              e.h,
              esf);
     }
-    ctx.fillStyle="#aaeebb";
-    ctx.fillStyle=e.drawStatus['color'] || "#aaeebb";
+    ctx.fillStyle=e.drawStatus['color'] || "#992200";
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,

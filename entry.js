@@ -8,6 +8,7 @@ import { Profile } from './profile';
 import { earth, tolok } from './story';
 import { missions } from './mission';
 import { Engine } from './engine';
+import { universe } from './universe'
 
 window.Profile = Profile; // for convenience in onClicks of links
 
@@ -29,6 +30,9 @@ function main(){
   cmd = getLocation();
   if (cmd === 'simulator'){
     return simulator(Engine.fromStart('simulator'));
+  }
+  if (cmd === ''){
+    cmd = 'adventure';
   }
   outerspace(Engine.fromStart(cmd));
 }
