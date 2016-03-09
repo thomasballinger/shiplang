@@ -29,7 +29,7 @@ function makeMissile(x: number, y: number, dx: number, dy: number, h: number, sh
     var missile = new ShipEntity(ship, x, y, script);
     missile.dx = dx;
     missile.dy = dy;
-    missile.r = 100;
+    missile.r = 3;
     missile.h = h;
     return missile;
 }

@@ -65,7 +65,7 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
       } else {
         //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
         var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
-        var w = sprite.naturalWidth;
+        var w = sprite.naturalWidth * psf;
 
         var h = e.h + 90;
 
@@ -77,7 +77,7 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
         ctx.save();
         ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
         ctx.rotate(h*Math.PI/180);
-        ctx.drawImage(sprite, -w/2, -w/2, w*psf, w*psf);
+        ctx.drawImage(sprite, -w/2, -w/2, w, w);
         (<any>ctx).restore();
       }
   } else {

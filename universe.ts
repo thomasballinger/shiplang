@@ -394,13 +394,15 @@ export class Ship extends DataNode{
         this.maxSpeed = parseInt(data.attributes[0].maxSpeed[0]);
         this.maxDH = parseInt(data.attributes[0].maxDH[0]);
 
-        this.r = 20; //TODO
-        this.isMunition = false;
-        this.isInertialess = false;
-        this.lifespan = undefined;
-        this.type = this.id.toLowerCase();
-        this.explosionSize = 20;
-        this.isComponent = false; //TODO
+        // optional
+        this.isMunition = data.attributes[0].isMunition ? true : false
+        this.isComponent = data.attributes[0].isComponent ? true : false
+        this.isInertialess = data.attributes[0].isIntertialess ? true : false
+        this.lifespan = data.attributes[0].lifespan ? parseFloat(data.attributes[0].lifespan[0]) : undefined
+        this.explosionSize = data.attributes[0].explosionSize ? parseFloat(data.attributes[0].explosionSize[0]) : 20
+
+        this.r = 20; //TODO use sprite infomation TODO eventually don't use radius-based collisions
+        this.type = this.id.toLowerCase(); //TODO get rid of this?
     }
     drawStatus: {[name: string]: any};
     shieldsMax: number;
