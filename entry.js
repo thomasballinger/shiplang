@@ -8,7 +8,7 @@ import { Profile } from './profile';
 import { earth, tolok } from './story';
 import { missions } from './mission';
 import { Engine } from './engine';
-import { universe } from './universe'
+import { universe } from './universe';
 
 window.Profile = Profile; // for convenience in onClicks of links
 

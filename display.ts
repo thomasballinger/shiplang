@@ -99,10 +99,13 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
     ctx.fill(); //TODO prettier lasers
   },
   'planet': function(e, ctx, dx, dy, psf, esf){
+    ctx.drawImage(<HTMLImageElement>document.getElementById('earth'), (e.x-dx-e.r)*psf, (e.y-dy-e.r)*psf, e.r*psf*2, e.r*psf*2);
+    /*
     ctx.fillStyle = e.drawStatus['color'] || "#11ff55";
     ctx.beginPath();
     ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
     ctx.fill();
+    */
   }
 };
 var shipDraws = <{[type:string]: ShipDrawFunc}>{
