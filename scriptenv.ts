@@ -403,10 +403,10 @@ function makeCommands():MakeCommandsReturnType{
                     // with that forked interpreter.
                     // TODO dispatch on context maybe?
                     if (script instanceof evaluation.CompiledFunctionObject){
-                        w.fireMissile(e, universe.ships['DroneMissile'], script, color);
+                        w.fireMissile(e, universe.ships['Drone Missile'], script, color);
                     } else {
                         var plsFork = [e.context, script]
-                        w.fireMissile(e, universe.ships['DroneMissile'], plsFork, color);
+                        w.fireMissile(e, universe.ships['Drone Missile'], plsFork, color);
                     }
                     missileFired = true;
                 } else if (t < startTime + .3){

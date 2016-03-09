@@ -59,7 +59,8 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions
   if (e instanceof Ship){
-      if (hud || !e.drawStatus['sprite']){
+      if (hud || !e.drawStatus['sprite'] || e.type === 'explosion'){
+          console.log(e.type);
           shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
         //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
@@ -282,7 +283,7 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
              e.h,
              esf);
   },
-  'dronemissile': function(e, ctx, dx, dy, psf, esf){
+  'drone missile': function(e, ctx, dx, dy, psf, esf){
     if (e.drawStatus['armed']){
       ctx.fillStyle="#AA1144";
     } else {

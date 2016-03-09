@@ -394,7 +394,7 @@ export class Ship extends DataNode{
         this.maxSpeed = parseInt(data.attributes[0].maxSpeed[0]);
         this.maxDH = parseInt(data.attributes[0].maxDH[0]);
 
-        this.r = 10; //TODO
+        this.r = 20; //TODO
         this.isMunition = false;
         this.isInertialess = false;
         this.lifespan = undefined;
