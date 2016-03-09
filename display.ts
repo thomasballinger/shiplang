@@ -65,18 +65,19 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
         //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
         var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
         var w = sprite.naturalWidth * esf;
+        var h = sprite.naturalHeight * esf;
 
-        var h = e.h + 90;
+        var theta = e.h + 90;
 
         var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
         var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
-        var rotatedX = onscreenX * Math.cos(h * Math.PI / 180) - onscreenY * Math.sin(h * Math.PI / 180);
-        var rotatedY = onscreenX * Math.sin(h * Math.PI / 180) + onscreenY * Math.cos(h * Math.PI / 180);
+        var rotatedX = onscreenX * Math.cos(theta * Math.PI / 180) - onscreenY * Math.sin(theta * Math.PI / 180);
+        var rotatedY = onscreenX * Math.sin(theta * Math.PI / 180) + onscreenY * Math.cos(theta * Math.PI / 180);
 
         ctx.save();
         ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
-        ctx.rotate(h*Math.PI/180);
-        ctx.drawImage(sprite, -w/2, -w/2, w, w);
+        ctx.rotate(theta*Math.PI/180);
+        ctx.drawImage(sprite, -w/2, -h/2, w, h);
         (<any>ctx).restore();
       }
   } else {

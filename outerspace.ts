@@ -12,10 +12,10 @@ import { Updateable, Selection, Scenario } from './interfaces';
 
 export function outerspace(originalWorld: Engine){
 
-// document body fullscreen
-document.body.addEventListener('click', function(e){
-  setup.makeFullscreen(document.body);
-});
+  // document body fullscreen
+  //document.body.addEventListener('click', function(e){
+  //  setup.makeFullscreen(document.body);
+  //});
 
   var canvas = <HTMLCanvasElement>document.getElementById('canvas');
   canvas.classList.toggle('space-background');
