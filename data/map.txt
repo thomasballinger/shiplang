@@ -8,38 +8,52 @@ system Sol
 	fleet "Triangle Patrol" 600
 	fleet "Pirates" 300
 	object Earth
-		color #004000
-		radius 40
+		sprite planet/earth
 		period 365.25
 		distance 1000
 		object Luna
-			color #aa9922
-			radius 20
+			sprite planet/earth
 			distance 200
 			period 27.3
 			object MadeUpMoonSatellite
-				radius 2
-				color #aa9922
+				sprite planet/earth
 				distance 50
 				period 10
 			object
-				radius 10
-				color #aa9922
+				sprite planet/earth
+				distance 250
+				period 10
+			object
+				sprite planet/earth
+				distance 150
+				period 10
+			object
+				sprite planet/earth
+				distance 50
+				period 10
+			object
+				sprite planet/earth
+				distance 250
+				period 10
+			object
+				sprite planet/earth
+				distance 150
+				period 10
+			object
+				sprite planet/earth
 				distance 50
 				period 10
 	object Mars
-		color #ee3333
+		sprite planet/earth
 		distance 1400
 		period 687
 	object Jupiter
-		color #aa3333
+		sprite planet/earth
 		distance 3000
 		period 4332
-		radius 100
 		object Europa
-			radius 20
+			sprite planet/earth
 			distance 180
-			color #3355bb
 			period 3.5
 
 system Simulator
@@ -56,7 +70,7 @@ system Robo
 	fleet "Mean Pirate" 1
 	fleet "Mean Pirate" 1
 	object Tolok
-		radius 40
+		sprite planet/earth
 		distance 300
 		period 2
 

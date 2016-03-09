@@ -41,7 +41,7 @@ document.body.addEventListener('click', function(e){
       canvas.height = window.innerHeight;
     }
   });
-  var mainDisplay = new SpaceDisplay('canvas', 1, 1, .1);
+  var mainDisplay = new SpaceDisplay('canvas', 1, 1, 1);
   updater.registerObserver(mainDisplay);
   updater.registerObserver(new SpaceDisplay('minimap', 0.07, 0.3, 0, true));
   updater.registerObserver(<Updateable>{
@@ -77,11 +77,13 @@ document.body.addEventListener('click', function(e){
         setTimeout(tick, 33.5); // 30fps
         return;
     }
-    var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
+    //var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
+    var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
     if (fastForward[0]){
         setTimeout(tick, 1);
     } else {
-        setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
+    //    setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
+        setTimeout(tick, 1); // max fps
     }
   }
 

@@ -39,9 +39,8 @@
       (fireLaser "#cccc21"))))
 
 (defn patrol ()
-  (define noEnemiesAbout (lambda () (log (enemyCount)) (< (enemyCount) 1)))
+  (define noEnemiesAbout (lambda () (< (enemyCount) 1)))
   (while true
-    (log (noEnemiesAbout))
     (if (noEnemiesAbout)
         (visitPlanetsWhile noEnemiesAbout))
     (attack)))

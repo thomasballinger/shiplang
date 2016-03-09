@@ -165,7 +165,7 @@ export class System extends DataNode{
     }
     createPlanets(world: Engine, profile: Profile){
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
-            world.addBackgroundEntity(makePlanet(x, y, spob.radius, spob.color));
+            world.addBackgroundEntity(makePlanet(x, y, 20, spob.sprite));
         }
     }
     createInitialFleets(world: Engine, profile: Profile){
@@ -293,20 +293,11 @@ export class Spob extends DataNode{
         if (data.period === undefined){ throw Error('No period found for planet '+this.id); }
         if (data.period.length > 1){ throw Error('Too many periods listed for spob'); }
         this.period = parseFloat(data.period[0]);
-        if (data.radius === undefined){
-            console.log('no radius found for planet '+this.id+' so using default'); 
-            this.radius = 40;
+        if (data.sprite === undefined){
+            throw Error('no sprite found for planet '+this.id);
         } else {
-            if (data.radius.length > 1){ throw Error('Too many radii listed for spob'); }
-            this.radius = parseFloat(data.radius[0]);
-        }
-        if (data.color === undefined){
-            console.log('no color found for planet '+this.id+' so using default');
-            this.color = '#123456';
-        } else {
-            if (data.color.length > 1){ throw Error('Too many colors listed for spob'); }
-            this.color = data.color[0];
-            if (!/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(this.color)){ throw Error("Color doesn't look like a hex color: "+this.color); }
+            if (data.sprite.length > 1){ throw Error('Too many sprites listed for spob'); }
+            this.sprite = data.sprite
         }
         this.spobs = (data.object || []).map(function(x: any){
             if (typeof x === 'string'){
@@ -324,8 +315,7 @@ export class Spob extends DataNode{
     }
     distance: number;
     period: number;
-    radius: number;
-    color: string;
+    sprite: string;
     offset: number;
     spobs: Spob[];
     position(center: [number, number], day: number): [number, number]{

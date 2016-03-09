@@ -22,8 +22,8 @@ export function isEnemy(e1: Entity, e2: Entity){
 export function govModReputation(e: Event, p: Profile){
     if (e.type === EventType.Kill){
         p.reputation[e.target.government] -= 1;
-        console.log(Gov[e.actor.government], 'killed', Gov[e.target.government]);
+        //console.log(Gov[e.actor.government], 'killed', Gov[e.target.government]);
     } else if (e.type === EventType.Provoke){
-        console.log(Gov[e.actor.government], 'hit', Gov[e.target.government]);
+        //console.log(Gov[e.actor.government], 'hit', Gov[e.target.government]);
     }
 }
