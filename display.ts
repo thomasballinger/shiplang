@@ -60,12 +60,11 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
   // esf is entity scale factor, used to scale ship dimensions
   if (e instanceof Ship){
       if (hud || !e.drawStatus['sprite'] || e.type === 'explosion'){
-          console.log(e.type);
           shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
         //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
         var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
-        var w = sprite.naturalWidth * psf;
+        var w = sprite.naturalWidth * esf;
 
         var h = e.h + 90;
 
@@ -127,8 +126,8 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
         ctx.fill();
     } else {
         var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
-        var w = sprite.naturalWidth;
-        ctx.drawImage(sprite, (e.x-dx-w)*psf, (e.y-dy-w)*psf, w*psf*2, w*psf*2);
+        var w = sprite.naturalWidth * esf;
+        ctx.drawImage(sprite, (e.x-dx)*psf-w/2, (e.y-dy)*psf-w/2, w, w);
     }
   }
 };

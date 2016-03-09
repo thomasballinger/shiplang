@@ -163,7 +163,8 @@ export class System extends DataNode{
     }
     createPlanets(world: Engine, profile: Profile){
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
-            world.addBackgroundEntity(makePlanet(x, y, 20, spob.sprite));
+            world.addBackgroundEntity(makePlanet(x, y, 100, spob.sprite));
+            //TODO this radius number should depend on the sprite
         }
     }
     createInitialFleets(world: Engine, profile: Profile){

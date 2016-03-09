@@ -41,9 +41,9 @@ document.body.addEventListener('click', function(e){
       canvas.height = window.innerHeight;
     }
   });
-  var mainDisplay = new SpaceDisplay('canvas', 1, 1, 1);
+  var mainDisplay = new SpaceDisplay('canvas', .5, .5, 1);
   updater.registerObserver(mainDisplay);
-  updater.registerObserver(new SpaceDisplay('minimap', 0.07, 0.3, 0, true));
+  updater.registerObserver(new SpaceDisplay('minimap', 0.04, 0.3, 0, true));
   updater.registerObserver(<Updateable>{
     lurper: new Lerper('player-armor', '#cc8800'),
     update: function(player, world){ this.lurper.update(player.armor, player.armorMax); }
