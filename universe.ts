@@ -361,11 +361,13 @@ export class Start extends DataNode{
         if (this.ship === undefined){
             throw Error("Can't find ship "+data.ship);
         }
+        /*
         this.missions = (data.mission || []).map(function(name: string){
             if (missions[name] === undefined) { throw Error("Can't find mission "+name); }
             return [missions[name], undefined];
         })
-        //this.missions = []; // TODO circular dependency with building a mission requiring the universe.
+        */
+        this.missions = []; // TODO circular dependency with building a mission requiring the universe.
         Object.freeze(this);
     }
     day: number;

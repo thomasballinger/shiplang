@@ -10,43 +10,84 @@ export class SpaceDisplay{
         this.psf = psfOrig;
         this.esf = esfOrig;
         this.starfield = [];
-        for (var i=0; i<100000; i++){
-            this.starfield.push([Math.random(), Math.random(), Math.random()]);
+
+        this.starDensity = .0001 // stars per world pixel
+        var i = 0;
+        var r = 0;
+
+        // Stars are rendered from the center out.
+        //TODO array of [x, y, size, x, y, size, ...]
+
+        // Make 10000 stars
+        while(r < 10000){
+            i += 1/(this.starDensity) // world pixels star
+            var r = Math.sqrt(i)/2;
+            var which = Math.random();
+            if (which < 0.25){
+                this.starfield.push([Math.random()*2*r - r, r, Math.random()]);
+            } else if (which < 0.5){
+                this.starfield.push([Math.random()*2*r - r, -r, Math.random()]);
+            } else if (which < 0.75){
+                this.starfield.push([r, Math.random()*2*r - r, Math.random()]);
+            } else {
+                this.starfield.push([-r, Math.random()*2*r - r, Math.random()]);
+            }
         }
     }
     psf: number;
     esf: number;
+    starDensity: number;
     starfield: [number, number][];
     renderCentered(centered: Entity, entities: Entity[],
                    positionScaleFactor:number, entityScaleFactor:number,
                    backgroundParallax:number, hud=false){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawStars(centered.x, centered.y, positionScaleFactor);
-        this.render(entities,
-                    centered.x-this.canvas.width/2/positionScaleFactor,
-                    centered.y-this.canvas.height/2/positionScaleFactor,
-                    centered.x+this.canvas.width/2/positionScaleFactor,
-                    centered.y+this.canvas.height/2/positionScaleFactor,
-                    positionScaleFactor,
-                    entityScaleFactor,
-                    hud);
+        var left = centered.x-this.canvas.width/2/positionScaleFactor;
+        var top = centered.y-this.canvas.height/2/positionScaleFactor;
+        var right = centered.x+this.canvas.width/2/positionScaleFactor;
+        var bottom = centered.y+this.canvas.height/2/positionScaleFactor;
+
+        if (!hud){
+            this.drawStars(left, top, right, bottom, positionScaleFactor);
+        }
+        this.render(entities, left, top, right, bottom,
+                    positionScaleFactor, entityScaleFactor, hud);
         if(backgroundParallax !== 0){
             this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
         }
     }
-    drawStars(centerX: number, centerY: number, psf: number){
-        (<any>window).ctx = this.ctx
-        var showStars = this.canvas.width * this.canvas.height / 10000
+    drawStars(left: number, top: number, right: number, bottom: number, psf: number){
+        (<any>window).ctx = this.ctx;
         var width = this.canvas.width
         var height = this.canvas.height
+        var side = Math.max(width, height);
+        var gameArea = Math.pow(Math.max(bottom - top, right - left), 2)
+        var displayArea = Math.pow(Math.max(width, height), 2)
         var ctx = this.ctx;
+        var midX = (left + right)/2;
+        var midY = (top + bottom)/2;
+
+        // If we were to select every star in the display area to be seen
+        var lastStarInFrame = Math.ceil(gameArea * this.starDensity);
+        // However we don't necessarily want to render every one of these stars.
+        // In order to achieve at least this.starDensity on-screen,
+        // skip some stars.
+        var advance = Math.pow(2, Math.abs(Math.ceil(Math.log2(Math.min(1, displayArea/gameArea)))));
+        console.log(lastStarInFrame, 'candidate stars in frame but only drawing', Math.floor(Math.min(lastStarInFrame, this.starfield.length)*(1/advance)));
+
         ctx.fillStyle = '#666666';
-        for (var i=0; i<showStars; i++){
-            var size = this.starfield[i][2] < .8 ? 1 : 2;
-            ctx.fillRect((width *this.starfield[i][0] - centerX*psf) % width,
-                         (height*this.starfield[i][1] - centerY*psf) % height,
+        var rendered = <any>[]
+        for (var i=0; i<Math.min(lastStarInFrame, this.starfield.length); i += advance){
+            var size = this.starfield[i][2] < .8 ? 10 : 20;
+            var screenX = (this.starfield[i][0] - left)*psf;
+            var screenY = (this.starfield[i][1] - top)*psf;
+            ctx.fillRect((screenX),
+                         (screenY),
                          size, size);
+            rendered.push(this.starfield[i]);
+
         }
+        (<any>window).rendered = rendered;
     }
     update(center: Entity, w: Engine){
         this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp, this.hud);
@@ -72,8 +113,8 @@ export class SpaceDisplay{
             return (e.x > left && e.x < right && e.y > top && e.y < bottom)
         })
     }
-    zoomIn(){  this.psf *= 6/8; this.esf *= 6/8; }
-    zoomOut(){ this.psf *= 8/6; this.esf *= 8/6; }
+    zoomIn(){  this.psf *= 19/20; this.esf *= 19/20; }
+    zoomOut(){ this.psf *= 20/19; this.esf *= 20/19; }
 }
 
 function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number, hud=false):void{

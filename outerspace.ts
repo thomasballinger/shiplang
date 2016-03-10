@@ -41,7 +41,7 @@ export function outerspace(originalWorld: Engine){
       canvas.height = window.innerHeight;
     }
   });
-  var mainDisplay = new SpaceDisplay('canvas', .5, .5, 0);
+  var mainDisplay = new SpaceDisplay('canvas', 1, 1, 0);
   updater.registerObserver(mainDisplay);
   updater.registerObserver(new SpaceDisplay('minimap', 0.04, 0.17, 0, true));
   updater.registerObserver(<Updateable>{
@@ -83,6 +83,7 @@ export function outerspace(originalWorld: Engine){
         setTimeout(tick, 1);
     } else {
     //    setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
+    //    setTimeout(tick, Math.max(5, 1033.5-tickTime)); // 1fps
         setTimeout(tick, 1); // max fps
     }
   }
