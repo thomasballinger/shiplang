@@ -41,7 +41,7 @@ export function outerspace(originalWorld: Engine){
       canvas.height = window.innerHeight;
     }
   });
-  var mainDisplay = new SpaceDisplay('canvas', .5, .5, 1);
+  var mainDisplay = new SpaceDisplay('canvas', .5, .5, 0);
   updater.registerObserver(mainDisplay);
   updater.registerObserver(new SpaceDisplay('minimap', 0.04, 0.17, 0, true));
   updater.registerObserver(<Updateable>{

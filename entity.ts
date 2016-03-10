@@ -181,6 +181,7 @@ export class Ship extends Entity{
         }
         if (spec.drawStatus){
             this.drawStatus['sprite'] = spec.drawStatus['sprite'];
+            this.drawStatus['engines'] = spec.drawStatus['engines'];
         }
     }
     maxThrust: number;

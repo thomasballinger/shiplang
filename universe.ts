@@ -395,6 +395,10 @@ export class Ship extends DataNode{
         this.maxSpeed = parseInt(data.attributes[0].maxSpeed[0]);
         this.maxDH = parseInt(data.attributes[0].maxDH[0]);
 
+        this.drawStatus['engines'] = (data.engine || []).map(function(spot: [string, string]){
+            return [parseInt(spot[0]), parseInt(spot[1])];
+        });
+
         // optional
         this.isMunition = data.attributes[0].isMunition ? true : false
         this.isComponent = data.attributes[0].isComponent ? true : false
