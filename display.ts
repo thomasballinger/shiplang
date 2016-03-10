@@ -9,30 +9,19 @@ export class SpaceDisplay{
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
         this.esf = esfOrig;
-        this.starfield = [];
+        this.starDensity = .0001
+        this.starfield = this.makeStarfield(this.starDensity, 2000, 1000);
+    }
 
-        this.starDensity = .0001 // stars per world pixel
-        var i = 0;
-        var r = 0;
-
-        // Stars are rendered from the center out.
-        //TODO array of [x, y, size, x, y, size, ...]
-
-        // Make 10000 stars
-        while(r < 10000){
-            i += 1/(this.starDensity) // world pixels star
-            var r = Math.sqrt(i)/2;
-            var which = Math.random();
-            if (which < 0.25){
-                this.starfield.push([Math.random()*2*r - r, r, Math.random()]);
-            } else if (which < 0.5){
-                this.starfield.push([Math.random()*2*r - r, -r, Math.random()]);
-            } else if (which < 0.75){
-                this.starfield.push([r, Math.random()*2*r - r, Math.random()]);
-            } else {
-                this.starfield.push([-r, Math.random()*2*r - r, Math.random()]);
-            }
+    makeStarfield(starDensity: number, maxDisplaySize: number, maxZoomLevel: number){
+        var stars: [number, number, number][] = [];
+        var numStars = starDensity * maxDisplaySize * maxDisplaySize;
+        for (var i=0; i<numStars; i++){
+            stars.push([Math.floor(Math.random()*maxZoomLevel*maxDisplaySize),
+                        Math.floor(Math.random()*maxZoomLevel*maxDisplaySize),
+                        Math.random() > .8 ? 20 : 10]);
         }
+        return stars;
     }
     psf: number;
     esf: number;
@@ -57,37 +46,21 @@ export class SpaceDisplay{
         }
     }
     drawStars(left: number, top: number, right: number, bottom: number, psf: number){
-        (<any>window).ctx = this.ctx;
         var width = this.canvas.width
         var height = this.canvas.height
-        var side = Math.max(width, height);
-        var gameArea = Math.pow(Math.max(bottom - top, right - left), 2)
-        var displayArea = Math.pow(Math.max(width, height), 2)
+        var starsToUse = this.starDensity * width * height;
+
         var ctx = this.ctx;
-        var midX = (left + right)/2;
-        var midY = (top + bottom)/2;
-
-        // If we were to select every star in the display area to be seen
-        var lastStarInFrame = Math.ceil(gameArea * this.starDensity);
-        // However we don't necessarily want to render every one of these stars.
-        // In order to achieve at least this.starDensity on-screen,
-        // skip some stars.
-        var advance = Math.pow(2, Math.abs(Math.ceil(Math.log2(Math.min(1, displayArea/gameArea)))));
-        console.log(lastStarInFrame, 'candidate stars in frame but only drawing', Math.floor(Math.min(lastStarInFrame, this.starfield.length)*(1/advance)));
-
         ctx.fillStyle = '#666666';
-        var rendered = <any>[]
-        for (var i=0; i<Math.min(lastStarInFrame, this.starfield.length); i += advance){
-            var size = this.starfield[i][2] < .8 ? 10 : 20;
-            var screenX = (this.starfield[i][0] - left)*psf;
-            var screenY = (this.starfield[i][1] - top)*psf;
+        for (var i=0; i<Math.min(starsToUse, this.starfield.length); i++){
+            var screenX = (this.starfield[i][0] - left)*psf % width;
+            var screenY = (this.starfield[i][1] -  top)*psf % height;
+            var size = this.starfield[i][2];
             ctx.fillRect((screenX),
                          (screenY),
                          size, size);
-            rendered.push(this.starfield[i]);
 
         }
-        (<any>window).rendered = rendered;
     }
     update(center: Entity, w: Engine){
         this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp, this.hud);
