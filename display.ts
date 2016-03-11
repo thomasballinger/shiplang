@@ -10,7 +10,7 @@ export class SpaceDisplay{
         this.psf = psfOrig;
         this.esf = esfOrig;
         this.psfTarget = psfOrig;
-        this.esfTarget = psfOrig;
+        this.esfTarget = esfOrig;
         this.starDensity = .00005
         this.starTileSize = 5000
         this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
