@@ -54,8 +54,8 @@ export function simulator(originalWorld: Engine){
       canvas.height = window.innerHeight;
     }
   });
-  updater.registerObserver(new SpaceDisplay('canvas', 1, 1, 1));
-  updater.registerObserver(new SpaceDisplay('minimap', 0.07, 0.3, 0));
+  updater.registerObserver(new SpaceDisplay('canvas', 1, 1));
+  updater.registerObserver(new SpaceDisplay('minimap', 0.07, 0.3));
   updater.registerObserver(<Updateable>{
     lurper: new Lerper('player-armor', '#cc8800'),
     update: function(player, world){ this.lurper.update(player.armor, player.armorMax); }

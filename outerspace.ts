@@ -41,9 +41,9 @@ export function outerspace(originalWorld: Engine){
       canvas.height = window.innerHeight;
     }
   });
-  var mainDisplay = new SpaceDisplay('canvas', 1, 1, 0);
+  var mainDisplay = new SpaceDisplay('canvas', 1, 1);
   updater.registerObserver(mainDisplay);
-  updater.registerObserver(new SpaceDisplay('minimap', 0.04, 0.17, 0, true));
+  updater.registerObserver(new SpaceDisplay('minimap', 0.04, 0.17, true));
   updater.registerObserver(<Updateable>{
     lurper: new Lerper('player-armor', '#cc8800'),
     update: function(player, world){ this.lurper.update(player.armor, player.armorMax); }

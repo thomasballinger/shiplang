@@ -4,7 +4,7 @@ import { Engine } from './engine';
 //TODO invert y axis
 
 export class SpaceDisplay{
-    constructor(id: string, public psfOrig: number, public esfOrig: number, public bgp: number, public hud=false){
+    constructor(id: string, public psfOrig: number, public esfOrig: number, public hud=false){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
@@ -48,7 +48,7 @@ export class SpaceDisplay{
     }
     renderCentered(centered: Entity, entities: Entity[],
                    positionScaleFactor:number, entityScaleFactor:number,
-                   backgroundParallax:number, hud=false){
+                   hud=false){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         var left = centered.x-this.canvas.width/2/positionScaleFactor;
         var top = centered.y-this.canvas.height/2/positionScaleFactor;
@@ -58,11 +58,8 @@ export class SpaceDisplay{
         if (!hud){
             this.drawStars(left, top, right, bottom, positionScaleFactor);
         }
-        this.render(entities, left, top, right, bottom,
+        this.renderEntities(entities, left, top, right, bottom,
                     positionScaleFactor, entityScaleFactor, hud);
-        if(backgroundParallax !== 0){
-            this.canvas.style.backgroundPosition=''+(0-centered.x*backgroundParallax)+' '+(0-centered.y*backgroundParallax);
-        }
     }
     drawStars(left: number, top: number, right: number, bottom: number, psf: number){
         var starsToUse = Math.ceil(psf * this.starfield.length);
@@ -101,11 +98,11 @@ export class SpaceDisplay{
                 this.esf = this.esfTarget;
             }
         }
-        this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp, this.hud);
+        this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.hud);
     }
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
-    render(entities: Entity[], left: number, top: number, right: number, bottom: number,
+    renderEntities(entities: Entity[], left: number, top: number, right: number, bottom: number,
            position_scale_factor: number, entity_scale_factor: number, hud=false){
         var onscreen = this.visibleEntities(entities, left, top, right, bottom); //TODO profile: does this make a difference?
         //var onscreen = entities;
@@ -134,7 +131,7 @@ export class SpaceDisplay{
     }
 }
 
-function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number, hud=false):void{
+function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false): void{
   //dx and dy are offsets in world space for panning
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions

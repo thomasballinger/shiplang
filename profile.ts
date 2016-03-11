@@ -2,7 +2,7 @@ var pilotScriptSource = require("raw!./scripts/pilot.js");
 import { Gov } from './interfaces';
 import { Event } from './mission';
 import { putMessage } from './messagelog';
-import { Ship, Mission, Fleet, universe } from './universe';
+import { Ship, Mission, Fleet, System, universe } from './universe';
 
 // Plan:
 // Profile is a serializable object that only gets saved on landing.
@@ -117,6 +117,9 @@ export class Profile{
                 return mission[0].getFleets();
             })
        );
+    }
+    getSystems(): { [name: string]: System}{
+        return universe.systems
     }
     static newProfile(): Profile{
         var reputation: ReputationTable = {};
