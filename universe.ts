@@ -2,7 +2,7 @@ import { Gov } from './interfaces';
 import { Domains } from './dataload';
 import { Profile } from './profile';
 import { chooseScript, getScriptByName, getJSByName } from './ai';
-import { missions, MissionStatic } from './mission';
+import { Event, EventType, killFiveAstroidsProcess } from './mission';
 import { Engine, makeShipEntity, makePlanet } from './engine';
 import { loadData } from './dataload';
 
@@ -25,6 +25,7 @@ interface AllObjects{
     planets: {[name: string]: Planet};
     starts: {[name: string]: Start};
     ships: {[name: string]: Ship};
+    missions: {[name: string]: Mission};
 
     [domain: string]: {[name: string]: any};
 }
@@ -39,6 +40,7 @@ export function createObjects(domains: Domains): AllObjects{
         'planet': Planet,
         'start': Start,
         'ship': Ship,
+        'mission': Mission,
     }
     var allObjects: AllObjects = {
         systems: {},
@@ -49,6 +51,7 @@ export function createObjects(domains: Domains): AllObjects{
         planets: {},
         starts: {},
         ships: {},
+        missions: {},
     };
     // create the objects
     for (var dataKey of Object.keys(dataKeys)){
@@ -173,11 +176,8 @@ export class System extends DataNode{
             world.addFleet(fleet);
         }
         // Mission fleets
-        for (var [spec, script] of profile.getMissionShips()){
-            world.addEntity(makeShipEntity(spec, Math.random()*1000,
-                                     Math.random()*1000, 270, script));
-            //TODO use world.addFleet because it's correctly
-            //sets the government of a ship
+        for (var fleet of profile.getMissionFleets()){
+            world.addFleet(fleet);
         }
     }
     createFleets(world: Engine, dt: number){
@@ -361,28 +361,28 @@ export class Start extends DataNode{
         if (this.ship === undefined){
             throw Error("Can't find ship "+data.ship);
         }
-        /*
         this.missions = (data.mission || []).map(function(name: string){
-            if (missions[name] === undefined) { throw Error("Can't find mission "+name); }
-            return [missions[name], undefined];
+            checkExists(name, 'missions', global);
+            return global.missions[name];
         })
-        */
-        this.missions = []; // TODO circular dependency with building a mission requiring the universe.
         Object.freeze(this);
     }
     day: number;
     system: System;
     planet: Planet;
     credits: number;
-    missions: [MissionStatic, any][];
+    missions: Mission[];
     script: string;
     ship: Ship;
     buildProfile(): Profile{
-        return Profile.newProfile()
+        var p = Profile.newProfile()
         .set('location', this.system)
         .set('script', getJSByName(this.script))
         .set('ship', this.ship)
         .initiateMissions(this.missions);
+        console.log(p)
+        console.log(p.missions);
+        return p
     }
 }
 Start.fieldName = 'starts'
@@ -397,16 +397,17 @@ export class Ship extends DataNode{
         this.maxSpeed = parseInt(data.attributes[0].maxSpeed[0]);
         this.maxDH = parseInt(data.attributes[0].maxDH[0]);
 
+        this.drawStatus['notDirectional'] = data.attributes[0].hasOwnProperty('notDirectional') ? true : false
         this.drawStatus['engines'] = (data.engine || []).map(function(spot: [string, string]){
             return [parseInt(spot[0]), parseInt(spot[1])];
         });
 
         // optional
-        this.isMunition = data.attributes[0].isMunition ? true : false
-        this.isComponent = data.attributes[0].isComponent ? true : false
-        this.isInertialess = data.attributes[0].isIntertialess ? true : false
+        this.isMunition = data.attributes[0].hasOwnProperty('isMunition') ? true : false
+        this.isComponent = data.attributes[0].hasOwnProperty('isComponent') ? true : false
+        this.isInertialess = data.attributes[0].hasOwnProperty('isIntertialess') ? true : false
         this.lifespan = data.attributes[0].lifespan ? parseFloat(data.attributes[0].lifespan[0]) : undefined
-        this.explosionSize = data.attributes[0].explosionSize ? parseFloat(data.attributes[0].explosionSize[0]) : 20
+        this.explosionSize = data.attributes[0].hasOwnProperty('explosionSize') ? parseFloat(data.attributes[0].explosionSize[0]) : 20
 
         this.r = 20; //TODO use sprite infomation TODO eventually don't use radius-based collisions
         this.type = this.id.toLowerCase(); //TODO get rid of this?
@@ -429,10 +430,34 @@ export class Ship extends DataNode{
 }
 Ship.fieldName = 'ships'
 
+export class Mission extends DataNode{
+    populate(data: any, global: AllObjects){
+        if (data.processEventMethod[0] !== 'killFiveAstroidsProcess'){ throw Error("Process event method "+data.missionClass[0]+" not found for mission "+this.id); }
+        this.processEventMethod = killFiveAstroidsProcess;
+        this.fleets = (data.fleet || []).map(function(x: string){
+            if (typeof x !== 'string'){ throw Error("fleet entry of wrong structure: "+x); }
+            checkExists(x, 'fleets', global);
+            return global.fleets[x];
+        });
+        this.description = data.description ? data.description[0] : 'a mission with unclear objectives';
+    }
+    fleets: Fleet[]
+    processEventMethod: (e: Event, data: any)=>void;
+    description: string
+    begin(): [Mission, any]{
+        return [this, {}]
+    }
+    save(data: any): [string, any]{
+        return [this.id, data];
+    }
+    getFleets(): Fleet[]{
+        return this.fleets;
+    }
+}
+Mission.fieldName = 'missions';
 
 
 // Go ahead and load all data here so everyone
 // can use the same copy
 var gamedata = loadData(require('raw!./data/map.txt'));
 export var universe = createObjects(gamedata);
-

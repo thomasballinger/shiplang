@@ -4,6 +4,7 @@ system Sol
 	pos 0 0
 	government Trader
 	link Robo
+	link Backwater
 	fleet "Intrastellar Shuttles" 300
 	fleet "Triangle Patrol" 600
 	fleet "Pirates" 300
@@ -56,6 +57,25 @@ system Sol
 			distance 180
 			period 3.5
 
+system "Backwater"
+	pos 200 300
+	government Trader
+	link Sol
+	fleet "Intrastellar Shuttles" 300
+	fleet "Triangle Patrol" 600
+	object Back
+		sprite planet/earth
+		period 365.25
+		distance 1000
+		object "A Moon"
+			sprite planet/earth
+			distance 200
+			period 27.3
+	object Water
+		sprite planet/earth
+		distance 1400
+		period 687
+
 system Simulator
 	pos 100 100
 	government Trader
@@ -81,11 +101,11 @@ start adventure
 	ship Triangle
 
 start gunner
-	system "Sol"
-	planet "Earth"
+	system "Backwater"
+	planet "Back"
 	script gunner
 	ship Gunship
-	mission KillFiveAstroidsMission
+	mission "Gunner 1"
 
 start simulator
 	system "Simulator"
@@ -183,12 +203,22 @@ ship "Gunship"
 	sprite "ship/combat drone"
 	attributes
 		"shields" 0
-		"hull" 1
+		"hull" 10
 		"maxThrust" 300
 		"maxSpeed" 350
 		"maxDH" 300
+		isComponent
 	engine 6 30
 	engine -6 30
+
+ship "Holder"
+	sprite "ship/bastion"
+	attributes
+		"shields" 2
+		"hull" 10
+		"maxThrust" 300
+		"maxDH" 200
+		"maxSpeed" 300
 
 ship "Boid"
 	sprite "ship/combat drone"
@@ -200,3 +230,30 @@ ship "Boid"
 		"maxDH" 300
 	engine 6 30
 	engine -6 30
+
+ship "Astroid"
+	sprite "asteroid/big rock/spin-00"
+	attributes
+		"shields" 0
+		"hull" 20
+		"maxThrust" 100
+		"maxDH" 500
+		"maxSpeed" 300
+		notDirectional
+
+mission "Gunner 1"
+	processEventMethod killFiveAstroidsProcess
+	fleet Holder
+	fleet "Five Astroids"
+
+fleet "Five Astroids"
+	government Debris
+	personality wander
+	variant 100
+		Astroid 5
+
+fleet Holder
+	government Cleanup
+	personality holderScript
+	variant 100
+		Holder 1

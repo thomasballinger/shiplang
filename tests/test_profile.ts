@@ -2,28 +2,29 @@
 import { assert } from 'chai';
 
 import { Profile } from '../profile';
-import { Mission, MissionStatic, missions, Event } from '../mission';
-
-class SimpleMission extends Mission{
-    processEvent(e: Event): void{}
-}
+import { Event } from '../mission';
+import { Mission, universe } from '../universe';
 
 describe('Profile', () => {
     it("can be round-trip serialized", () => {
-        (<any>missions).SimpleMission = SimpleMission;
+        var simpleMission = new Mission()
+        simpleMission.fleets = [];
+        simpleMission.description = '';
+        simpleMission.processEventMethod = function(e: Event, data: any){};
+        universe.missions['SimpleMission'] = simpleMission;
 
         //TODO crap method name
         var p = Profile.newProfile();
 
         p.script = '1 + 1';
         var l = [1, 2, 3];
-        p.initiateMission(SimpleMission, {a: l});
+        p.missions.push([simpleMission, {a: l}])
         p.set('name', 'Fred');
         var p2 = Profile.fromJson(p.toJson());
         assert.deepEqual(p.toJson(), p2.toJson());
         l.push(4);
         assert.notDeepEqual(p.toJson(), p2.toJson());
-        delete (<any>missions).SimpleMission;
+        delete universe.missions['SimpleMission'];
     });
 });
 

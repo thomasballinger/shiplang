@@ -366,7 +366,7 @@ export class Engine{
         events.map(function(e: Event){ govModReputation(e, profile); });
         events.map(function(e: Event){
             profile.missions.map(function(m){
-                m.processEvent(e);
+                m[0].processEventMethod(e, m[1]);
             });
         });
         //console.log(events)

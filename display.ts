@@ -108,7 +108,6 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
       if (hud || !e.drawStatus['sprite'] || e.type === 'explosion'){
           shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
-        //var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
         var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
         var w = sprite.naturalWidth * esf;
         var h = sprite.naturalHeight * esf;
@@ -122,7 +121,9 @@ function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:numbe
 
         ctx.save();
         ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
-        ctx.rotate(theta*Math.PI/180);
+        if (!e.drawStatus['notDirectional']){
+            ctx.rotate(theta*Math.PI/180);
+        }
         if (e.thrust > 0){
             for (var spot of e.drawStatus['engines']){
                 //TODO fix drawStatus type

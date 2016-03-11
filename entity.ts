@@ -180,8 +180,9 @@ export class Ship extends Entity{
             this.timeToDie = -spec.lifespan;
         }
         if (spec.drawStatus){
-            this.drawStatus['sprite'] = spec.drawStatus['sprite'];
-            this.drawStatus['engines'] = spec.drawStatus['engines'];
+            for (var key of Object.keys(spec.drawStatus)){
+                this.drawStatus[key] = spec.drawStatus[key];
+            }
         }
     }
     maxThrust: number;

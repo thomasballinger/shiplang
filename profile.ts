@@ -1,8 +1,8 @@
 var pilotScriptSource = require("raw!./scripts/pilot.js");
 import { Gov } from './interfaces';
-import { Mission, Event, MissionStatic } from './mission';
+import { Event } from './mission';
 import { putMessage } from './messagelog';
-import { Ship, universe } from './universe';
+import { Ship, Mission, Fleet, universe } from './universe';
 
 // Plan:
 // Profile is a serializable object that only gets saved on landing.
@@ -26,16 +26,24 @@ interface AnnoyedTable {
 
 function jsonProfileReplacer(key: string, value: any){
     if (key === 'missions'){
-        return value.map(function(x: Mission){ return x.save(); })
+        return value.map(function(x: [Mission, any]){
+            return x[0].save(x[1]);
+        })
+    }
+    if (key === 'location'){
+        return value.id;
     }
     return value;
 }
 
 function jsonProfileReviver(key: string, value: any){
     if (key === 'missions'){
-        return value.map(function(x: any){
-            return Mission.fromNameAndData(x[0], x[1])
+        return value.map(function(x: [string, any]){
+            return [universe.missions[x[0]], x[1]];
         });
+    }
+    if (key === 'location'){
+        return universe.systems[value];
     }
     return value;
 }
@@ -81,21 +89,21 @@ export class Profile{
     deepCopyPopulate = function(copy: Profile, memo:any, innerDeepCopy:any){
         //NOP because simple JSON copy works
     };
-    initiateMission(m: MissionStatic, data: any){
-        this.missions.push(new m(data))
+    initiateMission(m: Mission){
+        this.missions.push(m.begin());
         return this;
     }
-    initiateMissions(m: [MissionStatic, any][]){
+    initiateMissions(m: Mission[]){
         var self = this;
-        m.map(function(x: [MissionStatic, any]){
-            self.initiateMission(x[0], x[1]);
+        m.map(function(x: Mission){
+            self.initiateMission(x);
         });
         return this;
     }
     missionsSummary(): string{
         var msg = '';
         for (var mission of this.missions){
-            msg += mission.instructions();
+            msg += mission[0].description;
             msg += "\n";
         }
         if (this.missions.length === 0){
@@ -103,10 +111,10 @@ export class Profile{
         }
         return msg;
     }
-    getMissionShips(): [Ship, any][]{
+    getMissionFleets(): Fleet[]{
         return [].concat.apply([],
             this.missions.map(function(mission){
-                return mission.getShips();
+                return mission[0].getFleets();
             })
        );
     }
@@ -136,9 +144,8 @@ export class Profile{
     name: string;
     location: string;
     script: string;
-    missions: Mission[];
     day: number;
-    //missions: [string, any][];
+    missions: [Mission, any][];
     reputation: ReputationTable;
     ship: Ship;
 }
