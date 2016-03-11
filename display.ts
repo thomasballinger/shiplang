@@ -9,15 +9,33 @@ export class SpaceDisplay{
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
         this.esf = esfOrig;
+        this.psfTarget = psfOrig;
+        this.esfTarget = psfOrig;
         this.starDensity = .00005
         this.starTileSize = 5000
         this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
     }
     psf: number;
     esf: number;
+    psfTarget: number;
+    esfTarget: number;
     starDensity: number;
+    showingMap: boolean;
     starfield: [number, number][];
     starTileSize: number;
+    showMap(){
+        this.showingMap = true;
+        this.psfTarget = .01;
+        this.esfTarget = .01;
+    }
+    hideMap(){
+        this.showingMap = true;
+        this.psfTarget = this.psfOrig;
+        this.esfTarget = this.esfOrig;
+    }
+    isZooming(){
+        return this.psf !== this.psfTarget || this.esf !== this.esfTarget;
+    }
     makeStarfield(starDensity: number, tileSize: number){
         var stars: [number, number, number][] = [];
         var numStars = Math.ceil(starDensity * tileSize * tileSize);
@@ -73,6 +91,16 @@ export class SpaceDisplay{
         }
     }
     update(center: Entity, w: Engine){
+        if (this.isZooming()){
+            this.psf = Math.pow(2, (Math.log2(this.psf)*99 + Math.log2(this.psfTarget))/100)
+            if (Math.abs(this.psf - this.psfTarget) / this.psfTarget < .01){
+                this.psf = this.psfTarget;
+            }
+            this.esf = Math.pow(2, (Math.log2(this.esf)*99 + Math.log2(this.esfTarget))/100)
+            if (Math.abs(this.esf - this.esfTarget) / this.esfTarget < .01){
+                this.esf = this.esfTarget;
+            }
+        }
         this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.bgp, this.hud);
     }
     canvas: HTMLCanvasElement;
@@ -96,8 +124,14 @@ export class SpaceDisplay{
             return (e.x > left && e.x < right && e.y > top && e.y < bottom)
         })
     }
-    zoomIn(){  this.psf *= 19/20; this.esf *= 19/20; }
-    zoomOut(){ this.psf *= 20/19; this.esf *= 20/19; }
+    zoomIn(){
+        this.psfOrig *= 6/8; this.esfOrig *= 6/8;
+        this.psfTarget = this.psfOrig; this.esfTarget = this.esfOrig
+    }
+    zoomOut(){
+        this.psfOrig *= 8/6; this.esfOrig *= 8/6;
+        this.psfTarget = this.psfOrig; this.esfTarget = this.esfOrig
+    }
 }
 
 function entityDraw(e: Entity, ctx:CanvasRenderingContext2D, dx:number, dy:number, psf:number, esf:number, hud=false):void{

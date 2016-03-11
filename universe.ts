@@ -380,8 +380,6 @@ export class Start extends DataNode{
         .set('script', getJSByName(this.script))
         .set('ship', this.ship)
         .initiateMissions(this.missions);
-        console.log(p)
-        console.log(p.missions);
         return p
     }
 }
