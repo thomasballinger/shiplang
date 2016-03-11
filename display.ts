@@ -1,5 +1,6 @@
 import { Entity, Ship as ShipEntity } from './entity';
 import { Engine } from './engine';
+import { System } from './universe';
 
 //TODO invert y axis
 
@@ -14,39 +15,37 @@ export class SpaceDisplay{
         this.starDensity = .00005
         this.starTileSize = 5000
         this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
+        this.active = true;
     }
     psf: number;
     esf: number;
     psfTarget: number;
     esfTarget: number;
     starDensity: number;
-    showingMap: boolean;
     starfield: [number, number][];
     starTileSize: number;
-    showMap(){
-        this.showingMap = true;
-        this.psfTarget = .01;
-        this.esfTarget = .01;
-    }
-    hideMap(){
-        this.showingMap = true;
-        this.psfTarget = this.psfOrig;
-        this.esfTarget = this.esfOrig;
-    }
-    isZooming(){
-        return this.psf !== this.psfTarget || this.esf !== this.esfTarget;
-    }
-    makeStarfield(starDensity: number, tileSize: number){
-        var stars: [number, number, number][] = [];
-        var numStars = Math.ceil(starDensity * tileSize * tileSize);
-        for (var i=0; i<numStars; i++){
-            stars.push([Math.floor(Math.random()*tileSize),
-                        Math.floor(Math.random()*tileSize),
-                        Math.random() > .8 ? 2 : 1]);
+    active: boolean;
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+
+    update(center: {x: number, y: number}, drawables: {x: number, y:number}[]){
+        if (!this.active){ return; }
+        if (this.isZooming()){
+            this.psf = Math.pow(2, (Math.log2(this.psf)*99 + Math.log2(this.psfTarget))/100)
+            if (Math.abs(this.psf - this.psfTarget) / this.psfTarget < .01){
+                this.psf = this.psfTarget;
+            }
+            this.esf = Math.pow(2, (Math.log2(this.esf)*99 + Math.log2(this.esfTarget))/100)
+            if (Math.abs(this.esf - this.esfTarget) / this.esfTarget < .01){
+                this.esf = this.esfTarget;
+            }
         }
-        return stars;
+        this.renderCentered(center, drawables, this.psf, this.esf, this.hud);
     }
-    renderCentered(centered: Entity, entities: Entity[],
+    hide(){ this.active = false; this.canvas.hidden = true; }
+    show(){ this.active = true; this.canvas.hidden = false }
+    isZooming(){ return this.psf !== this.psfTarget || this.esf !== this.esfTarget; }
+    renderCentered(centered: {x: number, y:number}, drawables: {x: number, y:number}[],
                    positionScaleFactor:number, entityScaleFactor:number,
                    hud=false){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -58,11 +57,34 @@ export class SpaceDisplay{
         if (!hud){
             this.drawStars(left, top, right, bottom, positionScaleFactor);
         }
-        this.renderEntities(entities, left, top, right, bottom,
+        this.renderEntities(drawables, left, top, right, bottom,
                     positionScaleFactor, entityScaleFactor, hud);
+    }
+    renderEntities(drawables: {x: number, y:number}[], left: number, top: number, right: number, bottom: number,
+           position_scale_factor: number, entity_scale_factor: number, hud=false){
+        var onscreen = this.getVisible(drawables, left, top, right, bottom); //TODO profile: does this make a difference?
+        for (var i=0; i<onscreen.length; i++){
+            var drawable = onscreen[i];
+            if (drawable instanceof Entity){
+                entityDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
+            } else if (drawable instanceof System){
+                systemDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor);
+            }
+            // Given the world-space
+        }
+    };
+    getVisible(drawables: {x: number, y:number}[], left: number, top: number, right: number, bottom: number): {x: number, y: number}[]{
+        left -= 100;
+        right += 100;
+        top -= 100;
+        bottom += 100;
+        return drawables.filter(function(e){
+            return (e.x > left && e.x < right && e.y > top && e.y < bottom)
+        })
     }
     drawStars(left: number, top: number, right: number, bottom: number, psf: number){
         var starsToUse = Math.ceil(psf * this.starfield.length);
+        // TODO based on a tile's offset from (0, 0), use different subsets of stars
 
         var ctx = this.ctx;
         ctx.fillStyle = '#666666';
@@ -87,39 +109,15 @@ export class SpaceDisplay{
 
         }
     }
-    update(center: Entity, w: Engine){
-        if (this.isZooming()){
-            this.psf = Math.pow(2, (Math.log2(this.psf)*99 + Math.log2(this.psfTarget))/100)
-            if (Math.abs(this.psf - this.psfTarget) / this.psfTarget < .01){
-                this.psf = this.psfTarget;
-            }
-            this.esf = Math.pow(2, (Math.log2(this.esf)*99 + Math.log2(this.esfTarget))/100)
-            if (Math.abs(this.esf - this.esfTarget) / this.esfTarget < .01){
-                this.esf = this.esfTarget;
-            }
+    makeStarfield(starDensity: number, tileSize: number){
+        var stars: [number, number, number][] = [];
+        var numStars = Math.ceil(starDensity * tileSize * tileSize);
+        for (var i=0; i<numStars; i++){
+            stars.push([Math.floor(Math.random()*tileSize),
+                        Math.floor(Math.random()*tileSize),
+                        Math.random() > .8 ? 2 : 1]);
         }
-        this.renderCentered(center, w.entitiesToDraw(), this.psf, this.esf, this.hud);
-    }
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    renderEntities(entities: Entity[], left: number, top: number, right: number, bottom: number,
-           position_scale_factor: number, entity_scale_factor: number, hud=false){
-        var onscreen = this.visibleEntities(entities, left, top, right, bottom); //TODO profile: does this make a difference?
-        //var onscreen = entities;
-        for (var i=0; i<onscreen.length; i++){
-            var entity = onscreen[i];
-            entityDraw(entity, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
-            // Given the world-space
-        }
-    };
-    visibleEntities(entities: Entity[], left: number, top: number, right: number, bottom: number): Entity[]{
-        left -= 100;
-        right += 100;
-        top -= 100;
-        bottom += 100;
-        return entities.filter(function(e){
-            return (e.x > left && e.x < right && e.y > top && e.y < bottom)
-        })
+        return stars;
     }
     zoomIn(){
         this.psfOrig *= 6/8; this.esfOrig *= 6/8;
@@ -129,6 +127,24 @@ export class SpaceDisplay{
         this.psfOrig *= 8/6; this.esfOrig *= 8/6;
         this.psfTarget = this.psfOrig; this.esfTarget = this.esfOrig
     }
+}
+
+function systemDraw(e: System, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number): void{
+  ctx.fillStyle="#ffffff";
+  ctx.strokeStyle="#ffffff";
+  ctx.lineWidth = 3*esf;
+  ctx.beginPath();
+  ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, 10*esf, 0, 2*Math.PI);
+  ctx.stroke();
+  ctx.fillStyle="#888888";
+  ctx.fillText(e.id, (e.x-dx)*psf+15*esf, (e.y-dy)*psf);
+  ctx.strokeStyle="#ffffff";
+  for (var link of e.links){
+      ctx.beginPath();
+      ctx.moveTo((e.x-dx)*psf,(e.y-dy)*psf);
+      ctx.lineTo((link.x-dx)*psf, (link.y-dy)*psf);
+      ctx.stroke();
+  }
 }
 
 function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false): void{

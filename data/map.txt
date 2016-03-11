@@ -58,7 +58,7 @@ system Sol
 			period 3.5
 
 system "Backwater"
-	pos 200 300
+	pos -20 49
 	government Trader
 	link Sol
 	fleet "Intrastellar Shuttles" 300

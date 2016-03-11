@@ -118,8 +118,10 @@ export class Profile{
             })
        );
     }
-    getSystems(): { [name: string]: System}{
-        return universe.systems
+    getSystems(): System[]{
+        return Object.keys(universe.systems).map(function(x){
+            return universe.systems[x];
+        });
     }
     static newProfile(): Profile{
         var reputation: ReputationTable = {};

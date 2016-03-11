@@ -25,6 +25,13 @@ body {
   border: 5px solid black;
   background-color: #001900;
 }
+#map {
+  position: absolute;
+  top: 0;
+  left: 0px;
+  bottom: 0;
+  right: 0;
+}
 #player-armor {
   position: absolute;
   top: 210;

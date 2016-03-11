@@ -70,11 +70,16 @@ function stealZoomKeys(display){
   });
 }
 
-function stealPauseKey(cb){
+function stealPauseAndMapKeys(pause, map){
   window.addEventListener('keydown', function(e){
     // stealing right command
     if (e.keyCode === 80){ //p
-      cb();
+      pause();
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (e.keyCode === 77){ //m
+      map();
       e.stopPropagation();
       e.preventDefault();
     }
@@ -106,5 +111,5 @@ exports.waitForWindow = waitForWindow;
 exports.stealSimulatorKeys = stealSimulatorKeys;
 exports.stealDebugKeys = stealDebugKeys;
 exports.stealZoomKeys = stealZoomKeys;
-exports.stealPauseKey = stealPauseKey;
+exports.stealPauseAndMapKeys = stealPauseAndMapKeys;
 exports.makeFullscreen = makeFullscreen;

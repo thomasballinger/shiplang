@@ -39,11 +39,24 @@ export function outerspace(originalWorld: Engine){
     update: function(){
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      map.canvas.width = window.innerWidth;
+      map.canvas.height = window.innerHeight;
     }
   });
   var mainDisplay = new SpaceDisplay('canvas', 1, 1);
-  updater.registerObserver(mainDisplay);
-  updater.registerObserver(new SpaceDisplay('minimap', 0.04, 0.17, true));
+  updater.registerObserver(<Updateable>{
+      display: mainDisplay,
+      update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
+  });
+  updater.registerObserver(<Updateable>{
+      display: new SpaceDisplay('minimap', 0.04, 0.17, true),
+      update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
+  });
+  var map = new SpaceDisplay('map', 1, 1, true);
+  updater.registerObserver(<Updateable>{
+      display: map,
+      update: function(player, world){ this.display.update(world.profile.location, world.profile.getSystems()); }
+  });
   updater.registerObserver(<Updateable>{
     lurper: new Lerper('player-armor', '#cc8800'),
     update: function(player, world){ this.lurper.update(player.armor, player.armorMax); }
@@ -62,7 +75,7 @@ export function outerspace(originalWorld: Engine){
   var fastForward = [false];
   setup.stealDebugKeys(updater, fastForward);
   setup.stealZoomKeys(mainDisplay)
-  setup.stealPauseKey(function(){
+  setup.stealPauseAndMapKeys(function(){
       if (updater.paused){
           hideMenu();
           updater.unpause();
@@ -70,13 +83,29 @@ export function outerspace(originalWorld: Engine){
           updater.pause();
           showMenu(Profile.fromStorage());
       }
-  })
+  }, function(){
+      var mapZoom = 0.01
+      if (mainDisplay.psf < 0.05){
+          mainDisplay.psfTarget = mainDisplay.psfOrig;
+          mainDisplay.esfTarget = mainDisplay.esfOrig;
+      } else {
+          mainDisplay.psfTarget = mapZoom;
+          mainDisplay.esfTarget = mapZoom;
+      }
+  });
 
   function tick(){
     if (updater.paused){
         setTimeout(tick, 33.5); // 30fps
         return;
     }
+
+    if (mainDisplay.psf < 0.05){
+        map.show();
+    } else {
+        map.hide();
+    }
+
     //var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
     var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
     if (fastForward[0]){

@@ -54,8 +54,14 @@ export function simulator(originalWorld: Engine){
       canvas.height = window.innerHeight;
     }
   });
-  updater.registerObserver(new SpaceDisplay('canvas', 1, 1));
-  updater.registerObserver(new SpaceDisplay('minimap', 0.07, 0.3));
+  updater.registerObserver(<Updateable>{
+      display: new SpaceDisplay('canvas', 1, 1),
+      update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
+  });
+  updater.registerObserver(<Updateable>{
+      display: new SpaceDisplay('minimap', 0.07, 0.3, true),
+      update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
+  });
   updater.registerObserver(<Updateable>{
     lurper: new Lerper('player-armor', '#cc8800'),
     update: function(player, world){ this.lurper.update(player.armor, player.armorMax); }

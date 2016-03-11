@@ -104,13 +104,20 @@ export class System extends DataNode{
     populate(data: any, global: AllObjects){
         if (data.pos === undefined){ throw Error('No position listed for system '+this.id); }
         if (data.pos.length > 1){ throw Error('Too many positions listed for system'); }
-        this.position = data.pos[0].map(function(x: string){ return parseInt(x); });
-        if (this.position.length !== 2){ throw Error('expected two numebers for position: '+data.pos); }
+        if (data.pos[0].length !== 2){ throw Error('expected two numebers for position: '+data.pos); }
+        [this.x, this.y] = data.pos[0].map(function(x: string){ return parseInt(x); });
         if (data.government === undefined){ throw Error('No government value for system '+this.id); }
         this.government = data.government[0];
         if (Gov[this.government] === undefined){ throw Error('Bad government value: '+this.government); }
+        var id = this.id;
         this.links = (data.link || []).map(function(x: string){
             checkExists(x, 'systems', global);
+            if (global.systems[x].hasOwnProperty('links') && global.systems[x].links.filter(function(other){
+                return other.id === id;
+            }).length < 1){ //TODO check the other situation, that a system that does have its
+                            // links has this system in it but this system doesn't link to that one
+                console.log('Warning: one-way link detected from '+this.id+' to '+x);
+            }
             return global.systems[x];
         });
         this.fleets = (data.fleet || []).map(function(x: string){
@@ -138,7 +145,8 @@ export class System extends DataNode{
         }
         Object.freeze(this);
     }
-    position: [number, number];
+    x: number;
+    y: number;
     government: Gov
     links: System[];
     fleets: [Fleet, number][];
