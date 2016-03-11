@@ -9,24 +9,25 @@ export class SpaceDisplay{
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
         this.esf = esfOrig;
-        this.starDensity = .0001
-        this.starfield = this.makeStarfield(this.starDensity, 2000, 1000);
-    }
-
-    makeStarfield(starDensity: number, maxDisplaySize: number, maxZoomLevel: number){
-        var stars: [number, number, number][] = [];
-        var numStars = starDensity * maxDisplaySize * maxDisplaySize;
-        for (var i=0; i<numStars; i++){
-            stars.push([Math.floor(Math.random()*maxZoomLevel*maxDisplaySize),
-                        Math.floor(Math.random()*maxZoomLevel*maxDisplaySize),
-                        Math.random() > .8 ? 20 : 10]);
-        }
-        return stars;
+        this.starDensity = .00005
+        this.starTileSize = 5000
+        this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
     }
     psf: number;
     esf: number;
     starDensity: number;
     starfield: [number, number][];
+    starTileSize: number;
+    makeStarfield(starDensity: number, tileSize: number){
+        var stars: [number, number, number][] = [];
+        var numStars = Math.ceil(starDensity * tileSize * tileSize);
+        for (var i=0; i<numStars; i++){
+            stars.push([Math.floor(Math.random()*tileSize),
+                        Math.floor(Math.random()*tileSize),
+                        Math.random() > .8 ? 2 : 1]);
+        }
+        return stars;
+    }
     renderCentered(centered: Entity, entities: Entity[],
                    positionScaleFactor:number, entityScaleFactor:number,
                    backgroundParallax:number, hud=false){
@@ -46,19 +47,28 @@ export class SpaceDisplay{
         }
     }
     drawStars(left: number, top: number, right: number, bottom: number, psf: number){
-        var width = this.canvas.width
-        var height = this.canvas.height
-        var starsToUse = this.starDensity * width * height;
+        var starsToUse = Math.ceil(psf * this.starfield.length);
 
         var ctx = this.ctx;
         ctx.fillStyle = '#666666';
-        for (var i=0; i<Math.min(starsToUse, this.starfield.length); i++){
-            var screenX = (this.starfield[i][0] - left)*psf % width;
-            var screenY = (this.starfield[i][1] -  top)*psf % height;
-            var size = this.starfield[i][2];
-            ctx.fillRect((screenX),
-                         (screenY),
-                         size, size);
+
+        var offsets: [number, number][] = [];
+        var leftOffset = Math.floor(left / this.starTileSize)*this.starTileSize;
+        var topOffset =  Math.floor(top / this.starTileSize)*this.starTileSize;
+        var rightOffset = Math.floor(right / this.starTileSize)*this.starTileSize;
+        var bottomOffset = Math.floor(bottom / this.starTileSize)*this.starTileSize;
+
+        for (var dx = leftOffset; dx <= rightOffset; dx += this.starTileSize){
+            for (var dy = topOffset; dy <= bottomOffset; dy += this.starTileSize ){
+                for (var i=0; i<Math.min(starsToUse, this.starfield.length); i++){
+                    var screenX = (this.starfield[i][0] - left + dx)*psf;
+                    var screenY = (this.starfield[i][1] -  top + dy)*psf;
+                    var size = this.starfield[i][2];
+                    ctx.fillRect((screenX),
+                                 (screenY),
+                                 size, size);
+                }
+            }
 
         }
     }
