@@ -83,7 +83,7 @@ export class SpaceDisplay{
         })
     }
     drawStars(left: number, top: number, right: number, bottom: number, psf: number){
-        var starsToUse = Math.ceil(psf * this.starfield.length);
+        var starsToUse = Math.max(Math.ceil(psf * psf* this.starfield.length), 1);
         // TODO based on a tile's offset from (0, 0), use different subsets of stars
 
         var ctx = this.ctx;
@@ -97,10 +97,13 @@ export class SpaceDisplay{
 
         for (var dx = leftOffset; dx <= rightOffset; dx += this.starTileSize){
             for (var dy = topOffset; dy <= bottomOffset; dy += this.starTileSize ){
-                for (var i=0; i<Math.min(starsToUse, this.starfield.length); i++){
-                    var screenX = (this.starfield[i][0] - left + dx)*psf;
-                    var screenY = (this.starfield[i][1] -  top + dy)*psf;
-                    var size = this.starfield[i][2];
+                var stride = Math.abs(dy / this.starTileSize * 50 + dx / this.starTileSize) + 1
+                var offset = (Math.abs(dy / this.starTileSize + 4 * dx / this.starTileSize) + 1) % this.starTileSize;
+
+                for (var i=offset; i<starsToUse+offset; i++){
+                    var screenX = (this.starfield[i*stride%this.starfield.length][0] - left + dx)*psf;
+                    var screenY = (this.starfield[i*stride%this.starfield.length][1] -  top + dy)*psf;
+                    var size = this.starfield[i*stride%this.starfield.length][2];
                     ctx.fillRect((screenX),
                                  (screenY),
                                  size, size);
@@ -111,7 +114,7 @@ export class SpaceDisplay{
     }
     makeStarfield(starDensity: number, tileSize: number){
         var stars: [number, number, number][] = [];
-        var numStars = Math.ceil(starDensity * tileSize * tileSize);
+        var numStars = Math.ceil(starDensity * tileSize * tileSize) *10;
         for (var i=0; i<numStars; i++){
             stars.push([Math.floor(Math.random()*tileSize),
                         Math.floor(Math.random()*tileSize),
