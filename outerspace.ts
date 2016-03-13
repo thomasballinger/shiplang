@@ -72,6 +72,7 @@ export function outerspace(originalWorld: Engine){
 
   updater.notifyOfCodeChange();
 
+  var oldZoomTarget: number;
   var fastForward = [false];
   setup.stealDebugKeys(updater, fastForward);
   setup.stealZoomKeys(mainDisplay)
@@ -84,13 +85,12 @@ export function outerspace(originalWorld: Engine){
           showMenu(Profile.fromStorage());
       }
   }, function(){
-      var mapZoom = 0.01
-      if (mainDisplay.psf < 0.05){
-          mainDisplay.psfTarget = mainDisplay.psfOrig;
-          mainDisplay.esfTarget = mainDisplay.esfOrig;
+      if (oldZoomTarget === undefined){
+          oldZoomTarget = mainDisplay.zoomTarget;
+          mainDisplay.zoomTarget = -15;
       } else {
-          mainDisplay.psfTarget = mapZoom;
-          mainDisplay.esfTarget = mapZoom;
+          mainDisplay.zoomTarget = oldZoomTarget
+          oldZoomTarget = undefined;
       }
   });
 
@@ -100,7 +100,7 @@ export function outerspace(originalWorld: Engine){
         return;
     }
 
-    if (mainDisplay.psf < 0.05){
+    if (mainDisplay.zoom < -13 && oldZoomTarget !== undefined){
         map.show();
     } else {
         map.hide();
@@ -111,9 +111,9 @@ export function outerspace(originalWorld: Engine){
     if (fastForward[0]){
         setTimeout(tick, 1);
     } else {
-    //    setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
+        setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
     //    setTimeout(tick, Math.max(5, 1033.5-tickTime)); // 1fps
-        setTimeout(tick, 1); // max fps
+    //    setTimeout(tick, 1); // max fps
     }
   }
 

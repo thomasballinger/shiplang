@@ -10,41 +10,42 @@ export class SpaceDisplay{
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
         this.esf = esfOrig;
-        this.psfTarget = psfOrig;
-        this.esfTarget = esfOrig;
         this.starDensity = .00005
         this.starTileSize = 5000
         this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
         this.active = true;
+
+        this.zoom = 0;
+        this.zoomTarget = 0;
     }
     psf: number;
     esf: number;
-    psfTarget: number;
-    esfTarget: number;
     starDensity: number;
     starfield: [number, number][];
     starTileSize: number;
+
+    zoomTarget: number;
+    zoom: number;
+
     active: boolean;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
 
     update(center: {x: number, y: number}, drawables: {x: number, y:number}[]){
         if (!this.active){ return; }
-        if (this.isZooming()){
-            this.psf = Math.pow(2, (Math.log2(this.psf)*99 + Math.log2(this.psfTarget))/100)
-            if (Math.abs(this.psf - this.psfTarget) / this.psfTarget < .01){
-                this.psf = this.psfTarget;
+        if (this.zoomTarget !== this.zoom){
+            this.zoom = (this.zoom * 29 + this.zoomTarget) / 30;
+            if (Math.abs(this.zoom - this.zoomTarget) < .01){
+                this.zoom = this.zoomTarget;
             }
-            this.esf = Math.pow(2, (Math.log2(this.esf)*99 + Math.log2(this.esfTarget))/100)
-            if (Math.abs(this.esf - this.esfTarget) / this.esfTarget < .01){
-                this.esf = this.esfTarget;
-            }
+
+            this.psf = this.psfOrig * Math.pow(2, this.zoom/2);
+            this.esf = this.esfOrig * Math.pow(2, this.zoom/2);
         }
         this.renderCentered(center, drawables, this.psf, this.esf, this.hud);
     }
     hide(){ this.active = false; this.canvas.hidden = true; }
-    show(){ this.active = true; this.canvas.hidden = false }
-    isZooming(){ return this.psf !== this.psfTarget || this.esf !== this.esfTarget; }
+    show(){ this.active = true; this.canvas.hidden = false; }
     renderCentered(centered: {x: number, y:number}, drawables: {x: number, y:number}[],
                    positionScaleFactor:number, entityScaleFactor:number,
                    hud=false){
@@ -83,6 +84,7 @@ export class SpaceDisplay{
         })
     }
     drawStars(left: number, top: number, right: number, bottom: number, psf: number){
+        // For each tile, how many stars to render
         var starsToUse = Math.max(Math.ceil(psf * psf* this.starfield.length), 1);
         // TODO based on a tile's offset from (0, 0), use different subsets of stars
 
@@ -90,26 +92,35 @@ export class SpaceDisplay{
         ctx.fillStyle = '#666666';
 
         var offsets: [number, number][] = [];
-        var leftOffset = Math.floor(left / this.starTileSize)*this.starTileSize;
-        var topOffset =  Math.floor(top / this.starTileSize)*this.starTileSize;
-        var rightOffset = Math.floor(right / this.starTileSize)*this.starTileSize;
-        var bottomOffset = Math.floor(bottom / this.starTileSize)*this.starTileSize;
+        var leftOffset = Math.floor(left / this.starTileSize);
+        var topOffset =  Math.floor(top / this.starTileSize);
+        var rightOffset = Math.ceil(right / this.starTileSize);
+        var bottomOffset = Math.ceil(bottom / this.starTileSize);
 
-        for (var dx = leftOffset; dx <= rightOffset; dx += this.starTileSize){
-            for (var dy = topOffset; dy <= bottomOffset; dy += this.starTileSize ){
-                var stride = Math.abs(dy / this.starTileSize * 50 + dx / this.starTileSize) + 1
-                var offset = (Math.abs(dy / this.starTileSize + 4 * dx / this.starTileSize) + 1) % this.starTileSize;
+        var numTiles = (rightOffset - leftOffset) * (bottomOffset - topOffset);
+        var skipRatio = Math.max(1 - psf*psf*this.starfield.length, 0);
+
+        // For each tile of stars
+        for (var dx = leftOffset; dx < rightOffset; dx++){
+            for (var dy = topOffset; dy < bottomOffset; dy++ ){
+                if (skipRatio !== 0){
+                    if (skipRatio > .50 && (dx + dy) % 2){ continue; }
+                    //TODO to allow further zoom-outs don't render
+                    //some tiles
+                }
+
+                var dxpx = dx * this.starTileSize;
+                var dypx = dy * this.starTileSize;
+                var stride = Math.abs(dy * 50 + dx) + 1
+                var offset = (Math.abs(dy + 4 * dx) + 1) % this.starTileSize;
 
                 for (var i=offset; i<starsToUse+offset; i++){
-                    var screenX = (this.starfield[i*stride%this.starfield.length][0] - left + dx)*psf;
-                    var screenY = (this.starfield[i*stride%this.starfield.length][1] -  top + dy)*psf;
+                    var screenX = (this.starfield[i*stride%this.starfield.length][0] - left + dxpx)*psf;
+                    var screenY = (this.starfield[i*stride%this.starfield.length][1] -  top + dypx)*psf;
                     var size = this.starfield[i*stride%this.starfield.length][2];
-                    ctx.fillRect((screenX),
-                                 (screenY),
-                                 size, size);
+                    ctx.fillRect(screenX, screenY, size, size);
                 }
             }
-
         }
     }
     makeStarfield(starDensity: number, tileSize: number){
@@ -122,13 +133,11 @@ export class SpaceDisplay{
         }
         return stars;
     }
-    zoomIn(){
-        this.psfOrig *= 6/8; this.esfOrig *= 6/8;
-        this.psfTarget = this.psfOrig; this.esfTarget = this.esfOrig
-    }
     zoomOut(){
-        this.psfOrig *= 8/6; this.esfOrig *= 8/6;
-        this.psfTarget = this.psfOrig; this.esfTarget = this.esfOrig
+        this.zoomTarget = Math.max(-16, this.zoomTarget - 1);
+    }
+    zoomIn(){
+        this.zoomTarget = Math.min(2, this.zoomTarget + 1);
     }
 }
 
