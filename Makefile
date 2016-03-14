@@ -17,7 +17,7 @@ bundle.js: FORCE
 	webpack
 
 deploy: bundle.js
-	rsync -r index.html bundle.js images tom:/home/tomb/missilecmd
+	rsync -r index.html bundle.js esimages tom:/home/tomb/missilecmd
 	rsync -r ./hotswapping-js-interp/* tom:/home/tomb/missilecmd/hotswapping-js-interp/
 
 FORCE:

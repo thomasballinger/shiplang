@@ -52,7 +52,7 @@ export function outerspace(originalWorld: Engine){
       display: new SpaceDisplay('minimap', 0.04, 0.17, true, false),
       update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
   });
-  var map = new SpaceDisplay('map', 1, 1, true);
+  var map = new SpaceDisplay('map', 1, 1, true, false);
   updater.registerObserver(<Updateable>{
       display: map,
       update: function(player, world){ this.display.update(world.profile.location, world.profile.getSystems()); }
