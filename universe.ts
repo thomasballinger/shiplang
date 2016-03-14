@@ -465,5 +465,5 @@ Mission.fieldName = 'missions';
 
 // Go ahead and load all data here so everyone
 // can use the same copy
-var gamedata = loadData(require('raw!./data/map.txt'));
+var gamedata = loadData(require('./data/index.js'));
 export var universe = createObjects(gamedata);

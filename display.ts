@@ -191,7 +191,7 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
                 ey *= esf
                 ctx.fillStyle = e.drawStatus["engineColor"] || "#882200";
                 var eWidth = 6 * esf
-                var eHeight = 10 * esf
+                var eHeight = 12 * esf
                 ctx.fillRect(ex-eWidth/2, ey, eWidth, eHeight);
             }
         }
