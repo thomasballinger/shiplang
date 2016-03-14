@@ -397,6 +397,10 @@ export class Ship extends DataNode{
     populate(data: any, global: AllObjects){
         this.drawStatus = {};
         this.drawStatus['sprite'] = data.sprite[0];
+        if (data.sprite.length === 2){
+            this.drawStatus['thrustSprite'] = data.sprite[1];
+        }
+
         this.shieldsMax = parseInt(data.attributes[0].shields[0]);
         this.armorMax = parseInt(data.attributes[0].hull[0]);
         this.maxThrust = parseInt(data.attributes[0].maxThrust[0]);

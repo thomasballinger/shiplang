@@ -10,7 +10,7 @@ export class SpaceDisplay{
         this.ctx = this.canvas.getContext('2d');
         this.psf = psfOrig;
         this.esf = esfOrig;
-        this.starDensity = .00005
+        this.starDensity = .000005
         this.starTileSize = 5000
         this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
         this.active = true;
@@ -167,7 +167,11 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
       if (hud || !e.drawStatus['sprite'] || e.type === 'explosion'){
           shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
-        var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
+        if (e.thrust > 0 && e.drawStatus['thrustSprite']){
+            var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['thrustSprite'].replace(/ /g, '_'));
+        } else {
+            var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
+        }
         var w = sprite.naturalWidth * esf;
         var h = sprite.naturalHeight * esf;
 
@@ -183,7 +187,7 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
         if (!e.drawStatus['notDirectional']){
             ctx.rotate(theta*Math.PI/180);
         }
-        if (e.thrust > 0){
+        if (e.thrust > 0 && !e.drawStatus['thrustSprite']){
             for (var spot of e.drawStatus['engines']){
                 //TODO fix drawStatus type
                 var [ex, ey] = <[number, number]><any>spot;
