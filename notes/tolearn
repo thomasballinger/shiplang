@@ -1,0 +1,61 @@
+* how are missions handled?
+* how are system ship probabilities handled?
+
+In Endless Sky:
+
+Interactions between ships generate ShipEvents.
+These are passed to all active missions and (governments?)
+  * type (fire, destroy, assist, etc.)
+  * actor
+  * actor gov
+  * target
+  * target gov
+
+
+Events are published by the engine I expect?
+
+Missions get to act on these, I expect Governments do too?
+
+make some other attributes globally available maybe?
+
+
+
+Mission: destroy some things.
+
+Can be classes with data so long as we can serialize this data. Check out Missions specs.
+
+Destroy 5 things.
+On each kill event generated, increment a counter?
+
+Mission:
+  desc: please kill 5 things
+  process(e: Event){
+      if death of right thing,
+          data.killed += 1
+  data: stuff that gets serialized in addition to 
+  load: instantiate mission, load its data
+
+
+Next up to do:
+
+* military should turn on you when you fire at someone
+* mission should know about it
+* missions should get to set permenant flags on the player
+* call the persistent part "Profile", Player is all 
+
+* player.missionFlags
+
+dont' access localstorage every time we need player - jsut do that on save.
+Use a singleton player object that only saves when landing on a planet.
+
+thePlayer is a singleton.
+
+player is the player
+
+Player is the object
+
+This all means that isEnemy depends on persistant Player reputation info and temporary player state?
+Maybe the player state belongs in the system?
+
+needs a set of flags for
+hasTemporarilyAnnoyed a government

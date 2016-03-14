@@ -1,0 +1,28 @@
+Possible ways to dynamically adjust settings
+* use a smaller canvas, transform it up
+* draw less stars
+
+Speed questions:
+* is React slowing down the editor? Why is highlighting code so slow?
+
+
+
+Speed seems to go with number of pixels drawn of canvas (big sprites are expensive)
+Does building a background canvas or changing the background image work better?
+
+Big planets were a problem until I turned off the moving image background of the canvas.
+
+Seems like it wasn't so much the background image as the parallax of it.
+(updating the offset of the canvas background)
+
+Huh, maybe unrelated to parallax, because now working fine with .1 bg movement? Really confusing. Yeah now I can see slow framerates at no parallax and good ones with parrallax. Perhaps some JIT-shit kicking in?
+
+Firefox seems to scale more with the size of the canvas
+
+better get ship sprites working before drawing too many conclusions
+
+idea: two canvases, one for background stars + planets, other for ships
+
+idea: clear all regions, then draw again (instead of clearing whole screen)
+
+Question: is it better to use a moving background or to render some stars each time?

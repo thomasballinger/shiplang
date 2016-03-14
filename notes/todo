@@ -1,0 +1,76 @@
+* image loading system
+* base planet radius on sprite size
+* mark planets as habitable or not
+* engine sprites
+* swizzles
+* planet sprites should be rotated to face the sun
+
+* test gunner scenario
+    * military ships attack when gunner fires on
+    * editing interface on planet, chance to repeatedly run the mission
+
+* remember star tiles so they can use different subsets of stars and be smaller
+* make landing on planets do something
+* figure out setting for how many ships in system
+
+* mission remembers how many fired on civilians occur
+* holder releases ship on killing a civilian
+* holder doesn't like being hit
+
+* restore determinism to simulation (use a splittable, deterministic random source)
+
+
+* fix issue with rewind being to point before missile is fired, so not firing at all - maybe a special holding place for "entities to be added on next tick, dont' start running their function until then so we get a clean snapshot before they start"
+* enforce constraints on which functions can be called in a script
+  Execution environment now entails:
+  * which entity is being affected
+  * what functions the script can call
+  Maybe do this at the AST level.
+
+* add a wait to tight while, for loops? Somehow eliminate the need for waitFor(.001) calls
+* fix garbage collection in simulator (or whatever is causing slow frame rate after reset)
+* allow multiple CSS background layers for displays (want stars in space)
+* needle missiles
+* update ast line numbers for highlighting
+* ammo counting (limited shots, or limited missiles at a time)
+* persist program
+* write some fun scenarios
+* adjust canvas to be smaller when editor visible
+* challenges and simulation with persistent code
+* time freeze for modal dialogs
+
+later
+-----
+* version that uses blockly instead of text editor
+* faster deepcopy of JSInterpreters
+* editor for Scheme code
+* change shiplang to use real Scheme syntax:
+  * special form of define for functions instead of defn
+
+
+done:
+----
+* js interp forking
+* script interface in only one entity
+* highlighting should be per entity
+* detonate
+* check that view reverts to player when missile dies
+* what happens when we modify a function that hasn't been called yet? works
+* adjust view to follow different entities
+* way to leave simulator (blast off!)
+* only highlight code for the entity view is following (or at least change color for that one)
+* going too fast to land message
+* refactor scriptenv so one constructor builds both JS and SL
+* have multiple scripts at the same time, with one selected as active
+* persistent player information - keep the script, location in space etc.
+* rename System -> Engine, system becomes about planets, fleets etc.
+* assign mission at start
+* translate other scenarios
+* military ships fight pirates
+* different colors for pirates
+* stars
+* describe missions with text so they can be part of universe?
+* engines light up on thrust
+* neato zoom out effect for pause
+* map
+* write scripts for traveling between planets unless enemies
