@@ -61,7 +61,9 @@ export class SpaceDisplay{
         this.renderEntities(drawables, left, top, right, bottom,
                     positionScaleFactor, entityScaleFactor, hud);
         if (bgp !== undefined){
-            this.canvas.style.backgroundPosition=''+(0-centered.x*bgp)+' '+(0-centered.y*bgp);
+
+            var scale = bgp * Math.pow(2, this.zoom/2);
+            this.canvas.style.backgroundPosition=''+(0-centered.x*scale)+' '+(0-centered.y*scale);
         }
     }
     renderEntities(drawables: {x: number, y:number}[], left: number, top: number, right: number, bottom: number,
