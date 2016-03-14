@@ -1,5 +1,5 @@
 all: images/857-tileable-classic-nebula-space-patterns blockly-master esimages
- 
+
 blockly-master: blockly.tar.gz
 	tar xzf blockly.tar.gz
 

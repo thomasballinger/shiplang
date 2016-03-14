@@ -5,18 +5,18 @@ import { System } from './universe';
 //TODO invert y axis
 
 export class SpaceDisplay{
-    constructor(id: string, public psfOrig: number, public esfOrig: number, public hud=false){
+    constructor(id: string, public psfOrig: number, public esfOrig: number, public hud=false, public showStars=true, public bgParallax?: number){
         this.canvas = <HTMLCanvasElement>document.getElementById(id);
         this.ctx = this.canvas.getContext('2d');
-        this.psf = psfOrig;
-        this.esf = esfOrig;
         this.starDensity = .000005
         this.starTileSize = 5000
         this.starfield = this.makeStarfield(this.starDensity, this.starTileSize);
         this.active = true;
 
-        this.zoom = 0;
-        this.zoomTarget = 0;
+        this.zoom = -2;
+        this.zoomTarget = -2;
+        this.psf = this.psfOrig * Math.pow(2, this.zoom/2);
+        this.esf = this.esfOrig * Math.pow(2, this.zoom/2);
     }
     psf: number;
     esf: number;
@@ -42,24 +42,27 @@ export class SpaceDisplay{
             this.psf = this.psfOrig * Math.pow(2, this.zoom/2);
             this.esf = this.esfOrig * Math.pow(2, this.zoom/2);
         }
-        this.renderCentered(center, drawables, this.psf, this.esf, this.hud);
+        this.renderCentered(center, drawables, this.psf, this.esf, this.hud, this.showStars, this.bgParallax);
     }
     hide(){ this.active = false; this.canvas.hidden = true; }
     show(){ this.active = true; this.canvas.hidden = false; }
     renderCentered(centered: {x: number, y:number}, drawables: {x: number, y:number}[],
                    positionScaleFactor:number, entityScaleFactor:number,
-                   hud=false){
+                   hud=false, drawStars=true, bgp?: number){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         var left = centered.x-this.canvas.width/2/positionScaleFactor;
         var top = centered.y-this.canvas.height/2/positionScaleFactor;
         var right = centered.x+this.canvas.width/2/positionScaleFactor;
         var bottom = centered.y+this.canvas.height/2/positionScaleFactor;
 
-        if (!hud){
+        if (drawStars){
             this.drawStars(left, top, right, bottom, positionScaleFactor);
         }
         this.renderEntities(drawables, left, top, right, bottom,
                     positionScaleFactor, entityScaleFactor, hud);
+        if (bgp !== undefined){
+            this.canvas.style.backgroundPosition=''+(0-centered.x*bgp)+' '+(0-centered.y*bgp);
+        }
     }
     renderEntities(drawables: {x: number, y:number}[], left: number, top: number, right: number, bottom: number,
            position_scale_factor: number, entity_scale_factor: number, hud=false){

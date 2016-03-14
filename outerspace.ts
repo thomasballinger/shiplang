@@ -49,7 +49,7 @@ export function outerspace(originalWorld: Engine){
       update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
   });
   updater.registerObserver(<Updateable>{
-      display: new SpaceDisplay('minimap', 0.04, 0.17, true),
+      display: new SpaceDisplay('minimap', 0.04, 0.17, true, false),
       update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
   });
   var map = new SpaceDisplay('map', 1, 1, true);

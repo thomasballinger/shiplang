@@ -77,10 +77,10 @@ system "Backwater"
 		period 687
 
 system Simulator
-	pos 100 100
+	pos 1000 1000
 	government Trader
-	fleet "Missile Boids" 100
-	fleet "Mean Pirate" 100
+	fleet "Missile Boids" 1000
+	fleet "Mean Pirate" 1000
 
 system Robo
 	pos 20 30

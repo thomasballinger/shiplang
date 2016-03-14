@@ -54,12 +54,13 @@ export function simulator(originalWorld: Engine){
       canvas.height = window.innerHeight;
     }
   });
+  var mainDisplay = new SpaceDisplay('canvas', 1, 1, false, false, 1);
   updater.registerObserver(<Updateable>{
-      display: new SpaceDisplay('canvas', 1, 1),
+      display: mainDisplay,
       update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
   });
   updater.registerObserver(<Updateable>{
-      display: new SpaceDisplay('minimap', 0.07, 0.3, true),
+      display: new SpaceDisplay('minimap', 0.07, 0.3, true, false),
       update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
   });
   updater.registerObserver(<Updateable>{
@@ -77,10 +78,23 @@ export function simulator(originalWorld: Engine){
 
   setup.stealSimulatorKeys(updater);
   setup.stealDebugKeys(updater);
+  var oldZoomTarget: number;
+  setup.stealZoomKeys(mainDisplay)
 
   function tick(){
-    var tickTime = updater.tick(0.032); // 30fps
-    setTimeout(tick, Math.max(5, 33.5-tickTime));
+    if (updater.paused){
+        setTimeout(tick, 33.5); // 30fps
+        return;
+    }
+
+    if ((<any>window).DEBUGMODE){
+        var tickTime = updater.tick(0.016); // 60fps game time
+        setTimeout(tick, 1); // max fps
+    } else {
+        var tickTime = updater.tick(0.032); // 30fps game time
+        setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
+    }
+    //    setTimeout(tick, Math.max(5, 1033.5-tickTime)); // 1fps, good for low cpu usage
   }
 
   editor.setCode(Profile.fromStorage().script);
