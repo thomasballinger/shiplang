@@ -1,4 +1,4 @@
-Currently using same assests as [Endless
+Currently using same assets as [Endless
 Sky](https://github.com/endless-sky/endless-sky), a great game by Michael
 Zahniser.
 
