@@ -16,7 +16,7 @@ window.Profile = Profile; // for convenience in onClicks of links
 // are throw instead of displayed and ignored
 // and player, world, and a few other things
 // are made available globally on window
-window.DEBUGMODE = true;
+window.DEBUGMODE = false;
 
 function getLocation(){
   if(window.location.search) {
