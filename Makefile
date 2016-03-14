@@ -1,4 +1,4 @@
-all: images/857-tileable-classic-nebula-space-patterns blockly-master esimages
+all: blockly-master esimages
 
 blockly-master: blockly.tar.gz
 	tar xzf blockly.tar.gz
@@ -6,22 +6,12 @@ blockly-master: blockly.tar.gz
 blockly.tar.gz:
 	curl -L -o blockly.tar.gz https://github.com/google/blockly/archive/master.tar.gz
 
-images/857-tileable-classic-nebula-space-patterns: spaceimages.zip
-	unzip -d images spaceimages.zip
-	rm images/857-tileable-classic-nebula-space-patterns/tileable-classic-nebula-space-patterns.*
-
-spaceimages.zip:
-	curl -L -o spaceimages.zip https://www.dropbox.com/s/pq9vmxvvnj6t14l/857-tileable-classic-nebula-space-patterns.zip?dl=1
-
 hotswapping-js-interp:
 	git clone https://github.com/thomasballinger/hotswapping-js-interp.git
 	cd hotswapping-js-interp; git pull
 
-endless-sky:
-	git clone git@github.com:endless-sky/endless-sky.git
-
-esimages: endless-sky
-	ln -s endless-sky/images esimages
+esimages:
+	svn export https://github.com/endless-sky/endless-sky/trunk/images esimages
 
 bundle.js: FORCE
 	webpack
