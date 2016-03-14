@@ -142,9 +142,16 @@ export class SpaceDisplay{
     zoomIn(){
         this.zoomTarget = Math.min(2, this.zoomTarget + 1);
     }
+    zoomTo(n: number){
+        this.zoom = n;
+        this.zoomTarget = n;
+        this.psf = this.psfOrig * Math.pow(2, this.zoom/2);
+        this.esf = this.esfOrig * Math.pow(2, this.zoom/2);
+    }
 }
 
 function systemDraw(e: System, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number): void{
+  ctx.font="20px Arial";
   ctx.fillStyle="#ffffff";
   ctx.strokeStyle="#ffffff";
   ctx.lineWidth = 3*esf;

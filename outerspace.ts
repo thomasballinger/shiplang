@@ -53,6 +53,7 @@ export function outerspace(originalWorld: Engine){
       update: function(player, world){ this.display.update(player, world.entitiesToDraw()); }
   });
   var map = new SpaceDisplay('map', 1, 1, true, false);
+  map.zoomTo(2)
   updater.registerObserver(<Updateable>{
       display: map,
       update: function(player, world){ this.display.update(world.profile.location, world.profile.getSystems()); }
