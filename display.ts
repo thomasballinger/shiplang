@@ -153,15 +153,15 @@ export class SpaceDisplay{
 }
 
 function systemDraw(e: System, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number): void{
-  ctx.font="20px Arial";
+  ctx.font="16px Arial";
   ctx.fillStyle="#ffffff";
   ctx.strokeStyle="#ffffff";
-  ctx.lineWidth = 3*esf;
+  ctx.lineWidth = 2*esf;
   ctx.beginPath();
-  ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, 10*esf, 0, 2*Math.PI);
+  ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, 6*esf, 0, 2*Math.PI);
   ctx.stroke();
   ctx.fillStyle="#888888";
-  ctx.fillText(e.id, (e.x-dx)*psf+15*esf, (e.y-dy)*psf);
+  ctx.fillText(e.id, (e.x-dx)*psf+8*esf, (e.y-dy)*psf + 2*esf);
   ctx.strokeStyle="#ffffff";
   for (var link of e.links){
       ctx.beginPath();
