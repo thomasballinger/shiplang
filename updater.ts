@@ -6,7 +6,7 @@
  */
 import { Engine } from './engine';
 import { Ship, Entity } from './entity';
-var manual = require('./manual');
+import { Controls } from './manual';
 import * as scriptEnv from './scriptenv';
 import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
@@ -30,7 +30,7 @@ export class Updater{
                 public onChangeViewedEntity?: (e: Ship)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
-        this.controls = new manual.Controls(keyHandlerTarget, 0); //TODO
+        this.controls = new Controls(keyHandlerTarget, 0);
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
         this.savedWorlds = [];

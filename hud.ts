@@ -49,7 +49,6 @@ export class FPS{
         this.draw(rest);
     }
     draw(info: any[]){
-
         this.div.innerHTML = (Number(this.fps).toFixed(1) +
                               ' ' + info.map(function(x){ return x.toString() }).join(' '));
     }
