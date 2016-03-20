@@ -77,8 +77,9 @@ export function simulator(originalWorld: Engine){
   });
 
   setup.stealSimulatorKeys(updater);
-  setup.stealDebugKeys(updater);
   var oldZoomTarget: number;
+  var fastForward = [false];
+  setup.stealDebugKeys(updater, fastForward);
   setup.stealZoomKeys(mainDisplay)
 
   function tick(){
@@ -87,11 +88,14 @@ export function simulator(originalWorld: Engine){
         return;
     }
 
-    if ((<any>window).DEBUGMODE){
-        var tickTime = updater.tick(0.016); // 60fps game time
+    if (fastForward[0]){
+        updater.tick(0.032, !fastForward[0]); // 30fps game time
+        setTimeout(tick, 1);
+    } else if ((<any>window).DEBUGMODE){
+        var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
         setTimeout(tick, 1); // max fps
     } else {
-        var tickTime = updater.tick(0.032); // 30fps game time
+        var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
         setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
     }
     //    setTimeout(tick, Math.max(5, 1033.5-tickTime)); // 1fps, good for low cpu usage

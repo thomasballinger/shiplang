@@ -34,7 +34,7 @@ function stealSimulatorKeys(updater){
   });
 }
 
-function stealDebugKeys(display, fastForward){
+function stealDebugKeys(updater, fastForward){
   if (window.DEBUGMODE){
     window.addEventListener('keydown', function(e){
       // can't use q in debug mode to write scripts :)
