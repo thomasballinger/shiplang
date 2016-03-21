@@ -8,78 +8,96 @@ var manualgen = require('./manualgen');
 // The thing with the handlers should perisist
 //
 // Two notions of current state: presented and actual.
-// Actual is necessary so e.g. keys don't get stuck down -
-// if a 
+// Actual is necessary so e.g. keys don't get stuck down.
+// It should persist across undos. It should be instant even when delay
+// is present.
+// Presented is what the ship can read. It should be serializable for the
+// first frame of an undo and then correct to match reality.
 
+/** Holds the true state of inputs */
+export class InputHandler{
+    constructor(keyHandlerTarget: HTMLElement){
+        this.pressed = {};
+        this.initialize(keyHandlerTarget);
+    }
+    pressed: { [key: string]: boolean };
+    observer: Controls;
+    initialize(keyHandlerTarget: HTMLElement){
+        var self = this;
+
+        keyHandlerTarget.addEventListener('keydown', function(e: KeyboardEvent){
+            self.pressed[e.keyCode] = true;
+
+            if ([37, 38, 29, 40, // arrows
+                 32, // spacebar
+                 8, // backspace
+                 9, // tab
+            ].indexOf(e.keyCode) !== -1){
+                e.preventDefault(); // prevents scrolling, back behavior etc.
+                //e.stopPropagation();
+            }
+
+            if(self.observer){
+                if (self.observer.delay){
+                    var observer = self.observer;
+                    var update = (function(innerE: KeyboardEvent, pressedCopy: { [key: string]: boolean }): void{
+                        // use current observer at event time
+                        observer.update(innerE, pressedCopy);
+                    })(e, self.pressedCopy());
+                    setTimeout(update, self.observer.delay);
+                } else {
+                    self.observer.update(e, self.pressedCopy());
+                }
+            }
+        });
+
+        keyHandlerTarget.addEventListener('keyup', function(e: KeyboardEvent){
+            self.pressed[e.keyCode] = false;
+
+            if(self.observer){
+                if (self.observer.delay){
+                    var observer = self.observer;
+                    var update = (function(innerE: KeyboardEvent, pressedCopy: { [key: string]: boolean }){
+                        // use current observer at event time
+                        observer.update(undefined, pressedCopy);
+                    })(undefined, self.pressedCopy());
+                    setTimeout(update, self.observer.delay);
+                } else {
+                    self.observer.update(e, self.pressedCopy());
+                }
+            }
+            return false;
+        });
+    }
+    pressedCopy(): { [key: string]: boolean }{
+        return JSON.parse(JSON.stringify(this.pressed));
+    }
+}
+
+/**
+ * A possibly delayed view of input state.
+ * It can be saved and restored for rewinds.
+ */
 export class Controls{
-    constructor(keyHandlerTarget: HTMLElement, delay: number){
+    constructor(public inputHandler: InputHandler, public delay=0){
         this.events = [];
         this.pressed = {};
-        this.delay = delay || 0;
-        this.initialize(keyHandlerTarget);
+        this.inputHandler.observer = this;
     }
     events: KeyboardEvent[];
     pressed: { [key: string]: boolean };
-    delay: number;
-    getEventOrUndefined(){
+
+    update(e: KeyboardEvent, pressed: { [key: string]: boolean }): void{
+        this.pressed = pressed;
+        this.events.push(e)
+    }
+    getEventOrUndefined(): KeyboardEvent{
         if (this.events.length > 0){
             return this.events.shift();
         }
     };
     isPressed(key: string){
         return !!this.pressed[keyCodeFor[key.toUpperCase()]];
-    };
-    initialize(keyHandlerTarget: HTMLElement){
-        var events = this.events;
-        var pressed = this.pressed;
-        var delay = this.delay;
-
-        keyHandlerTarget.addEventListener('keydown', function(e: KeyboardEvent){
-
-            var handler = (function(innerE: KeyboardEvent){
-                return function(){
-                    events.push(innerE);
-                    pressed[innerE.keyCode] = true;
-                };
-            })(e);
-
-            if (delay === 0){
-                //TODO make delay work in simulator
-                // (currently old keystroke will come in late)
-                handler();
-            } else {
-                setTimeout(handler, delay);
-            }
-
-            if ([37, 38, 29, 40, // arrows
-                32, // spacebar
-            8, // backspace
-            9, // tab
-            ].indexOf(e.keyCode) !== -1){
-                e.preventDefault(); // prevents scrolling, back behavior etc.
-                //e.stopPropagation();
-            }
-        });
-        /*keyHandlerTarget.addEventListener('keydown', function(e){
-          }, true); // useCapture true, so on the way down instead of up!
-         */
-        keyHandlerTarget.addEventListener('keyup', function(e: KeyboardEvent){
-
-            var handler = (function(innerE: KeyboardEvent){
-                return function(){
-                    events.push(innerE);
-                    pressed[innerE.keyCode] = false;
-                };
-            })(e);
-
-            if (delay === 0){
-                handler();
-            } else {
-                setTimeout(handler, delay);
-            }
-
-            return false;
-        });
     };
 }
 (<any>Controls.prototype).getevent = <any>manualgen.getEvent;

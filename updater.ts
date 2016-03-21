@@ -6,7 +6,7 @@
  */
 import { Engine } from './engine';
 import { Ship, Entity } from './entity';
-import { Controls } from './manual';
+import { InputHandler, Controls } from './manual';
 import * as scriptEnv from './scriptenv';
 import * as SLeval from './eval';
 import { UserFunctionBodies } from './userfunctionbodies';
@@ -30,7 +30,10 @@ export class Updater{
                 public onChangeViewedEntity?: (e: Ship)=>void){
 
         var keyHandlerTarget = document.getElementById(keyHandlerId);
-        this.controls = new Controls(keyHandlerTarget, 0);
+        if (!keyHandlerTarget){ throw Error("Key handler target not found: "+keyHandlerId); }
+
+        this.inputHandler = new InputHandler(keyHandlerTarget);
+        this.controls = new Controls(this.inputHandler, 0);
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
         this.savedWorlds = [];
@@ -41,7 +44,8 @@ export class Updater{
     world: Engine;
     lastValid: string;
     codeHasChanged: boolean;
-    controls: any;
+    controls: Controls;
+    inputHandler: InputHandler;
     observers: Updateable[];
     savedWorlds: Engine[];
     player: Ship;
