@@ -3,47 +3,15 @@
 // there's no generator shim: this won't work in browsers
 // that can't do generators)
 
-export function* actOnKey(e, controls){
+export function* keypress(controls){
     var event = yield* controls.getEvent();
-    switch(event.keyCode){
-        case 38:
-            if (event.type === 'keydown'){
-            e.thrust = e.maxThrust;
-        } else if (event.type === 'keyup'){
-            e.thrust = 0;
-        }
-        break;
-        case 37:
-            if (event.type === 'keydown'){
-            e.dh = -e.maxDH;
-        } else if (event.type === 'keyup'){
-            e.dh = 0;
-        }
-        break;
-        case 39:
-            if (event.type === 'keydown'){
-            e.dh = e.maxDH;
-        } else if (event.type == 'keyup'){
-            e.dh = 0;
-        }
-        break;
-        case 40:
-            if (event.type === 'keydown'){
-            e.hTarget = (e.vHeading() + 180) % 360;
-        } else if (event.type == 'keyup'){
-            e.hTarget = undefined;
-        }
-        break;
-        default:
-            if (event.type === 'keydown'){
-            return keyboardMap[event.keyCode];
-        }
-        break;
+    if (event.type === 'keydown'){
+      return keyboardMap[event.keyCode];
     }
     return null;
 }
 
-function* getEvent(){
+export function* getEvent(){
     var events = this.events;
     yield function(){
         return events.length > 0;

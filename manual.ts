@@ -3,6 +3,14 @@ var keyCodeFor = require('./keyboardmap').keyCodeFor;
 var manualgen = require('./manualgen');
 
 
+// should be able to build a new controls object (using the same handlers?
+// swapping out the handlers?)
+// The thing with the handlers should perisist
+//
+// Two notions of current state: presented and actual.
+// Actual is necessary so e.g. keys don't get stuck down -
+// if a 
+
 export class Controls{
     constructor(keyHandlerTarget: HTMLElement, delay: number){
         this.events = [];
@@ -76,4 +84,4 @@ export class Controls{
 }
 (<any>Controls.prototype).getevent = <any>manualgen.getEvent;
 
-export var actOnKey = manualgen.actOnKey;
+export var keypress = manualgen.keypress;

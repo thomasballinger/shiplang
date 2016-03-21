@@ -283,7 +283,7 @@ function makeCommands():MakeCommandsReturnType{
         new Command('numAttached', function(){ return w.getAttached(e).length; }),
 
         new AsyncCommand('keypress', function(){
-            keygen = manual.actOnKey(e, keys)
+            keygen = manual.keypress(keys)
             var {value, done} = keygen.next()
             if (done) { throw Error('expected done to be false'); }
             return value;
