@@ -34,6 +34,7 @@ export class Updater{
 
         this.inputHandler = new InputHandler(keyHandlerTarget);
         this.controls = new Controls(this.inputHandler, 0);
+        this.controls.activate() // make exclusive observer of this.inputHandler
         scriptEnv.setKeyControls(this.controls);
         this.observers = [];
         this.savedWorlds = [];

@@ -82,11 +82,14 @@ export class Controls{
     constructor(public inputHandler: InputHandler, public delay=0){
         this.events = [];
         this.pressed = {};
-        this.inputHandler.observer = this;
     }
     events: KeyboardEvent[];
     pressed: { [key: string]: boolean };
 
+    /** Steals the keyboard handler for itself */
+    activate(){
+        this.inputHandler.observer = this;
+    }
     update(e: KeyboardEvent, pressed: { [key: string]: boolean }): void{
         this.pressed = pressed;
         this.events.push(e)
@@ -99,6 +102,10 @@ export class Controls{
     isPressed(key: string){
         return !!this.pressed[keyCodeFor[key.toUpperCase()]];
     };
+    copy(): Controls{
+        var copy = new Controls(this.inputHandler, this.delay);
+        return copy;
+    }
 }
 (<any>Controls.prototype).getevent = <any>manualgen.getEvent;
 
