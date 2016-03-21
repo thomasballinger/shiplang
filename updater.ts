@@ -33,8 +33,7 @@ export class Updater{
         if (!keyHandlerTarget){ throw Error("Key handler target not found: "+keyHandlerId); }
 
         this.inputHandler = new InputHandler(keyHandlerTarget);
-        this.controls = new Controls(this.inputHandler, 0);
-        scriptEnv.setKeyControls(this.controls);
+        this.origControls = new Controls(this.inputHandler, 0);
         this.observers = [];
         this.savedWorlds = [];
         this.codeHasChanged = false;
@@ -45,6 +44,7 @@ export class Updater{
     lastValid: string;
     codeHasChanged: boolean;
     controls: Controls;
+    origControls: Controls;
     inputHandler: InputHandler;
     observers: Updateable[];
     savedWorlds: Engine[];
@@ -128,6 +128,7 @@ export class Updater{
         if ((<any>window).DEBUGMODE){
             (<any>window).world = this.world;
             (<any>window).player = this.player;
+            (<any>window).updater = this;
         }
     }
 
@@ -165,8 +166,8 @@ export class Updater{
                     this.userFunctionBodies.reset();
                     this.reset(s)
                 } else {
-                    //console.log('restoring from game time', save.gameTime)
-                    this.restartFromSave(save);
+                    //console.log('restoring from game time', save[0].gameTime)
+                    this.restartFromSave(save[0], save[1]);
                 }
             }
             this.lastValid = s;
@@ -176,6 +177,10 @@ export class Updater{
     reset(s?: string){
         if (s === undefined){ s = this.lastValid; }
         this.world = this.origWorld.copy()
+        this.controls = this.origControls.copy();
+        this.controls.activate() // make exclusive observer of this.inputHandler
+        scriptEnv.setKeyControls(this.controls);
+
         this.world.addPlayer([s, this.userFunctionBodies, this.highlight]);
         this.player = this.world.getPlayer();
         this.viewedEntity = this.player;
@@ -183,7 +188,11 @@ export class Updater{
         this.debugData();
         scriptEnv.setProfile(Profile.fromStorage())
     }
-    restartFromSave(world: Engine){
+    restartFromSave(world: Engine, controls: Controls){
+        this.controls = controls;
+        this.controls.activate();
+        console.log('this controls has pressed:', this.controls.pressed);
+        scriptEnv.setKeyControls(this.controls);
         this.world = world;
         this.player = this.world.getPlayer();
         this.viewedEntity = this.player;
@@ -199,7 +208,7 @@ export class Updater{
         if (this.codeHasChanged){
             if (this.language.toLowerCase() === 'shiplang'){
                 this.loadSL();
-            } else if (this.language.toLowerCase() == 'javascript'){
+            } else if (this.language.toLowerCase() === 'javascript'){
                 this.loadJS();
             } else {
                 throw Error("don't know language "+this.language)
@@ -207,13 +216,24 @@ export class Updater{
             this.codeHasChanged = false;
         }
         if (this.doSnapshots){
-            var preTickSnapshot = this.world.copy();
+            var preTickSnapshot: [Engine, Controls] = [
+                this.world.copy(), this.controls.copy()];
         }
         var world = this.world;
         var viewedEntity = this.viewedEntity;
+
+        // This includes:
+        // * warping in new fleets
+        // * moving everything
+        // * collision detection
+        // * ai for each entity (including creating and running projectile ai)
+        console.log('starting engine tick');
         world.tick(dt, this.setError);
+        console.log('ending engine tick');
         //world.tick(dt, function(e){ throw e; });
         this.ensureView()
+
+        this.controls.inputHandler.updateObserver() // just in case this is the first tick of a rewind
 
         if (updateDisplays){
             this.observers.map(function(obs){
@@ -221,7 +241,6 @@ export class Updater{
             })
         }
 
-        //TODO factor out reset behavior
         if (this.player.dead){
             this.reset();
         }
@@ -231,9 +250,10 @@ export class Updater{
             this.savedWorlds.shift();
         }
         */
-       if (this.doSnapshots){
-            this.userFunctionBodies.save(preTickSnapshot);
-       }
+        if (this.doSnapshots){
+            //console.log('snapshot controls has pressed:', preTickSnapshot[1].pressed);
+            this.userFunctionBodies.save(preTickSnapshot[0], preTickSnapshot[1]);
+        }
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime
