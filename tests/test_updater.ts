@@ -25,17 +25,9 @@ describe('Updater', () => {
         document.body.appendChild(div);
 
         var codeToLoad = '';
-        var updater = new Updater(new Engine(fixtures.systems['sys'], Profile.newProfile()),
-                                  ()=>{ return codeToLoad; },
-                                  (msg: string)=>{},
-                                  ()=>{},
-                                  (msg: string)=>{},
-                                  'asdf',
-                                  'javascript',
-                                  ()=>{},
-                                  (id: string, selections: Selection[])=>{},
-                                  true,
-                                  (e: any)=>{});
+        var updater = new Updater(new Engine(fixtures.systems['sys'],
+                                             Profile.newProfile()),
+                                  ()=>{ return codeToLoad; });
 
     });
     describe('#resetFromSave', () => {

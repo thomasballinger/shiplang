@@ -25,10 +25,10 @@ export function outerspace(originalWorld: Engine){
   var updater = new Updater(
     originalWorld, // updater holds on to a copy of this to reset
     function(){ return Profile.fromStorage().script; },
+    'canvas', // where to put key handlers
     (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
-    'canvas', // where to put key handlers
     'JavaScript',
     function(){"cleanup";},
     undefined,

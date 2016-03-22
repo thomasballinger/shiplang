@@ -18,7 +18,11 @@ var manualgen = require('./manualgen');
 export class InputHandler{
     constructor(keyHandlerTarget: HTMLElement){
         this.pressed = {};
-        this.initialize(keyHandlerTarget);
+        if (keyHandlerTarget){
+            this.initialize(keyHandlerTarget);
+        } else {
+            console.warn('InputHandler created without setting event listeners')
+        }
     }
     pressed: { [key: string]: boolean };
     observer: Controls;
