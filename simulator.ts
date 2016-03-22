@@ -28,6 +28,7 @@ export function simulator(originalWorld: Engine){
   var updater = new Updater(
     originalWorld, // updater holds on to a copy of this to reset
     function(){ return editor.getCode(); },
+    true,
     'canvas', // where to put key handlers
     (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
@@ -37,7 +38,6 @@ export function simulator(originalWorld: Engine){
     function(id: string, selections: Selection[]){
         return editor.setHighlight(id, selections);
     },
-    true,
     function(e: Ship){
         if (e !== undefined && e.context !== undefined &&
             (<any>e).context.highlightId !== undefined){

@@ -18,20 +18,24 @@ system Sys
 
 describe('Updater', () => {
     it("Can be constructed too much mocking", () => {
-
-        // TODO allow an unbound InputHandler object
-        var div = document.createElement("div");
-        div.id = 'asdf'
-        document.body.appendChild(div);
-
         var codeToLoad = '';
         var updater = new Updater(new Engine(fixtures.systems['sys'],
                                              Profile.newProfile()),
-                                  ()=>{ return codeToLoad; });
+                                  ()=>{ return codeToLoad; },
+                                  true);
 
     });
     describe('#resetFromSave', () => {
         it("Can restore a saved state", () => {
+            var codeToLoad = '';
+            var updater = new Updater(new Engine(fixtures.systems['sys'],
+                                                 Profile.newProfile()),
+                                      ()=>{ return codeToLoad; },
+                                      true);
+
+            updater.tick(0.1);
+            //TODO first try to test this with no script running
+            //my making a mock userFunctionBodies maybe
         });
         it("Can reset to original state", () => {
         });
