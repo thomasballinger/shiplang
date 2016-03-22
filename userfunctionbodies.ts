@@ -1,6 +1,9 @@
 import { Engine } from './engine';
 import { Controls } from './manual';
 
+/** Tracks current bodies of user defined functions and
+ * keeps track of which have been called when.
+ */
 export class UserFunctionBodies{
     constructor(){
         this.reset();

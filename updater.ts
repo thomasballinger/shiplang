@@ -102,6 +102,8 @@ export class Updater{
 
     // called when the editor has new state (it might not actually
     // be different, Updater will check)
+    // TODO It seems like it's required to call this to set up
+    // updater the first time?
     notifyOfCodeChange(){
         this.codeHasChanged = true;
     }
@@ -145,7 +147,9 @@ export class Updater{
             s = undefined;
         };
         if (s){
+            // save because it's syntactically valid
             Profile.fromStorage().set('script', s);
+
             var changed = jsastdiff.changedNamedFunctions(
                 (<any>window).acorn.parse(this.lastValid), newAST);
             if (changed.hasOwnProperty('*main*')){
@@ -208,7 +212,7 @@ export class Updater{
     tick(dt: number, updateDisplays=true):number{
         var tickStartTime = new Date().getTime();
 
-        if (this.codeHasChanged){jjj
+        if (this.codeHasChanged){
             if (this.language.toLowerCase() === 'shiplang'){
                 this.loadSL();
             } else if (this.language.toLowerCase() === 'javascript'){
@@ -236,7 +240,10 @@ export class Updater{
         //world.tick(dt, function(e){ throw e; });
         this.ensureView()
 
-        this.controls.inputHandler.updateObserver() // just in case this is the first tick of a rewind
+        // just in case this is the first tick of a rewind,
+        // reset pressed keys to match currently pressed keys
+        // (during that first tick they match restored state)
+        this.controls.inputHandler.updateObserver()
 
         if (updateDisplays){
             this.observers.map(function(obs){
