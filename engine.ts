@@ -106,9 +106,9 @@ export class Engine{
         this.system.createInitialFleets(this, this.profile);
     }
     addPlayer(script: any){
-        if (this.playerAdded){
-            throw Error("Player already added");
-        }
+        if (this.playerAdded){ throw Error("Player already added"); }
+        if (this.system === undefined){ throw Error("Engine needs a system"); }
+        if (this.profile === undefined){ throw Error("Engine needs a profile"); }
         this.system.createPlayerShipEntity(this, this.profile, script);
         this.playerAdded = true;
     }
