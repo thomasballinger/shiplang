@@ -39,6 +39,9 @@ function jsonProfileReplacer(key: string, value: any){
 function jsonProfileReviver(key: string, value: any){
     if (key === 'missions'){
         return value.map(function(x: [string, any]){
+            if (universe.missions[x[0]] === undefined){
+                throw Error("Can't find serialized mission name: "+x[0])
+            }
             return [universe.missions[x[0]], x[1]];
         });
     }

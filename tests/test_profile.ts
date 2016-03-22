@@ -11,6 +11,7 @@ describe('Profile', () => {
         simpleMission.fleets = [];
         simpleMission.description = '';
         simpleMission.processEventMethod = function(e: Event, data: any){};
+        simpleMission.id = 'SimpleMission';
         universe.missions['SimpleMission'] = simpleMission;
 
         //TODO crap method name
