@@ -4,3 +4,4 @@ require('./test_commands.ts');
 require('./test_missions.ts');
 require('./test_profile.ts');
 require('./test_dataload.ts');
+require('./test_updater.ts');
