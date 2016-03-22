@@ -24,7 +24,7 @@ describe('Engine', () => {
             var ship = makeShipEntity(universe.ships['Gunship'], 0, 0, 170);
             ship.shieldsMax = 0;
             s1.addEntity(ship);
-            s1.fireMissile(ship, universe.ships['DroneMissile'], undefined, '#abcdef')
+            s1.fireMissile(ship, universe.ships['Drone Missile'], undefined, '#abcdef')
             s1.tick(.2, function(e){ throw e; });
             s1.fireLaser(ship, '#abcdef')
             s1.tick(1, function(e){ throw e; });
