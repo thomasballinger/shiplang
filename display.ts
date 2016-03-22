@@ -33,6 +33,7 @@ export class SpaceDisplay{
 
     update(center: {x: number, y: number}, drawables: {x: number, y:number}[]){
         if (!this.active){ return; }
+        if (center === undefined){ throw Error("Centered entity cannot be undefined"); }
         if (this.zoomTarget !== this.zoom){
             this.zoom = (this.zoom * 29 + this.zoomTarget) / 30;
             if (Math.abs(this.zoom - this.zoomTarget) < .01){
