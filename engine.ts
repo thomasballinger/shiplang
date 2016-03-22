@@ -14,7 +14,7 @@ import { GameTime, Script, ShipSpec } from './interfaces';
 var IMMUNITY_TIME_S = 1;
 
 
-// move these helpers to something to do with entities - engine is more top-level.
+//TODO move these helpers to something to do with entities - engine is more top-level.
 export function makeShipEntity(kind: Ship, x: number, y: number, h: number, script?: Script){
     if (kind.isComponent){
         var ship = <ShipEntity>(new Component(kind, x, y, script));
