@@ -17,13 +17,13 @@ var jsastdiff = require('./jsastdiff');
 import { Updateable, Selection } from './interfaces';
 
 export class Updater{
-    constructor(public setError: (msg: string)=>void,
-                public clearError: ()=>void,
-                public queueWarning: (msg: string)=>void,
+    constructor(public origWorld: Engine,
                 public getCode: ()=>string, // gets updated code
+                public setError=(msg: string)=>{},
+                public clearError=()=>{},
+                public queueWarning=(msg: string)=>{},
                 public keyHandlerId: string, // where to set key handlers
-                public origWorld: Engine,
-                public language: string,
+                public language='JavaScript',
                 public onReset?: ()=>void,
                 public highlight?: (id: string, selections: Selection[])=>void,
                 public doSnapshots?: boolean,
@@ -189,7 +189,7 @@ export class Updater{
         scriptEnv.setProfile(Profile.fromStorage())
     }
     restartFromSave(world: Engine, controls: Controls){
-        this.controls = controls;
+        this.controls = controls.copy();
         this.controls.activate();
         console.log('this controls has pressed:', this.controls.pressed);
         scriptEnv.setKeyControls(this.controls);
@@ -227,9 +227,9 @@ export class Updater{
         // * moving everything
         // * collision detection
         // * ai for each entity (including creating and running projectile ai)
-        console.log('starting engine tick');
+        //console.log('starting engine tick');
         world.tick(dt, this.setError);
-        console.log('ending engine tick');
+        //console.log('ending engine tick');
         //world.tick(dt, function(e){ throw e; });
         this.ensureView()
 

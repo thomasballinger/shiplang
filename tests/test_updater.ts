@@ -25,12 +25,12 @@ describe('Updater', () => {
         document.body.appendChild(div);
 
         var codeToLoad = '';
-        var updater = new Updater((msg: string)=>{},
+        var updater = new Updater(new Engine(fixtures.systems['sys'], Profile.newProfile()),
+                                  ()=>{ return codeToLoad; },
+                                  (msg: string)=>{},
                                   ()=>{},
                                   (msg: string)=>{},
-                                  ()=>{ return codeToLoad; },
                                   'asdf',
-                                  new Engine(fixtures.systems['sys'], Profile.newProfile()),
                                   'javascript',
                                   ()=>{},
                                   (id: string, selections: Selection[])=>{},

@@ -26,12 +26,12 @@ export function simulator(originalWorld: Engine){
   var editor = new AceJS();
 
   var updater = new Updater(
+    originalWorld, // updater holds on to a copy of this to reset
+    function(){ return editor.getCode(); },
     (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
-    function(){ return editor.getCode(); },
     'canvas', // where to put key handlers
-    originalWorld, // updater holds on to a copy of this to reset
     'JavaScript',
     function(){ editor.clearAllHighlights(); },
     function(id: string, selections: Selection[]){

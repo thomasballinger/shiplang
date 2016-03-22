@@ -23,12 +23,12 @@ export function outerspace(originalWorld: Engine){
   canvas.focus();
 
   var updater = new Updater(
+    originalWorld, // updater holds on to a copy of this to reset
+    function(){ return Profile.fromStorage().script; },
     (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
-    function(){ return Profile.fromStorage().script; },
     'canvas', // where to put key handlers
-    originalWorld, // updater holds on to a copy of this to reset
     'JavaScript',
     function(){"cleanup";},
     undefined,
