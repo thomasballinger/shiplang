@@ -19,18 +19,21 @@ import { Updateable, Selection } from './interfaces';
 export class Updater{
     constructor(public origWorld: Engine,
                 public getCode: ()=>string, // gets updated code
+                public keyHandlerId: string, // where to set key handlers
                 public setError=(msg: string)=>{},
                 public clearError=()=>{},
                 public queueWarning=(msg: string)=>{},
-                public keyHandlerId: string, // where to set key handlers
                 public language='JavaScript',
-                public onReset?: ()=>void,
+                public onReset=()=>{},
                 public highlight?: (id: string, selections: Selection[])=>void,
-                public doSnapshots?: boolean,
+                public doSnapshots=false,
                 public onChangeViewedEntity?: (e: Ship)=>void){
 
-        var keyHandlerTarget = document.getElementById(keyHandlerId);
-        if (!keyHandlerTarget){ throw Error("Key handler target not found: "+keyHandlerId); }
+        var keyHandlerTarget: HTMLElement;
+        if (keyHandlerId){
+            var keyHandlerTarget = document.getElementById(keyHandlerId);
+            if (!keyHandlerTarget){ throw Error("Key handler target not found: "+keyHandlerId); }
+        }
 
         this.inputHandler = new InputHandler(keyHandlerTarget);
         this.origControls = new Controls(this.inputHandler, 0);

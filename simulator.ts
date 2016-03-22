@@ -28,10 +28,10 @@ export function simulator(originalWorld: Engine){
   var updater = new Updater(
     originalWorld, // updater holds on to a copy of this to reset
     function(){ return editor.getCode(); },
+    'canvas', // where to put key handlers
     (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
-    'canvas', // where to put key handlers
     'JavaScript',
     function(){ editor.clearAllHighlights(); },
     function(id: string, selections: Selection[]){
