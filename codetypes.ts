@@ -101,7 +101,7 @@ export class SLContext implements Context {
     }
 }
 
-var MAXSTEPS = 1000;
+var MAXSTEPS = 100000;
 export class JSContext implements Context {
     constructor(public source: string, public userFunctionBodies?: UserFunctionBodies, public highlight?: (id: string, selections: Selection[])=>void){
         this.highlightId = Math.random().toString(36).substring(1); // id currently just used for highlighting

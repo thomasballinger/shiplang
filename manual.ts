@@ -72,6 +72,10 @@ export class InputHandler{
     pressedCopy(): { [key: string]: boolean }{
         return JSON.parse(JSON.stringify(this.pressed));
     }
+    /** Do an immediate update regardless of delay */
+    updateObserver(){
+        this.observer.update(undefined, this.pressedCopy());
+    }
 }
 
 /**
@@ -100,10 +104,17 @@ export class Controls{
         }
     };
     isPressed(key: string){
-        return !!this.pressed[keyCodeFor[key.toUpperCase()]];
+        //return !!this.pressed[keyCodeFor[key.toUpperCase()]];
+        var isPressed =  !!this.pressed[keyCodeFor[key.toUpperCase()]];
+        if (isPressed){
+            console.log('found that key', key, 'was pressed:', this.pressed);
+        }
+        return isPressed
     };
     copy(): Controls{
         var copy = new Controls(this.inputHandler, this.delay);
+        copy.pressed = this.pressed;
+        copy.events = this.events.slice();
         return copy;
     }
 }

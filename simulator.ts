@@ -94,6 +94,7 @@ export function simulator(originalWorld: Engine){
     } else if ((<any>window).DEBUGMODE){
         var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
         setTimeout(tick, 1); // max fps
+        //setTimeout(tick, 900); // 1.1 fps
     } else {
         var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
         setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps

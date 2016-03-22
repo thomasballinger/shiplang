@@ -14,6 +14,13 @@ interface YieldFunction {
     requiresYield: boolean;
 }
 
+/**
+ * An important restriction on commands: if something
+ * spawns a new script, it needs to do it the same tick
+ * as the input that caused it: otherwise rewinding to that
+ * tick will no produce the same result.
+ */
+
 
 //TODO Add to these commands functionality needed for Blockly
 //       * types of inputs (including degrees)
@@ -392,24 +399,14 @@ function makeCommands():MakeCommandsReturnType{
 
         new AsyncCommand('fireMissile', function(script: any, color: string): any{
             var startTime = t;
-            var missileFired = false;
+            if (script instanceof evaluation.CompiledFunctionObject){
+                w.fireMissile(e, universe.ships['Drone Missile'], script, color);
+            } else {
+                var plsFork = [e.context, script]
+                w.fireMissile(e, universe.ships['Drone Missile'], plsFork, color);
+            }
             return function(){
-                if (t < startTime + .1){
-                    return false;
-                } else if (!missileFired){
-                    // TODO fork the interpreter here
-                    // If the script passed in is a JS-Interpreter function,
-                    // fork the interpreter and pass a script tuple
-                    // with that forked interpreter.
-                    // TODO dispatch on context maybe?
-                    if (script instanceof evaluation.CompiledFunctionObject){
-                        w.fireMissile(e, universe.ships['Drone Missile'], script, color);
-                    } else {
-                        var plsFork = [e.context, script]
-                        w.fireMissile(e, universe.ships['Drone Missile'], plsFork, color);
-                    }
-                    missileFired = true;
-                } else if (t < startTime + .3){
+                if (t < startTime + .4){
                     return false;
                 } else {
                     return true;
