@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { loadData, parseLine } from '../dataload';
 import { createObjects } from '../universe';
 
-var real = require('raw!../data/map.txt');
+var real = require('../data/index');
 
 var simple = `
 system Sol
