@@ -19,14 +19,14 @@ import { Updateable, Selection } from './interfaces';
 export class Updater{
     constructor(public origWorld: Engine,
                 public getCode: ()=>string, // gets updated code
-                public keyHandlerId: string, // where to set key handlers
+                public doSnapshots=false,
+                public keyHandlerId='', // where to set key handlers
                 public setError=(msg: string)=>{},
                 public clearError=()=>{},
                 public queueWarning=(msg: string)=>{},
                 public language='JavaScript',
                 public onReset=()=>{},
                 public highlight?: (id: string, selections: Selection[])=>void,
-                public doSnapshots=false,
                 public onChangeViewedEntity?: (e: Ship)=>void){
 
         var keyHandlerTarget: HTMLElement;
@@ -208,7 +208,7 @@ export class Updater{
     tick(dt: number, updateDisplays=true):number{
         var tickStartTime = new Date().getTime();
 
-        if (this.codeHasChanged){
+        if (this.codeHasChanged){jjj
             if (this.language.toLowerCase() === 'shiplang'){
                 this.loadSL();
             } else if (this.language.toLowerCase() === 'javascript'){
