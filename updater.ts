@@ -240,11 +240,6 @@ export class Updater{
         //world.tick(dt, function(e){ throw e; });
         this.ensureView()
 
-        // just in case this is the first tick of a rewind,
-        // reset pressed keys to match currently pressed keys
-        // (during that first tick they match restored state)
-        this.controls.inputHandler.updateObserver()
-
         if (updateDisplays){
             this.observers.map(function(obs){
                 obs.update(viewedEntity, world);
@@ -264,6 +259,12 @@ export class Updater{
             //console.log('snapshot controls has pressed:', preTickSnapshot[1].pressed);
             this.userFunctionBodies.save(preTickSnapshot[0], preTickSnapshot[1]);
         }
+
+        // just in case this is the first tick after a rewind tick,
+        // reset pressed keys to match currently pressed keys
+        // (during that first tick they match restored state)
+        // TODO only do this right after a rewind tick somehow
+        this.controls.updateFromInputHandler();
 
         var tickTime = new Date().getTime() - tickStartTime;
         return tickTime

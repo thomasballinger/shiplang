@@ -102,6 +102,16 @@ export class Controls{
         this.pressed = pressed;
         this.events.push(e)
     }
+    updateFromInputHandler(){
+        if (this.inputHandler){
+            if (this.inputHandler.observer !== this){
+                throw Error('Tried to make input handler update another controller');
+            }
+            this.inputHandler.updateObserver()
+        } else {
+            this.pressed = {};
+        }
+    }
     getEventOrUndefined(): KeyboardEvent{
         if (this.events.length > 0){
             return this.events.shift();

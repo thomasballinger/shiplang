@@ -396,7 +396,7 @@ export class Engine{
 
     deepCopyCreate():Engine{
         if (this.inTick){ throw Error("Engine can't be copied during a tick!"); }
-        return new Engine(undefined, undefined);
+        return new (<any>this).constructor(undefined, undefined);
     };
     deepCopyPopulate = function(copy: Engine, memo:any, innerDeepCopy:any){
         copy.entities = innerDeepCopy(this.entities, memo);
