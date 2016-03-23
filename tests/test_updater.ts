@@ -16,18 +16,32 @@ class FakeUserFunctionBodies extends UserFunctionBodies{
     }
 }
 
+class PeekEngine extends Engine{
+    tick(dt: number, onError: (err: string)=>void){
+        if (PeekEngine.preTick){
+            PeekEngine.preTick();
+        }
+        super.tick(dt, onError);
+        if (PeekEngine.postTick){
+            PeekEngine.postTick();
+        }
+    }
+    static preTick: ()=>void;
+    static postTick: ()=>void;
+}
+
 
 var fixtures = createObjects(loadData(`
 system Sys
 	pos 0 0
 	government Trader
 `.replace(/    /g, '\t')));
-console.log('fixtures:', fixtures);
+//console.log('fixtures:', fixtures);
 
 /** Returns updater and code update function */
 function buildUpdater(): [Updater, (code: string)=>void]{
     var codeToLoad = '';
-    var updater = new Updater(new Engine(fixtures.systems['Sys'],
+    var updater = new Updater(new PeekEngine(fixtures.systems['Sys'],
                                          Profile.newProfile()),
                               ()=>{ return codeToLoad; },
                               true);
@@ -72,6 +86,42 @@ describe('Updater', () => {
             assert.equal(updater.world.gameTime, 0.03);
         });
     });
+    /** This tests assumes userFunctionBodies are getting marked as accessed correctly
+     * during the reset tick
+     */
     describe('#resetFromSave', () => {
+        var [updater, updateCode] = buildUpdater();
+            updateCode('function foo(){ return 1; }');
+            updater.tick(0.01)
+
+            updater.controls.pressed[90] = true;
+            (<FakeUserFunctionBodies>updater.userFunctionBodies).pretendFunctionBodyWasAccessed('foo');
+            updater.tick(0.03);
+
+            updater.controls.pressed[90] = false;
+            updater.tick(0.05);
+
+            updateCode('function foo(){ return 2; }');
+            (<FakeUserFunctionBodies>updater.userFunctionBodies).pretendFunctionBodyWasAccessed('foo');
+            PeekEngine.preTick = function(){
+                assert.equal(updater.controls.pressed[90], true)
+            }
+            updater.tick(0.07);
+            PeekEngine.preTick = undefined;
+            assert.equal(updater.world.gameTime, 0.08);
+
+            // check that control state reverts after a tick
+            assert.notEqual(updater.controls.pressed[90], true)
+
+            updater.tick(0.09);
+            updateCode('function foo(){ return 3; }');
+            PeekEngine.preTick = function(){
+                assert.equal(updater.controls.pressed[90], true)
+            }
+            updater.tick(0.11)
+            PeekEngine.preTick = undefined;
+            assert.equal(updater.world.gameTime, 0.12);
+            assert.notEqual(updater.controls.pressed[90], true)
+
     });
 });
