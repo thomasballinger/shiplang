@@ -130,16 +130,20 @@ describe('Updater', () => {
         it('restores global script state if script has already been started', () => {
             var [updater, updateCode] = buildUpdater();
             updateCode('var a = 1; waitFor(1); function foo(){ a += 1; return 1; }; foo(); waitFor(1)');
+            console.log('--- ticking original');
             updater.tick(.1);
             assert.equal(playerScopeLookup(updater, 'a'), 1);
+            console.log('--- ticking original');
             updater.tick(1.2);
             assert.equal(playerScopeLookup(updater, 'a'), 2);
             updateCode('var a = 1; waitFor(1); function foo(){ a += 1; return 2; }; foo(); waitFor(1)');
+            console.log('--- ticking after rewind');
             updater.tick(1.2);
             assert.equal(playerScopeLookup(updater, 'a'), 2);
         });
+        // TODO problem with current rewind scheme: will the world clock keep ticking forward on rewinds?
         /** Repo of a bug with missile firing */
-        it('keeps saves safe from corruption', () => {
+        describe('keeps saves safe from corruption', () => {
             var [updater, updateCode] = buildUpdater();
             updateCode('var a = 1; waitFor(1); function foo(){ 1; }; foo(); waitFor(1); a++; waitFor(1)');
             updater.tick(.1);
@@ -148,7 +152,7 @@ describe('Updater', () => {
             assert.equal(Object.keys(updater.userFunctionBodies.saves).length, 1);
             assert.equal(playerScopeLookup(updater, 'a'), 1);
             assert.equal(saveScopeLookup(updater, 'a', 'foo'), 1);
-            updater.tick(1);
+            updater.tick(2);
             assert.equal(playerScopeLookup(updater, 'a'), 2);
             assert.equal(saveScopeLookup(updater, 'a', 'foo'), 1);
         });

@@ -6,7 +6,7 @@ import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
 import { Fleet, System, Ship, universe } from './universe';
 import { chooseScript } from './ai';
-
+//
 var deepcopy = (<any>window).deepCopy;
 
 import { GameTime, Script, ShipSpec } from './interfaces';

@@ -26,6 +26,11 @@ export class UserFunctionBodies{
         return this.bodies[name];
     }
     saveBody(name: string, body: any){
+        if (body.type === 'FunctionDeclaration'){
+            console.warn('function declaration saved as body - this could be ok if the body of the function saved is itself');
+            console.warn('a function declaration, but is not then save is being used incorrectly');
+            throw Error('asdf')
+        }
         this.bodies[name] = body;
     }
     // Ought to be called after a tick with pre-tick world state
@@ -34,9 +39,6 @@ export class UserFunctionBodies{
         if (Object.keys(this.accessedThisTick).length === 0){ return; }
         for (var funcName of Object.keys(this.accessedThisTick)){
             this.saves[funcName] = [this.tickNum, world, controls];
-            if (funcName === 'towardExpected'){
-                console.log('saving toward expected controls of:', controls.pressed);
-            }
         }
         this.accessedThisTick = {};
     }

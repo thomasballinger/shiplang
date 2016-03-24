@@ -1,6 +1,8 @@
 var acorn = require('acorn');
 acorn.walk = require('acorn/dist/walk');
 
+//TODO standardize on versions of acorn (jsinterpreter is using
+//a vendored version)
 
 //
 // Main goal: find what functions have been modified between two asts.
@@ -93,7 +95,7 @@ function changedNamedFunctions(a, b){
   });
   var modifiedObjects = {};
   for (var name of modified){
-    modifiedObjects[name] = funcs2[name];
+    modifiedObjects[name] = funcs2[name].body;
   }
   //TODO think about when these need to be deep-copied
   return modifiedObjects;

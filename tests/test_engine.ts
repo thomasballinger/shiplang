@@ -49,7 +49,15 @@ describe('Engine', () => {
             assert.equal((<any>world.getPlayer().context).interpreter
                          .getValueFromScope('a').data, 1);
             var copy = world.copy();
+
+            var interp = (<any>world.getPlayer().context).interpreter;
+            var copyInterp = (<any>copy.getPlayer().context).interpreter;
+
             world.tick(1.2, (msg: string)=>{ assert.fail(); });
+
+            // should be different entities
+            (<any>world.getPlayer()).madeUpProperty = 1;
+            assert.notProperty((<any>copy.getPlayer()), 'madeUpProperty');
 
             // should be different contexts
             (<any>world.getPlayer().context).madeUpProperty = 1;
@@ -59,7 +67,7 @@ describe('Engine', () => {
             (<any>world.getPlayer().context).interpreter.madeUpProperty = 1;
             assert.notProperty((<any>copy.getPlayer().context).interpreter, 'madeUpProperty');
 
-            // should not share scopes
+            // should not share scope data
             assert.equal((<any>world.getPlayer().context).interpreter
                          .getValueFromScope('a').data, 2);
             assert.equal((<any>copy.getPlayer().context).interpreter
