@@ -5,6 +5,8 @@ typings
 *.map
 .DS_Store
 
+nodetest.build.js
+
 # assets pulled in by Makefile
 images
 blockly-master

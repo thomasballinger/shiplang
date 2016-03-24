@@ -7,7 +7,7 @@ import { Profile } from './profile';
 import { Fleet, System, Ship, universe } from './universe';
 import { chooseScript } from './ai';
 //
-var deepcopy = (<any>window).deepCopy;
+var deepcopy = require('deepcopy');
 
 import { GameTime, Script, ShipSpec } from './interfaces';
 

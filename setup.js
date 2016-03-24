@@ -1,3 +1,5 @@
+var DEBUGMODE = require('DEBUGMODE');
+
 function makeFullscreen(element){
   if (element.requestFullscreen) {
    element.requestFullscreen();
@@ -35,7 +37,7 @@ function stealSimulatorKeys(updater){
 }
 
 function stealDebugKeys(updater, fastForward){
-  if (window.DEBUGMODE){
+  if (DEBUGMODE){
     window.addEventListener('keydown', function(e){
       // can't use q in debug mode to write scripts :)
       if (e.keyCode === 81) {

@@ -4,8 +4,8 @@ import { initShipEnv } from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Selection, Interpreter, Generator, ByteCode, Context, JSInterpFunction } from './interfaces'
 
-var deepcopy = (<any>window).deepCopy
-var Interpreter = (<any>window).Interpreter;
+var deepcopy = require('deepcopy');
+var JSInterpreter = require('Interpreter');
 
 export class NOPContext implements Context {
     contructor(){
@@ -117,9 +117,9 @@ export class JSContext implements Context {
     step(e: Ship){
         if (this.interpreter === undefined){
             if (this.userFunctionBodies){
-                this.interpreter = new (<any>window).Interpreter(this.source, initShipEnv, undefined, this.userFunctionBodies);
+                this.interpreter = new JSInterpreter(this.source, initShipEnv, undefined, this.userFunctionBodies);
             } else {
-                this.interpreter = new (<any>window).Interpreter(this.source, initShipEnv);
+                this.interpreter = new JSInterpreter(this.source, initShipEnv);
             }
         }
 

@@ -1,9 +1,9 @@
 import { Profile } from './profile';
 
-var messagelog = document.getElementById('messagelog');
 var lastMessageTime = 0;
 
 export function putMessage(s: string, e?: any){
+    var messagelog = document.getElementById('messagelog');
     if (e !== undefined){
         s = e.type + ' says: '+s;
     }

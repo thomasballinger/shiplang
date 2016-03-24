@@ -8,7 +8,15 @@ module.exports = {
   },
   devtool: 'source-map',
   externals: {
+    // in browsers: provided by hotswapping-js-interp/acorn.js
     'acorn': "acorn",
+    // in browsers: provided by hotswapping-js-interp/deepcopy.js
+    'deepcopy': "deepCopy",
+    // in browsers: provided by hotswapping-js-interp/acorn.js
+    'Interpreter': "Interpreter",
+
+    // Boolean for debug mode
+    'DEBUGMODE': "DEBUGMODE",
   },
   resolve: {
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],

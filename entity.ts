@@ -4,6 +4,7 @@ import * as codetypes from './codetypes';
 import * as scriptEnv from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Ship as ShipPrototype } from './universe';
+var DEBUGMODE = require('DEBUGMODE');
 
 import { GameTime, Generator, Interpreter, Selection, Script, Context, JSInterpFunction, Gov } from './interfaces';
 
@@ -253,7 +254,7 @@ export class Ship extends Entity{
     //relies on some globals lying around that are only
     //there in debug mode
     run(s: string){
-        if((<any>window).DEBUGMODE){
+        if(DEBUGMODE){
             scriptEnv.setCurrentEntity(this);
             return scriptEnv.controls[s].apply(null, arguments);
         }

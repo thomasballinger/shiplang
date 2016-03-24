@@ -143,7 +143,7 @@ describe('Updater', () => {
         });
         // TODO problem with current rewind scheme: will the world clock keep ticking forward on rewinds?
         /** Repo of a bug with missile firing */
-        describe('keeps saves safe from corruption', () => {
+        it('keeps saves safe from corruption', () => {
             var [updater, updateCode] = buildUpdater();
             updateCode('var a = 1; waitFor(1); function foo(){ 1; }; foo(); waitFor(1); a++; waitFor(1)');
             updater.tick(.1);

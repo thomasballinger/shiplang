@@ -13,6 +13,7 @@ import { UserFunctionBodies } from './userfunctionbodies';
 import { Profile } from './profile';
 import { createObjects, Start, System, universe } from './universe';
 var jsastdiff = require('./jsastdiff');
+var DEBUGMODE = require('DEBUGMODE');
 
 import { Updateable, Selection } from './interfaces';
 
@@ -130,7 +131,7 @@ export class Updater{
     }
 
     debugData(){
-        if ((<any>window).DEBUGMODE){
+        if (DEBUGMODE){
             (<any>window).world = this.world;
             (<any>window).player = this.player;
             (<any>window).updater = this;
@@ -212,7 +213,7 @@ export class Updater{
 
     //TODO consider making first tick disregard the dt? dt=0 doesn't work,
     //     have to be special cased - probably not worth it. Think of something.
-    // please advance world state one tick and update displays
+    // Advance world state one tick and update displays
     tick(dt: number, updateDisplays=true):number{
         var tickStartTime = new Date().getTime();
 

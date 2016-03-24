@@ -3,6 +3,7 @@ import { Gov } from './interfaces';
 import { Event } from './mission';
 import { putMessage } from './messagelog';
 import { Ship, Mission, Fleet, System, universe } from './universe';
+var DEBUGMODE = require('DEBUGMODE');
 
 // Plan:
 // Profile is a serializable object that only gets saved on landing.
@@ -61,7 +62,7 @@ export class Profile{
         var data = localStorage.getItem('profile')
         if (data === null){ return Profile.newProfile(); }
         var profile = Profile.fromJson(data);
-        if ((<any>window).DEBUGMODE){ (<any>window).profile = profile; }
+        if (DEBUGMODE){ (<any>window).profile = profile; }
         return profile;
     }
     static fromJson(data: string): Profile{

@@ -10,6 +10,8 @@ import { AceJS } from './editors';
 import { Updateable, Selection, Scenario } from './interfaces';
 import { Ship } from './entity';
 
+var DEBUGMODE = require('DEBUGMODE');
+
 
 export function simulator(originalWorld: Engine){
 
@@ -30,7 +32,7 @@ export function simulator(originalWorld: Engine){
     function(){ return editor.getCode(); },
     true,
     'canvas', // where to put key handlers
-    (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
+    DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
     'JavaScript',
@@ -92,7 +94,7 @@ export function simulator(originalWorld: Engine){
     if (fastForward[0]){
         updater.tick(0.032, !fastForward[0]); // 30fps game time
         setTimeout(tick, 1);
-    } else if ((<any>window).DEBUGMODE){
+    } else if (DEBUGMODE){
         var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
         setTimeout(tick, 1); // max fps
         //setTimeout(tick, 900); // 1.1 fps

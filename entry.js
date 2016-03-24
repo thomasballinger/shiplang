@@ -8,8 +8,6 @@ import { missions } from './mission';
 import { Engine } from './engine';
 import { universe } from './universe';
 
-window.Profile = Profile; // for convenience in onClicks of links
-
 // errors resulting from running user's script
 // are throw instead of displayed and ignored
 // and player, world, and a few other things

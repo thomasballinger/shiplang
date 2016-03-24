@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Mocha</title>
+        <title>Browser tests</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="./node_modules/mocha/mocha.css" />
+
+        <script> window.DEBUGMODE=true; </script>
 
         <script src="hotswapping-js-interp/interpreter.js"></script>
         <script src="hotswapping-js-interp/acorn.js"></script>
@@ -13,5 +15,5 @@
         <script src="/test.build.js"></script>
     </head>
     <body>
-    </body>
+    <h2>Note: these tests can also be run with node!</h2>
 </html>

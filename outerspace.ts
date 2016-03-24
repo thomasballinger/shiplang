@@ -6,8 +6,8 @@ import { Updater } from './updater';
 import { Engine } from './engine';
 import * as errorbar from './errorbar';
 import { showMenu, hideMenu } from './pausemenu';
-
 import { Updateable, Selection, Scenario } from './interfaces';
+var DEBUGMODE = require('DEBUGMODE');
 
 
 export function outerspace(originalWorld: Engine){
@@ -27,7 +27,7 @@ export function outerspace(originalWorld: Engine){
     function(){ return Profile.fromStorage().script; },
     false,
     'canvas', // where to put key handlers
-    (<any>window).DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
+    DEBUGMODE ? function(e){ throw e; } : errorbar.setError,
     errorbar.clearError,
     function(msg){}, // queue warning
     'JavaScript',
@@ -110,7 +110,7 @@ export function outerspace(originalWorld: Engine){
     if (fastForward[0]){
         updater.tick(0.032, !fastForward[0]); // 30fps game time
         setTimeout(tick, 1);
-    } else if ((<any>window).DEBUGMODE){
+    } else if (DEBUGMODE){
         var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
         setTimeout(tick, 1); // max fps
     } else {
@@ -120,6 +120,5 @@ export function outerspace(originalWorld: Engine){
     //    setTimeout(tick, Math.max(5, 1033.5-tickTime)); // 1fps, good for low cpu usage
   }
 
-  if ((<any>window).DEBUGMODE){ (<any>window).reset = function(){ updater.reset(); }}
   tick();
 }

@@ -1,8 +1,8 @@
-var acorn = (<any>window).acorn;
 
 import { Editor, Selection } from './interfaces';
 import { makeReactEditor } from './reacteditor';
 
+var acorn = require('acorn');
 var brace = require('brace');
 var Range = <any>(<any>brace).acequire('ace/range').Range
 
