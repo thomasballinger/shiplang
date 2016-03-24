@@ -48,7 +48,7 @@ describe('data', () => {
             assert.deepEqual(data, expected);
         });
         it('should load real data', () => {
-            console.log(loadData(real));
+            loadData(real);
         });
     });
 });
@@ -56,15 +56,13 @@ describe('data', () => {
 describe('data objects', () => {
     it('should create objects from full data', () => {
         var data = loadData(real)
-        console.log(data);
-        console.log(createObjects(data));
+        createObjects(data);
     })
 })
 
 describe('Spobs', () => {
     it('should calculate positions of descendents', () => {
         var Sol = createObjects(loadData(real)).systems['Sol'];
-        console.log(Sol.spobSpots(0));
         var spots = Sol.spobSpots(0);
         // earth has a moon that should also be in the list
         assert(spots.length > Sol.spobs.length);

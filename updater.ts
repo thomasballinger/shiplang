@@ -14,6 +14,7 @@ import { Profile } from './profile';
 import { createObjects, Start, System, universe } from './universe';
 var jsastdiff = require('./jsastdiff');
 var DEBUGMODE = require('DEBUGMODE');
+var acorn = require('acorn');
 
 import { Updateable, Selection } from './interfaces';
 
@@ -141,7 +142,7 @@ export class Updater{
     loadJS(){
         var s = this.getCode();
         try {
-            var newAST = (<any>window).acorn.parse(s);
+            var newAST = acorn.parse(s);
             this.clearError();
         } catch (e) {
             this.setError(e);
@@ -152,7 +153,7 @@ export class Updater{
             Profile.fromStorage().set('script', s);
 
             var changed = jsastdiff.changedNamedFunctions(
-                (<any>window).acorn.parse(this.lastValid), newAST);
+                acorn.parse(this.lastValid), newAST);
             if (changed.hasOwnProperty('*main*')){
                 // start over totally, top level change
                 this.userFunctionBodies.reset();

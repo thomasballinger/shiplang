@@ -36,6 +36,24 @@ describe('Updater', () => {
     it("Can be constructed too much mocking", () => {
         var [updater, _] = buildUpdater();
     });
+    describe("#loadJS", () =>{
+        it.only('should call this.reset()', () => {
+            var [updater, updateCode] = buildUpdater();
+            updateCode('1 + 1');
+            var called: boolean;
+            updater.reset = function(x){ called = true; };
+            assert.equal(updater.getCode(), '1 + 1');
+            updater.loadJS();
+            assert.equal(called, true);
+        });
+        it('should create this.world', () => {
+            var [updater, updateCode] = buildUpdater();
+            updateCode('1 + 1');
+            assert.equal(updater.world, undefined);
+            updater.loadJS();
+            assert.notEqual(updater.world, undefined);
+        });
+    });
     describe('detects when reset or restart needed', () => {
         it("Doesn't reset when an unrun function changes", () => {
             var [updater, updateCode] = buildUpdater();
@@ -130,14 +148,11 @@ describe('Updater', () => {
         it('restores global script state if script has already been started', () => {
             var [updater, updateCode] = buildUpdater();
             updateCode('var a = 1; waitFor(1); function foo(){ a += 1; return 1; }; foo(); waitFor(1)');
-            console.log('--- ticking original');
             updater.tick(.1);
             assert.equal(playerScopeLookup(updater, 'a'), 1);
-            console.log('--- ticking original');
             updater.tick(1.2);
             assert.equal(playerScopeLookup(updater, 'a'), 2);
             updateCode('var a = 1; waitFor(1); function foo(){ a += 1; return 2; }; foo(); waitFor(1)');
-            console.log('--- ticking after rewind');
             updater.tick(1.2);
             assert.equal(playerScopeLookup(updater, 'a'), 2);
         });
