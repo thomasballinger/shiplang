@@ -21,7 +21,7 @@ export class InputHandler{
         if (keyHandlerTarget){
             this.initialize(keyHandlerTarget);
         } else {
-            console.warn('InputHandler created without setting event listeners')
+            //console.warn('InputHandler created without setting event listeners')
         }
     }
     pressed: { [key: string]: boolean };
@@ -119,10 +119,7 @@ export class Controls{
     };
     isPressed(key: string){
         //return !!this.pressed[keyCodeFor[key.toUpperCase()]];
-        var isPressed =  !!this.pressed[keyCodeFor[key.toUpperCase()]];
-        if (isPressed){
-            console.log('found that key', key, 'was pressed:', this.pressed);
-        }
+        var isPressed = !!this.pressed[keyCodeFor[key.toUpperCase()]];
         return isPressed
     };
     copy(): Controls{

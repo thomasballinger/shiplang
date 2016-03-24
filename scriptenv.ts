@@ -533,6 +533,7 @@ export function initShipEnv(interpreter: any, scope: any){
         cmd.interpreterInit(interpreter, scope);
     }
     interpreter.setProperty(scope, 'log', interpreter.createNativeFunction(
-        function(x: any){ console.log('from jsinterp:', x);
-    }));
+        function(...args: any[]){
+            console.log.apply(console, [].concat(['from jsinterp:'], args));
+        }));
 }

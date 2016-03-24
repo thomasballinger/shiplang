@@ -128,5 +128,39 @@ describe('Updater', () => {
             // check that control state reverts after a tick
             assert.notEqual(updater.controls.pressed[90], true)
         });
+
+        /** looks up variable in current scope of the player's interpreter */
+        function playerScopeLookup(updater: Updater, name: string): any{
+            return (<any>updater.world.getPlayer().context).interpreter.getScope().properties[name].data;
+        }
+
+        it('restores global script state if in save the script has not been started', () => {
+            var [updater, updateCode] = buildUpdater();
+            // the waitFor is important because if a script finishes its interpreter
+            // disappears and we can no longer inspect its global scope
+            updateCode('var a = 1; function foo(){ a += 1; return 1; }; foo(); waitFor(1)');
+            updater.tick(0.01);
+            assert.equal(playerScopeLookup(updater, 'a'), 2);
+            updateCode('var a = 1; function foo(){ a += 1; return 2; }; foo(); waitFor(1)');
+            updater.tick(0.03);
+            assert.equal(playerScopeLookup(updater, 'a'), 2);
+        });
+        it('restores global script state if script has already been started', () => {
+            var [updater, updateCode] = buildUpdater();
+            updateCode('var a = 1; waitFor(1); function foo(){ a += 1; return 1; }; foo(); waitFor(1)');
+            updater.tick(.1);
+            assert.equal(playerScopeLookup(updater, 'a'), 1);
+            updater.tick(1.2);
+            assert.equal(playerScopeLookup(updater, 'a'), 2);
+            updateCode('var a = 1; waitFor(1); function foo(){ a += 1; return 2; }; foo(); waitFor(1)');
+            updater.tick(1.2);
+            assert.equal(playerScopeLookup(updater, 'a'), 2);
+        });
+
+        /** To repo a bug with missile firing:
+         * Notes: 
+         * on the tick of firing, the world looks good
+         * Worlds are leaking into each other! The deepcopy is not pure!
+         * */
     });
 });

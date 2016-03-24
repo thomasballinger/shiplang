@@ -198,7 +198,6 @@ export class Updater{
     restartFromSave(world: Engine, controls: Controls){
         this.controls = controls.copy();
         this.controls.activate();
-        console.log('this controls has pressed:', this.controls.pressed);
         scriptEnv.setKeyControls(this.controls);
         this.world = world;
         this.player = this.world.getPlayer();

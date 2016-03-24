@@ -8,6 +8,7 @@ function manual(){
   if (keyPressed('LEFT')){ fullLeft(); }
   if (keyPressed('RIGHT')){ fullRight(); }
   if (keyPressed(' ')){
+    log('current alternate status:', alternate);
     if (alternate){
       fireMissile(ProNav, '#aa1144');
       alternate = 0;
