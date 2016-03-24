@@ -6,3 +6,4 @@ require('./test_profile.ts');
 require('./test_dataload.ts');
 require('./test_updater.ts');
 require('./test_jsastdiff.ts');
+require('./test_perf.ts');

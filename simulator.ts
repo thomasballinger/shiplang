@@ -34,7 +34,7 @@ export function simulator(originalWorld: Engine){
     errorbar.clearError,
     function(msg){}, // queue warning
     'JavaScript',
-    function(){ editor.clearAllHighlights(); },
+    function(){ editor.clearAllHighlights(); }/*,
     function(id: string, selections: Selection[]){
         return editor.setHighlight(id, selections);
     },
@@ -44,6 +44,7 @@ export function simulator(originalWorld: Engine){
             editor.setHighlightedEntity((<any>e).context.highlightId);
         }
     }
+    */
   );
 
   editor.setListener(function(){ updater.notifyOfCodeChange(); });
