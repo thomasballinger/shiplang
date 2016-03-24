@@ -4,7 +4,7 @@ import { initShipEnv } from './scriptenv';
 import { UserFunctionBodies } from './userfunctionbodies';
 import { Selection, Interpreter, Generator, ByteCode, Context, JSInterpFunction } from './interfaces'
 
-var deepcopy = (<any>window).deepcopy
+var deepcopy = (<any>window).deepCopy
 var Interpreter = (<any>window).Interpreter;
 
 export class NOPContext implements Context {

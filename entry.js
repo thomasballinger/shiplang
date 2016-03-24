@@ -1,7 +1,5 @@
 require("./style.css");
 
-window.deepcopy = require('./deepcopy'); // needed by JS interpreter
-
 import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';
 import { Profile } from './profile';

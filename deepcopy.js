@@ -102,7 +102,7 @@
 
   function isAcorn(obj){
     return (obj.constructor === acorn.Node ||
-            (obj.hasOwnProperty('start') && obj.hasOwnProperty('end')));
+            (obj.start !== undefined && obj.end !== undefined));
   }
   function isPrimitive(obj){ return obj.isPrimitive; }
 
@@ -177,6 +177,10 @@
       exports = module.exports = deepCopy;
     }
   } else {
-    window.deepCopy = deepCopy;
+    if (window.deepCopy){
+      console.log('carefully avoiding loading deepCopy a second time...');
+    } else {
+      window.deepCopy = deepCopy;
+    }
   }
 })();
