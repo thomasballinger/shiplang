@@ -3,11 +3,10 @@ import { assert } from 'chai';
 
 import { Updater } from '../updater';
 import { Engine } from '../engine';
-import { System, universe, createObjects } from '../universe';
 import { Selection } from '../interfaces';
 import { Profile } from '../profile';
-import { loadData } from '../dataload';
 import { UserFunctionBodies } from '../userfunctionbodies';
+import { PeekEngine, engineFixtures } from './test_engine';
 
 class FakeUserFunctionBodies extends UserFunctionBodies{
     /**  */
@@ -16,32 +15,11 @@ class FakeUserFunctionBodies extends UserFunctionBodies{
     }
 }
 
-class PeekEngine extends Engine{
-    tick(dt: number, onError: (err: string)=>void){
-        if (PeekEngine.preTick){
-            PeekEngine.preTick();
-        }
-        super.tick(dt, onError);
-        if (PeekEngine.postTick){
-            PeekEngine.postTick();
-        }
-    }
-    static preTick: ()=>void;
-    static postTick: ()=>void;
-}
-
-
-var fixtures = createObjects(loadData(`
-system Sys
-	pos 0 0
-	government Trader
-`.replace(/    /g, '\t')));
-//console.log('fixtures:', fixtures);
 
 /** Returns updater and code update function */
 function buildUpdater(): [Updater, (code: string)=>void]{
     var codeToLoad = '';
-    var updater = new Updater(new PeekEngine(fixtures.systems['Sys'],
+    var updater = new Updater(new PeekEngine(engineFixtures.systems['Sys'],
                                          Profile.newProfile()),
                               ()=>{ return codeToLoad; },
                               true);
@@ -131,7 +109,11 @@ describe('Updater', () => {
 
         /** looks up variable in current scope of the player's interpreter */
         function playerScopeLookup(updater: Updater, name: string): any{
-            return (<any>updater.world.getPlayer().context).interpreter.getScope().properties[name].data;
+            return (<any>updater.world.getPlayer().context).interpreter.getValueFromScope(name).data;
+        }
+        function saveScopeLookup(updater: Updater, name: string, saveName: string){
+            return (<any>updater.userFunctionBodies.saves[saveName][1].getPlayer()
+                    .context).interpreter.getValueFromScope(name).data
         }
 
         it('restores global script state if in save the script has not been started', () => {
@@ -156,11 +138,20 @@ describe('Updater', () => {
             updater.tick(1.2);
             assert.equal(playerScopeLookup(updater, 'a'), 2);
         });
+        /** Repo of a bug with missile firing */
+        it('keeps saves safe from corruption', () => {
+            var [updater, updateCode] = buildUpdater();
+            updateCode('var a = 1; waitFor(1); function foo(){ 1; }; foo(); waitFor(1); a++; waitFor(1)');
+            updater.tick(.1);
+            assert.equal(Object.keys(updater.userFunctionBodies.saves).length, 0);
+            updater.tick(1.2);
+            assert.equal(Object.keys(updater.userFunctionBodies.saves).length, 1);
+            assert.equal(playerScopeLookup(updater, 'a'), 1);
+            assert.equal(saveScopeLookup(updater, 'a', 'foo'), 1);
+            updater.tick(1);
+            assert.equal(playerScopeLookup(updater, 'a'), 2);
+            assert.equal(saveScopeLookup(updater, 'a', 'foo'), 1);
+        });
 
-        /** To repo a bug with missile firing:
-         * Notes: 
-         * on the tick of firing, the world looks good
-         * Worlds are leaking into each other! The deepcopy is not pure!
-         * */
     });
 });

@@ -181,6 +181,7 @@ export class Updater{
         }
     }
 
+    //TODO rename to "restart"
     reset(s?: string){
         if (s === undefined){ s = this.lastValid; }
         this.world = this.origWorld.copy()
@@ -194,7 +195,9 @@ export class Updater{
         this.onReset()
         this.debugData();
         scriptEnv.setProfile(Profile.fromStorage())
+        //TODO clear saves on reset
     }
+    //TODO rename to "restore" from save
     restartFromSave(world: Engine, controls: Controls){
         this.controls = controls.copy();
         this.controls.activate();
@@ -207,8 +210,13 @@ export class Updater{
         scriptEnv.setProfile(world.profile)
     }
 
+    //TODO consider making first tick disregard the dt? dt=0 doesn't work,
+    //     have to be special cased - probably not worth it. Think of something.
     // please advance world state one tick and update displays
     tick(dt: number, updateDisplays=true):number{
+        if (this.userFunctionBodies.saves['towardExpected']){
+            console.log((<any>this).userFunctionBodies.saves.towardExpected[1].getPlayer().context.interpreter.getValueFromScope('alternate').data);
+        }
         var tickStartTime = new Date().getTime();
 
         if (this.codeHasChanged){

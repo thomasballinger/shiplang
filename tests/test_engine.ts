@@ -3,9 +3,30 @@ import { assert } from 'chai';
 
 import { Engine, makeShipEntity } from '../engine';
 import { Entity } from '../entity';
-import { universe } from '../universe';
+import { System, universe, createObjects } from '../universe';
+import { Profile } from '../profile';
+import { loadData } from '../dataload';
+
+export class PeekEngine extends Engine{
+    tick(dt: number, onError: (err: string)=>void){
+        if (PeekEngine.preTick){
+            PeekEngine.preTick();
+        }
+        super.tick(dt, onError);
+        if (PeekEngine.postTick){
+            PeekEngine.postTick();
+        }
+    }
+    static preTick: ()=>void;
+    static postTick: ()=>void;
+}
 
 
+export var engineFixtures = createObjects(loadData(`
+system Sys
+	pos 0 0
+	government Trader
+`.replace(/    /g, '\t')));
 
 describe('Engine', () => {
     describe('#copy', () => {
@@ -17,6 +38,14 @@ describe('Engine', () => {
             l1.push(4);
             assert.equal((<any>s2.entities[0]).length, 3)
         });
+        /*
+        it("should create new interpreters on copy", () => {
+            var world = new PeekEngine(engineFixtures.systems['Sys'],
+                                       Profile.newProfile());
+            var code = `var a = 1;
+            world.addPlayer([])
+        });
+        */
     });
     describe('#checkCollisions', () => {
         it("explosions from own missile should damage entities", () => {
