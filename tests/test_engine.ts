@@ -6,6 +6,7 @@ import { Entity } from '../entity';
 import { System, universe, createObjects } from '../universe';
 import { Profile } from '../profile';
 import { loadData } from '../dataload';
+import { UserFunctionBodies } from '../userfunctionbodies';
 
 export class PeekEngine extends Engine{
     tick(dt: number, onError: (err: string)=>void){
@@ -38,14 +39,32 @@ describe('Engine', () => {
             l1.push(4);
             assert.equal((<any>s2.entities[0]).length, 3)
         });
-        /*
-        it("should create new interpreters on copy", () => {
+        it("should create interpreters without shared state", () => {
             var world = new PeekEngine(engineFixtures.systems['Sys'],
                                        Profile.newProfile());
-            var code = `var a = 1;
-            world.addPlayer([])
+            var code = `var a = 1; waitFor(1); a = 2; waitFor(2)`;
+            var ufb = new UserFunctionBodies();
+            world.addPlayer([code, ufb, undefined]);
+            world.tick(0.1, (msg: string)=>{ assert.fail(); });
+            assert.equal((<any>world.getPlayer().context).interpreter
+                         .getValueFromScope('a').data, 1);
+            var copy = world.copy();
+            world.tick(1.2, (msg: string)=>{ assert.fail(); });
+
+            // should be different contexts
+            (<any>world.getPlayer().context).madeUpProperty = 1;
+            assert.notProperty((<any>copy.getPlayer().context), 'madeUpProperty');
+
+            // should be different interpreters
+            (<any>world.getPlayer().context).interpreter.madeUpProperty = 1;
+            assert.notProperty((<any>copy.getPlayer().context).interpreter, 'madeUpProperty');
+
+            // should not share scopes
+            assert.equal((<any>world.getPlayer().context).interpreter
+                         .getValueFromScope('a').data, 2);
+            assert.equal((<any>copy.getPlayer().context).interpreter
+                         .getValueFromScope('a').data, 1);
         });
-        */
     });
     describe('#checkCollisions', () => {
         it("explosions from own missile should damage entities", () => {

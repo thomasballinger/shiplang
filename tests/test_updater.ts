@@ -152,6 +152,5 @@ describe('Updater', () => {
             assert.equal(playerScopeLookup(updater, 'a'), 2);
             assert.equal(saveScopeLookup(updater, 'a', 'foo'), 1);
         });
-
     });
 });

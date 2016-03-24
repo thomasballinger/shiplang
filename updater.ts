@@ -214,9 +214,6 @@ export class Updater{
     //     have to be special cased - probably not worth it. Think of something.
     // please advance world state one tick and update displays
     tick(dt: number, updateDisplays=true):number{
-        if (this.userFunctionBodies.saves['towardExpected']){
-            console.log((<any>this).userFunctionBodies.saves.towardExpected[1].getPlayer().context.interpreter.getValueFromScope('alternate').data);
-        }
         var tickStartTime = new Date().getTime();
 
         if (this.codeHasChanged){

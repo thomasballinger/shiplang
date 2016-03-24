@@ -145,6 +145,7 @@ export class Ship extends Entity{
         this.maxSpeed = spec.maxSpeed;
         this.isMunition = spec.isMunition;
         this.explosionSize = spec.explosionSize;
+        console.log(script);
         if (script === undefined){
             this.context = new codetypes.NOPContext();
         } else if (Array.isArray(script) && (<any[]>script).length === 3 &&
