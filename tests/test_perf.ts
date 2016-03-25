@@ -22,4 +22,33 @@ describe('deepcopy', () => {
             }
         });
     });
+    describe("copying a world with 2 missiles forked from the player's js interp", () => {
+        it('5 times', () => {
+            var world = new PeekEngine(engineFixtures.systems['Sys'],
+                                       Profile.newProfile());
+            var code = `var a = 1;
+                        function fly(){
+                          waitFor(20);
+                        }
+                        fireMissile(fly, '#abcdef')
+                        fireMissile(fly, '#abcdef')
+                        waitFor(20)`;
+            var ufb = new UserFunctionBodies();
+            world.addPlayer([code, ufb, undefined]);
+            world.getPlayer().h = 90
+            world.tick(0.1, (msg: string)=>{ assert.fail(); });
+            world.getPlayer().h = 45
+            world.tick(0.5, (msg: string)=>{ assert.fail(); });
+            world.getPlayer().h = 15
+            world.tick(0.5, (msg: string)=>{ assert.fail(); });
+            assert.equal(world.entities.length, 3);
+
+            var copies: Engine[] = [];
+            for (var i=0; i<20; i++){
+                world.tick(0.1, (msg: string)=>{ assert.fail(); });
+                copies.push(world.copy())
+            }
+            assert.equal(world.entities.length, 3);
+        });
+    });
 });
