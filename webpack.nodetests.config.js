@@ -10,9 +10,6 @@ fs.readdirSync('node_modules').filter(function(x) {
   nodeModules[mod] = 'commonjs ' + mod;
 });
 
-console.log('adding to externals:');
-console.log(nodeModules);
-
 parent.entry = './nodetests.js';
 parent.target = 'node';
 parent.output = { filename: 'nodetest.build.js', };

@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --config webpack.config.js --port 8080",
-    "devtest": "webpack-dev-server --config webpack.tests.config.js --port 8081"
+    "devtest": "webpack-dev-server --config webpack.tests.config.js --port 8081",
+    "nodetest": "webpack --config webpack.nodetests.config.js; mocha --require source-map-support/register nodetest.build.js"
   },
   "dependencies": {
     "devpack": "0.0.0",
