@@ -149,8 +149,7 @@ export class Updater{
             s = undefined;
         };
         if (s){
-            // save because it's syntactically valid
-            Profile.fromStorage().set('script', s);
+            //TODO save because it's syntactically valid
 
             var changed = jsastdiff.changedNamedFunctions(
                 acorn.parse(this.lastValid), newAST);

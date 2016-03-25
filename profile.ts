@@ -14,6 +14,12 @@ var DEBUGMODE = require('DEBUGMODE');
 //   * anything important on a planet happens
 //
 // Missions, stored on the Profile object, have a chance to process events.
+//
+
+//TODO separate out portions of profile that persist through restarts and
+// deaths and those that don't. It's really two objects with two different
+// sets of behaviors.
+// The only thing right now that does this is scripts
 
 
 interface ReputationTable {
@@ -59,7 +65,12 @@ export class Profile{
         }
     }
     static fromStorage(): Profile{
-        var data = localStorage.getItem('profile')
+        if (typeof window === 'undefined') {
+            // shim for node
+            data = null;
+        } else {
+            var data = localStorage.getItem('profile')
+        }
         if (data === null){ return Profile.newProfile(); }
         var profile = Profile.fromJson(data);
         if (DEBUGMODE){ (<any>window).profile = profile; }
@@ -76,11 +87,13 @@ export class Profile{
         (<any>window).location.reload();
     }
     save(): Profile{
+        if (typeof window === 'undefined'){ return this; }
         var data = localStorage.setItem('profile', this.toJson());
         localStorage.setItem('profile', this.toJson());
         return this;
     }
     static clear(){
+        if (typeof window === 'undefined'){ return this; }
         localStorage.removeItem('profile');
     }
     set(prop: string, value: any): Profile{

@@ -37,7 +37,7 @@ describe('Updater', () => {
         var [updater, _] = buildUpdater();
     });
     describe("#loadJS", () =>{
-        it.only('should call this.reset()', () => {
+        it('should call this.reset()', () => {
             var [updater, updateCode] = buildUpdater();
             updateCode('1 + 1');
             var called: boolean;
