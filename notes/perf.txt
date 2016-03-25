@@ -1,0 +1,5 @@
+Copying JS interpreters is killing performance in the simulator.
+For some reason forks seem to be worse: copying the world with one ship 20
+times is cheaper than copying a world with 2 forked missiles 5 times.
+This suggests one of the kinds of two ways of copying (fork/exec and copy)
+is wrong.
