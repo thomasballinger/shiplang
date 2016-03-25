@@ -45,7 +45,7 @@ describe('Engine', () => {
             var code = `var a = 1; waitFor(1); a = 2; waitFor(2)`;
             var ufb = new UserFunctionBodies();
             world.addPlayer([code, ufb, undefined]);
-            world.tick(0.1, (msg: string)=>{ assert.fail(); });
+            world.tick(0.1, (msg: string)=>{ throw Error(msg); });
             assert.equal((<any>world.getPlayer().context).interpreter
                          .getValueFromScope('a').data, 1);
             var copy = world.copy();
@@ -53,7 +53,7 @@ describe('Engine', () => {
             var interp = (<any>world.getPlayer().context).interpreter;
             var copyInterp = (<any>copy.getPlayer().context).interpreter;
 
-            world.tick(1.2, (msg: string)=>{ assert.fail(); });
+            world.tick(1.2, (msg: string)=>{ throw Error(msg); });
 
             // should be different entities
             (<any>world.getPlayer()).madeUpProperty = 1;

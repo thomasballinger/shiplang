@@ -134,7 +134,7 @@ export class JSContext implements Context {
     }
     safelyStep(e: Ship, onError: (e: string)=>void){
         if (this.done){ return; }
-        try{
+        //try{
             var unfinished = this.step(e);
             if (!unfinished){
                 this.done = true;
@@ -154,10 +154,10 @@ export class JSContext implements Context {
 
             return true;
 
-        } catch (e) {
-            onError(e)
-            return false;
-        }
+        //} catch (e) {
+        //    onError(e)
+        //    return false;
+        //}
     }
     forkWithFunction(func: JSInterpFunction):JSContext{
         var copy = deepcopy(this);

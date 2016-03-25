@@ -2,9 +2,9 @@
 // Expected to be globally available
 global.DEBUGMODE = false;
 
-// Loading this without window defined also creates
-// acorn and deepCopy on the global object
-global.Interpreter = require('./hotswapping-js-interp/interpreter.js');
+// Loading this without window defined creates Interpreter,
+// acorn, and deepCopy on the global object
+require('./hotswapping-js-interp/interpreter.js');
 
 /* TODO a possible solution:
 // make window available
