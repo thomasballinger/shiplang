@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/thomasballinger/shiplang.svg?branch=master)](https://travis-ci.org/thomasballinger/shiplang)
+
 Currently using same assets as [Endless
 Sky](https://github.com/endless-sky/endless-sky), a great game by Michael
 Zahniser.
