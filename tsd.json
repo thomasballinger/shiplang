@@ -13,6 +13,18 @@
     },
     "chai/chai.d.ts": {
       "commit": "163a4277199c3d896d9efffe24ea84c85f55c8ac"
+    },
+    "react/react.d.ts": {
+      "commit": "299b5caa22876ef27dc8e9a5b7fd7bf93457b6f4"
+    },
+    "node/node.d.ts": {
+      "commit": "299b5caa22876ef27dc8e9a5b7fd7bf93457b6f4"
+    },
+    "react/react-dom.d.ts": {
+      "commit": "299b5caa22876ef27dc8e9a5b7fd7bf93457b6f4"
+    },
+    "ace/ace.d.ts": {
+      "commit": "299b5caa22876ef27dc8e9a5b7fd7bf93457b6f4"
     }
   }
 }
