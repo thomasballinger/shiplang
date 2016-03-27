@@ -1,4 +1,6 @@
-all: blockly-master esimages
+all: blockly-master esimages testdeps
+
+testdeps: hotswapping-js-interp
 
 blockly-master: blockly.tar.gz
 	tar xzf blockly.tar.gz
