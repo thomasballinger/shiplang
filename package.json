@@ -17,6 +17,7 @@
     "devpack": "0.0.0",
     "lodash": "^4.5.1",
     "mocha-loader": "^0.7.1",
+    "pegjs": "^0.9.0",
     "react": "^0.14.7",
     "react-ace": "^3.1.0",
     "react-dom": "^0.14.7",
