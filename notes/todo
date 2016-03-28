@@ -1,9 +1,17 @@
-* image loading system
 * base planet radius on sprite size
+* use different planet sprites for different planets
+* planet sprites should be rotated to face the sun
 * mark planets as habitable or not
 * engine sprites
 * swizzles
-* planet sprites should be rotated to face the sun
+
+* optimize javascript interpreter copying - way too slow atm!
+
+* intro level - give player a shuttlecraft initially
+
+* fancy collision detection based on sprites
+
+* planet interface: computer lab to modify scripts!
 
 * test gunner scenario
     * military ships attack when gunner fires on
@@ -74,3 +82,4 @@ done:
 * neato zoom out effect for pause
 * map
 * write scripts for traveling between planets unless enemies
+* image loading system
