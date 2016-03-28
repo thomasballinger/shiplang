@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { loadData, parseLine, merge, loadMany } from '../dataload';
 import { createObjects } from '../universe';
 
-var real = require('../data/index');
+var real = require('raw!../data/map.txt') + '\n' + require('raw!../data/ships.txt');
 
 var simple = `
 system Sol
@@ -47,8 +47,10 @@ describe('data', () => {
             }
             assert.deepEqual(data, expected);
         });
+        /*
         it('duplicates in same ', () => {
         });
+        */
         it('should load real data', () => {
             loadData(real);
         });

@@ -265,9 +265,9 @@ export class Variant extends DataNode{
             if (data[key].length > 1){
                 throw Error('ship listed twice: '+key);
             }
-            var num = data[key][0] === undefined ? 1: parseInt(data[key][0]);
+            var num = (data[key][0] === undefined || data[key][0] === null) ? 1: parseInt(data[key][0]);
             if (!isFinite(num)){
-                throw Error('Bad number for variant: '+data[key]);
+                throw Error('Bad number for variant: '+key+': '+data[key]);
             }
             this.ships.push([ship, num]);
         }
@@ -469,5 +469,5 @@ Mission.fieldName = 'missions';
 
 // Go ahead and load all data here so everyone
 // can use the same copy
-var gamedata = loadData(require('./data/index.js'));
+var gamedata = require('json!./data-loader!./data');
 export var universe = createObjects(gamedata);

@@ -117,7 +117,7 @@ export function merge(acc: Domains, next: Domains): Domains{
 }
 
 /** Load structured data loads */
-export function loadMany(...data: Domains[]){
+export function loadMany(data: Domains[]){
     return data.reduce((acc: Domains, stuff: Domains): Domains => {
         return merge(acc, stuff);
     })
@@ -133,7 +133,7 @@ export function parseLine(line: string){
 function dataLines(text: string): [number, string][]{
     var lines = text.split(/[\r\n]+/g);
     function notJustWhitespace(line: string){ return !!line.trim() }
-    function notComment(line: string){ return !line.trim().startsWith('#'); }
+    function notComment(line: string){ return !(line.trim().slice(0, 1) === '#'); }
     function indentAndLine(line: string): [number, string]{
         var indent = line.match(/[\t]*/)[0].length;
         return [indent, line.trim()];

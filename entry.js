@@ -1,6 +1,7 @@
 require("./style.css");
-// TODO combine all data files before building sprites
-document.getElementById('images').innerHTML = require('html!./sprite-loader!./data/ships.txt') + require('html!./sprite-loader!./data/map.txt');
+
+//TODO find/write a loader that just does this
+document.getElementById('images').innerHTML = require('html!./sprite-loader!./data-loader!./data');
 
 import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';
