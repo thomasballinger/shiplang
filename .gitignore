@@ -6,6 +6,8 @@ typings
 .DS_Store
 
 nodetest.build.js
+# created by node typescript loader
+tmp
 
 # assets pulled in by Makefile
 images

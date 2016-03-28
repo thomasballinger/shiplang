@@ -181,9 +181,13 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
           shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
         if (e.thrust > 0 && e.drawStatus['thrustSprite']){
-            var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['thrustSprite'].replace(/ /g, '_'));
+            var imgid = e.drawStatus['thrustSprite'].replace(/ /g, '_');
         } else {
-            var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'].replace(/ /g, '_'));
+            var imgid = e.drawStatus['sprite'].replace(/ /g, '_');
+        }
+        var sprite = <HTMLImageElement>document.getElementById(imgid);
+        if (sprite === null){
+            throw Error("Can't find sprite with id "+imgid);
         }
         var w = sprite.naturalWidth * esf;
         var h = sprite.naturalHeight * esf;
@@ -262,6 +266,9 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
         ctx.fill();
     } else {
         var sprite = <HTMLImageElement>document.getElementById(e.drawStatus['sprite'])
+        if (sprite === null){
+            throw Error("Can't find sprite with id "+e.drawStatus['sprite']);
+        }
         var w = sprite.naturalWidth * esf;
         ctx.drawImage(sprite, (e.x-dx)*psf-w/2, (e.y-dy)*psf-w/2, w, w);
     }
