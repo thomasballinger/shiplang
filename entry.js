@@ -8,6 +8,9 @@ import { missions } from './mission';
 import { Engine } from './engine';
 import { universe } from './universe';
 
+var sprites = require('./sprite-loader!./data/ships.txt');
+console.log('sprites:', sprites);
+
 // errors resulting from running user's script
 // are throw instead of displayed and ignored
 // and player, world, and a few other things

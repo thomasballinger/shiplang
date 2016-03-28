@@ -1,7 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { loadData, parseLine } from '../dataload';
+import { loadData, parseLine, merge, loadMany } from '../dataload';
 import { createObjects } from '../universe';
 
 var real = require('../data/index');
@@ -47,9 +47,18 @@ describe('data', () => {
             }
             assert.deepEqual(data, expected);
         });
+        it('duplicates in same ', () => {
+        });
         it('should load real data', () => {
             loadData(real);
         });
+    });
+});
+describe('merge', () => {
+    it('should override in subsequent loads', () =>{
+        var result = merge(loadData(simple), {'system': {'A': 7}});
+        assert.equal(result['system']['A'], 7);
+        assert.property(result['system'], 'Sol');
     });
 });
 

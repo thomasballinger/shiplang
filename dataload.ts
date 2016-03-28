@@ -8,6 +8,9 @@ function isNumber(n: string) {
   return !isNaN(parseFloat(n)) && isFinite(<any>n);
 }
 
+// should follow the behavior described in
+// https://github.com/endless-sky/endless-sky/wiki/CreatingPlugins
+
 export function loadData(text: string): Domains {
     if (text.search('  ') > -1){ throw Error("Found 2 spaces instead of tabs in file!"); }
     var domains: Domains = {};
@@ -96,6 +99,28 @@ export function loadData(text: string): Domains {
     }
 
     return domains;
+}
+
+/** Override data in acc with data in next */
+export function merge(acc: Domains, next: Domains): Domains{
+    for (var domain of Object.keys(next)){
+        if (acc[domain] === undefined){
+            acc[domain] = {};
+        }
+        for (var id of Object.keys(next[domain])){
+            //TODO write merge code as needed
+            //     right now new data overrides old
+            acc[domain][id] = next[domain][id];
+        }
+    }
+    return acc;
+}
+
+/** Load structured data loads */
+export function loadMany(...data: Domains[]){
+    return data.reduce((acc: Domains, stuff: Domains): Domains => {
+        return merge(acc, stuff);
+    })
 }
 
 export function parseLine(line: string){
