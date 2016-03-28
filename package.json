@@ -27,6 +27,7 @@
     "react-dom": "^0.14.7",
     "ts-loader": "^0.8.1",
     "typescript": "^1.8.9",
+    "typescript-require": "0.2.9",
     "webpack": "^2.0.7-beta",
     "webpack-dev-server": "^1.14.1"
   },
