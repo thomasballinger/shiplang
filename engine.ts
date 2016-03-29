@@ -61,8 +61,9 @@ function fireLaser(e:Entity, gameTime:GameTime){
     return laser;
 }
 
-export function makePlanet(x: number, y: number, r: number, sprite: string){
+export function makePlanet(x: number, y: number, r: number, h: number, sprite: string){
     var planet = new SpobEntity('planet', x, y, 0, 0, r);
+    planet.h = h;
     planet.drawStatus['sprite'] = sprite
     return planet
 }

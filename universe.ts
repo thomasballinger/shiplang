@@ -175,7 +175,9 @@ export class System extends DataNode{
     }
     createPlanets(world: Engine, profile: Profile){
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
-            world.addBackgroundEntity(makePlanet(x, y, spob.r, spob.sprite));
+            var h = ((Math.atan2(x, -y) * 180 / Math.PI) + 3600) % 360;
+            //TODO this is one of many spots with a bad y axis
+            world.addBackgroundEntity(makePlanet(x, y, spob.r, h, spob.sprite));
             //TODO this radius number should depend on the sprite
         }
     }
@@ -293,17 +295,36 @@ Variant.fieldName = 'variants';
 /** Object, called Spob for Space Object to avoid JS builtin */
 export class Spob extends DataNode{
     populate(data: any, global: AllObjects){
-        if (data.distance === undefined){ throw Error('No distance found for planet '+this.id); }
-        if (data.distance.length > 1){ throw Error('Too many distances listed for spob'); }
-        this.distance = parseFloat(data.distance[0]);
-        if (data.period === undefined){ throw Error('No period found for planet '+this.id); }
-        if (data.period.length > 1){ throw Error('Too many periods listed for spob'); }
-        this.period = parseFloat(data.period[0]);
         if (data.sprite === undefined){
             throw Error('no sprite found for planet '+this.id);
         } else {
             if (data.sprite.length > 1){ throw Error('Too many sprites listed for spob'); }
             this.sprite = data.sprite[0];
+        }
+        if (data.distance === undefined){
+            if (this.sprite.slice(0, 4) === 'star'){
+                this.distance = 0;
+            } else {
+                throw Error('No distance found for planet '+this.id);
+            }
+        } else {
+            if (data.distance.length > 1){
+                throw Error('Too many distances listed for spob');
+            } else {
+                this.distance = parseFloat(data.distance[0]);
+            }
+        }
+        if (data.period === undefined){
+            if (this.distance === 0){
+                this.period = 1;
+            } else {
+                throw Error('No period found for planet '+this.id); }
+        } else {
+            if (data.period.length > 1){
+                throw Error('Too many periods listed for spob');
+            } else {
+                this.period = parseFloat(data.period[0]);
+            }
         }
         this.r = spriteWidth(this.sprite) / 2;
         this.spobs = (data.object || []).map(function(x: any){
@@ -331,10 +352,10 @@ export class Spob extends DataNode{
         return [center[0] + Math.cos(angle) * this.distance, center[1] + Math.sin(angle) * this.distance];
     }
     treeSpots(center: [number, number], day: number): [Spob, [number, number]][]{
-        var innerCenter = this.position(center, day);
-        return [].concat.apply([[this, innerCenter]],
+        var [x, y] = this.position(center, day);
+        return [].concat.apply([[this, [x, y]]],
                                 this.spobs.map(function(s){
-                                    return s.treeSpots(innerCenter, day);
+                                    return s.treeSpots([x, y], day);
                                 }));
     }
 }

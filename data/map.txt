@@ -8,6 +8,8 @@ system Sol
 	fleet "Intrastellar Shuttles" 300
 	fleet "Triangle Patrol" 600
 	fleet "Pirates" 300
+	object
+		sprite star/g0
 	object Earth
 		sprite planet/earth
 		period 365.25

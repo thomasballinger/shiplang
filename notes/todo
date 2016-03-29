@@ -1,6 +1,5 @@
-* base planet radius on sprite size
-* use different planet sprites for different planets
 * planet sprites should be rotated to face the sun
+* add stars
 * mark planets as habitable or not
 * engine sprites
 * swizzles
@@ -84,3 +83,5 @@ done:
 * write scripts for traveling between planets unless enemies
 * image loading system
 * take out react, I'm not really using it and it's Huge
+* base planet radius on sprite size
+* use different planet sprites for different planets

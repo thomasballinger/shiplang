@@ -223,11 +223,15 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
   } else {
       entityDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
   }
+
+  // This shows the spot used for collision detection
+  /*
   ctx.fillStyle="#222222";
   ctx.strokeStyle="#222222";
   ctx.beginPath();
   ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
   ctx.stroke();
+  */
 }
 
 // x and y are in display space
@@ -270,8 +274,20 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
         if (sprite === null){
             throw Error("Can't find sprite with id "+e.drawStatus['sprite']);
         }
-        var w = sprite.naturalWidth * esf;
-        ctx.drawImage(sprite, (e.x-dx)*psf-w/2, (e.y-dy)*psf-w/2, w, w);
+        var w = sprite.naturalWidth * esf; //TODO could use precalculated value for this - is that better?
+
+        var theta = e.h;
+
+        var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
+        var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
+        var rotatedX = onscreenX * Math.cos(theta * Math.PI / 180) - onscreenY * Math.sin(theta * Math.PI / 180);
+        var rotatedY = onscreenX * Math.sin(theta * Math.PI / 180) + onscreenY * Math.cos(theta * Math.PI / 180);
+
+        ctx.save();
+        ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
+        ctx.rotate(theta*Math.PI/180);
+        ctx.drawImage(sprite, -w/2, -w/2, w, w);
+        (<any>ctx).restore();
     }
   }
 };
@@ -282,10 +298,10 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,
-             [[-13, -10],
-              [-9, -10],
-              [-9, 10],
-              [-13, 10]],
+             [[-1.3*e.r, -1*e.r],
+              [-.9*e.r, -1],
+              [-.9*e.r, 1*e.r],
+              [-1.3*e.r, 1*e.r]],
              e.h,
              esf);
     }
@@ -299,9 +315,9 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,
-             [[15, 0],
-              [-10, -12],
-              [-10, 12]],
+             [[1.5*e.r, 0],
+              [-1*e.r, -1.2*e.r],
+              [-1*e.r, 1.2*e.r]],
              e.h,
              esf);
   },
@@ -311,10 +327,10 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,
-             [[-20, -25],
-              [-15, -22],
-              [-15, 22],
-              [-20, 25]],
+             [[-2*e.r, -2.5*e.r],
+              [-1.5*e.r, -2.2*e.r],
+              [-1.5*e.r, 2.2*e.r],
+              [-2.0*e.r, 2.5*e.r]],
              e.h,
              esf);
     }
@@ -322,9 +338,9 @@ var shipDraws = <{[type:string]: ShipDrawFunc}>{
     drawPoly(ctx,
              (e.x-dx)*psf,
              (e.y-dy)*psf,
-             [[20, 0],
-              [-15, -22],
-              [-15, 22]],
+             [[2*e.r, 0],
+              [-1.5*e.r, -2.2*e.r],
+              [-1.5*e.r, 2.2*e.r]],
              e.h,
              esf);
   },
