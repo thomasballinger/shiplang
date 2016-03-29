@@ -3,7 +3,6 @@ var fs = require('fs');
 
 /** source should be a list of sprites */
 module.exports = function(source) {
-  console.log(source);
   this.cacheable();
   var sprites = source;
 
@@ -26,7 +25,6 @@ module.exports = function(source) {
               'id="'+ids[i]+'" '+
               'alt="sprite for '+sprites[i]+'" >\n';
   }
-  console.log(output);
   return output;
 };
 

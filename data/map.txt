@@ -13,49 +13,25 @@ system Sol
 		period 365.25
 		distance 1000
 		object Luna
-			sprite planet/earth
+			sprite planet/luna
 			distance 200
 			period 27.3
-			object MadeUpMoonSatellite
-				sprite planet/earth
-				distance 50
-				period 10
-			object
-				sprite planet/earth
-				distance 250
-				period 10
-			object
-				sprite planet/earth
-				distance 150
-				period 10
-			object
-				sprite planet/earth
-				distance 50
-				period 10
-			object
-				sprite planet/earth
-				distance 250
-				period 10
-			object
-				sprite planet/earth
-				distance 150
-				period 10
-			object
-				sprite planet/earth
-				distance 50
-				period 10
 	object Mars
-		sprite planet/earth
+		sprite planet/mars
 		distance 1400
 		period 687
 	object Jupiter
-		sprite planet/earth
+		sprite planet/jupiter
 		distance 3000
 		period 4332
 		object Europa
-			sprite planet/earth
+			sprite planet/europa
 			distance 180
 			period 3.5
+		object MadeUpMoonSatellite
+			sprite planet/io
+			distance 250
+			period 10
 
 system "Backwater"
 	pos -20 49

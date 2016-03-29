@@ -175,7 +175,7 @@ export class System extends DataNode{
     }
     createPlanets(world: Engine, profile: Profile){
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
-            world.addBackgroundEntity(makePlanet(x, y, 100, spob.sprite));
+            world.addBackgroundEntity(makePlanet(x, y, spob.r, spob.sprite));
             //TODO this radius number should depend on the sprite
         }
     }
@@ -305,7 +305,7 @@ export class Spob extends DataNode{
             if (data.sprite.length > 1){ throw Error('Too many sprites listed for spob'); }
             this.sprite = data.sprite[0];
         }
-        this.r = spriteWidth(this.sprite);
+        this.r = spriteWidth(this.sprite) / 2;
         this.spobs = (data.object || []).map(function(x: any){
             if (typeof x === 'string'){
                 checkExists(x, 'spobs', global);
