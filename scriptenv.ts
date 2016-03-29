@@ -235,8 +235,14 @@ function makeCommands():MakeCommandsReturnType{
         new Command('distToClosestComponent', function():any{ return e.distFrom(w.findClosestComponent(e)); }),
         new Command('headingToClosestPlanet', function():any{ return e.towards(w.findClosestBackgroundEntity(e)); }),
         new Command('distToClosestPlanet', function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); }),
-        new Command('headingToNthPlanet', function(i: number):any{ return e.towards(w.bgEntities[i % w.bgEntities.length]); }),
-        new Command('distToNthPlanet', function(i: number):any{ return e.distFrom(w.bgEntities[i % w.bgEntities.length]); }),
+        new Command('headingToNthPlanet', function(i: number):any{
+            var habitable = w.habitablePlanets();
+            return e.towards(habitable[i % habitable.length]);
+        }),
+        new Command('distToNthPlanet', function(i: number):any{
+            var habitable = w.habitablePlanets();
+            return e.distFrom(habitable[i % habitable.length]);
+        }),
 
         new Command('distToClosestEnemy', function(){ return e.distFrom(w.findClosestEnemy(e)); }),
         new Command('headingToClosestEnemy', function():any{ return e.towards(w.findClosestEnemy(e)); }),

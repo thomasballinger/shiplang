@@ -177,7 +177,7 @@ export class System extends DataNode{
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
             var h = ((Math.atan2(x, -y) * 180 / Math.PI) + 3600) % 360;
             //TODO this is one of many spots with a bad y axis
-            world.addBackgroundEntity(makePlanet(x, y, spob.r, h, spob.sprite));
+            world.addBackgroundEntity(makePlanet(x, y, spob.r, h, spob.sprite, !!spob.planet));
             //TODO this radius number should depend on the sprite
         }
     }
@@ -339,7 +339,9 @@ export class Spob extends DataNode{
         })
         // each time loaded planets will be in different positions.
         this.offset = Math.random();
-        Object.freeze(this);
+
+        //TODO can't freeze because Planets modify Spobs
+        //Object.freeze(this);
     }
     distance: number;
     r: number;
@@ -347,6 +349,7 @@ export class Spob extends DataNode{
     sprite: string;
     offset: number;
     spobs: Spob[];
+    planet: Planet;
     position(center: [number, number], day: number): [number, number]{
         var angle = (this.offset * this.period + day) * 2 * Math.PI / this.period;
         return [center[0] + Math.cos(angle) * this.distance, center[1] + Math.sin(angle) * this.distance];
@@ -372,20 +375,12 @@ export class Phrase extends DataNode{
 }
 Phrase.fieldName = 'phrases';
 
-/** Planets should have a corresponding object to make them accessible */
-export class Planet extends DataNode{
-    populate(data: any, global: AllObjects){
-        Object.freeze(this);
-    }
-}
-Planet.fieldName = 'planets';
-
 export class Start extends DataNode{
     populate(data: any, global: AllObjects){
         checkExists(data.system[0], 'systems', global);
         this.system = global.systems[data.system[0]];
         checkExists(data.planet[0], 'spobs', global);
-        this.planet = global.spobs[data.planet[0]];
+        this.spob = global.spobs[data.planet[0]];
         this.script = data.script ? data.script[0] : 'console.log("no script specified");';
         if (data.ship === undefined){ throw Error("No ship provided for start "+this.id)}
         checkExists(data.ship[0], 'ships', global);
@@ -401,7 +396,7 @@ export class Start extends DataNode{
     }
     day: number;
     system: System;
-    planet: Planet;
+    spob: Spob;
     credits: number;
     missions: Mission[];
     script: string;
@@ -445,6 +440,7 @@ export class Ship extends DataNode{
 
         this.r = 20; //TODO use sprite infomation TODO eventually don't use radius-based collisions
         this.type = this.id.toLowerCase(); //TODO get rid of this?
+        Object.freeze(this);
     }
     drawStatus: {[name: string]: any};
     shieldsMax: number;
@@ -489,6 +485,20 @@ export class Mission extends DataNode{
     }
 }
 Mission.fieldName = 'missions';
+
+export class Planet extends DataNode{
+    populate(data: any, global: AllObjects){
+        global.spobs[this.id].planet = this;
+        this.description = data.description ? data.description.join('\n') : '';
+        this.bar = data.bar ? data.bar.join('\n') : '';
+        Object.freeze(this);
+    }
+    description: string;
+    landscape: string;
+    bar: string;
+}
+Planet.fieldName = 'planets';
+
 
 
 // Go ahead and load all data here so everyone

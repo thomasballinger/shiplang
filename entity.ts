@@ -31,6 +31,7 @@ export class Entity{
         this.randomSeed = Math.random();
         this.weaponCharge = 0;
         this.damage = 0;
+        this.landablePlanet = false;
     }
     type: string;
     x: number;
@@ -55,6 +56,7 @@ export class Entity{
     weaponCharge: number;
     damage: number;
     government: Gov;
+    landablePlanet: boolean;
 
     // some bookkeeping props for the engine
     dead: boolean;     // will be cleaned up this tick

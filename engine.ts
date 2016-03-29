@@ -4,7 +4,7 @@ import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
-import { Fleet, System, Ship, universe } from './universe';
+import { Fleet, System, Ship, Planet, universe } from './universe';
 import { chooseScript } from './ai';
 //
 var deepcopy = require('deepcopy');
@@ -61,11 +61,12 @@ function fireLaser(e:Entity, gameTime:GameTime){
     return laser;
 }
 
-export function makePlanet(x: number, y: number, r: number, h: number, sprite: string){
-    var planet = new SpobEntity('planet', x, y, 0, 0, r);
-    planet.h = h;
-    planet.drawStatus['sprite'] = sprite
-    return planet
+export function makePlanet(x: number, y: number, r: number, h: number, sprite: string, landablePlanet?: boolean){
+    var p = new SpobEntity('planet', x, y, 0, 0, r);
+    p.landablePlanet = !!landablePlanet;
+    p.h = h;
+    p.drawStatus['sprite'] = sprite
+    return p
 }
 
 function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boolean{
@@ -301,6 +302,10 @@ export class Engine{
         return this.entities.filter(function(x: Entity){
             return isEnemy(e1, x);
         }).length
+    }
+    habitablePlanets = function(): SpobEntity{
+        console.log(this.bgEntities.filter(function(e: SpobEntity){ return e.landablePlanet; }));
+        return this.bgEntities.filter(function(e: SpobEntity){ return e.landablePlanet; });
     }
     findClosestShip = function(e1: Entity){
         return this.findClosest(e1, this.ships());

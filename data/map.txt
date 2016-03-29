@@ -35,6 +35,18 @@ system Sol
 			distance 250
 			period 10
 
+planet Earth
+	landscape land/city3
+	description `This is earth. Birthplace of humanity, home to the plurality of humans in the galaxy, seat of power of the empire. It kind of stinks.`
+	bar `No cantina music here.`
+
+planet Luna
+	landscape land/earthrise
+
+planet Mars
+	landscape land/desert0
+	description `Mars really isn't so bad.`
+
 system "Backwater"
 	pos -20 49
 	government Trader
