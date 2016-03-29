@@ -11,5 +11,5 @@ require('./hotswapping-js-interp/interpreter.js');
 global.window = window
 */
 
-var tests = require('./tests/index');
-console.log(tests);
+var browsertests = require('./tests/index');
+var nodetests = require('./nodetests/index');

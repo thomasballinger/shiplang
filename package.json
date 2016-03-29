@@ -37,6 +37,7 @@
     "devpack": "0.0.0",
     "mocha": "^2.4.5",
     "mocha-loader": "^0.7.1",
+    "node-png": "^0.4.3",
     "source-map-support": "^0.4.0"
   }
 }

@@ -41,7 +41,6 @@ module.exports = function(source) {
   for (var sprite of sprites){ unique[sprite] = true; }
   sprites = Object.keys(unique);
 
-  console.log(sprites);
   return sprites;
 };
 

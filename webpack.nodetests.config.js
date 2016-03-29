@@ -10,7 +10,7 @@ fs.readdirSync('node_modules').filter(function(x) {
   nodeModules[mod] = 'commonjs ' + mod;
 });
 
-parent.entry = './nodetests.js';
+parent.entry = './loadnodetests.js';
 parent.target = 'node';
 parent.output = { filename: 'nodetest.build.js', };
 parent.externals = [].concat(nodeModules, parent.externals);
