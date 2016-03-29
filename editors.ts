@@ -1,10 +1,12 @@
 
 import { Editor, Selection } from './interfaces';
-import { makeReactEditor } from './reacteditor';
 
 var acorn = require('acorn');
 var brace = require('brace');
 var Range = <any>(<any>brace).acequire('ace/range').Range
+
+require('brace/mode/javascript');
+require('brace/theme/github');
 
 export class AceSL {
     constructor(){
@@ -29,24 +31,22 @@ export class AceJS {
         this.lastContent = '';
 
         var self = this;
-        function delayedInit(editor: any){
-            self.editor = editor;
-            self.editor.getSession().on('change', function(){self.onChange;});
-            self.editor.$blockScrolling = Infinity; // to avoid a console.warning
-            self.editor.commands.removeCommand('gotoline') // bound to command-L which selects the url in osx chrome
-            self.editor.getSession().setTabSize(2);
-            self.editor.getSession().setUseSoftTabs(true);
-            self.markers = [];
-            self.highlighter = new Highlighter(self.editor.getSession());
 
-            self.loaded = true;
+        self.editor = brace.edit("editor");
+        self.editor.getSession().setMode('ace/mode/javascript');
+        self.editor.setTheme('ace/theme/github');
+        self.editor.getSession().on('change', function(){self.onChange;});
+        self.editor.$blockScrolling = Infinity; // to avoid a console.warning
+        self.editor.commands.removeCommand('gotoline') // bound to command-L which selects the url in osx chrome
+        self.editor.getSession().setTabSize(2);
+        self.editor.getSession().setUseSoftTabs(true);
+        self.markers = [];
+        self.highlighter = new Highlighter(self.editor.getSession());
 
-            if (self.codeToLoad){
-                self.setCode(self.codeToLoad);
-                self.codeToLoad = undefined;
-            }
+        if (self.codeToLoad){
+            self.setCode(self.codeToLoad);
+            self.codeToLoad = undefined;
         }
-        makeReactEditor(delayedInit, function(s: string){ self.onChange(); });
     }
     callbacks: any[];
     editor: any;
@@ -54,7 +54,6 @@ export class AceJS {
     lastContent: string;
     highlighter: Highlighter;
 
-    loaded: boolean;
     codeToLoad: string;
 
     refresh(): boolean{
@@ -70,12 +69,8 @@ export class AceJS {
         return this.lastContent;
     }
     setCode(s: string){
-        if (this.loaded){
-            this.editor.getSession().setValue(s);
-            this.onChange();
-        } else {
-            this.codeToLoad = s;
-        }
+        this.editor.getSession().setValue(s);
+        this.onChange();
     }
     setListener(cb: ()=>void){
         this.callbacks.push(cb);
@@ -91,17 +86,18 @@ export class AceJS {
     }
     // interface used by Contexts
     setHighlightedEntity(id: string){
+        console.log('set highlighted entity called')
         this.highlighter.setActive(id);
     }
     setHighlight(id: string, selections: Selection[]){
-        if (!this.loaded){ return; }
+        console.log('set highlight called')
         if (selections.length === 0){
             this.highlighter.clear(id);
         }
         this.highlighter.set(id, selections);
     }
     clearAllHighlights(){
-        if (!this.loaded){ return; }
+        console.log('clear all highlights called')
         this.highlighter.clearAll();
     }
 }

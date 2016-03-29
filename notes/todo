@@ -4,6 +4,7 @@
 * mark planets as habitable or not
 * engine sprites
 * swizzles
+* take out react, I'm not really using it and it's Huge
 
 * optimize javascript interpreter copying - way too slow atm!
 
