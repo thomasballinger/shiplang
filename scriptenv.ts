@@ -363,8 +363,8 @@ function makeCommands():MakeCommandsReturnType{
                 putMessage('Moving too quickly to land on this planet');
                 return function(){ return true; };
             }
-            if (!closest.onLand){
-                putMessage("Can't land on this planet yet, sorry!");
+            if (!closest.habitable){
+                putMessage("It's not safe to land on this planet");
                 return function(){ return true; };
             }
             Profile.fromStorage().set('spaceLocation', [e.x, e.y]).save();

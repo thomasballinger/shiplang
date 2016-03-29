@@ -8,6 +8,9 @@ export function putMessage(s: string, e?: any){
         s = e.type + ' says: '+s;
     }
     s = template(s);
+    if (messagelog.innerHTML.search(s) !== -1){
+        return;
+    }
     messagelog.innerHTML = messagelog.innerHTML + '<br/>' + s;
     lastMessageTime = new Date().getTime();
     setTimeout(function(){
