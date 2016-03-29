@@ -1,7 +1,7 @@
 require("./style.css");
 
 //TODO find/write a loader that just does this
-document.getElementById('images').innerHTML = require('html!./sprite-loader!./data-loader!./data');
+document.getElementById('images').innerHTML = require('raw!./sprite-src-loader!./sprite-loader!./data-loader!./data');
 
 import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';

@@ -4,7 +4,6 @@
 * mark planets as habitable or not
 * engine sprites
 * swizzles
-* take out react, I'm not really using it and it's Huge
 
 * optimize javascript interpreter copying - way too slow atm!
 
@@ -84,3 +83,4 @@ done:
 * map
 * write scripts for traveling between planets unless enemies
 * image loading system
+* take out react, I'm not really using it and it's Huge

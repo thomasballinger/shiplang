@@ -5,6 +5,7 @@ import { chooseScript, getScriptByName, getJSByName } from './ai';
 import { Event, EventType, killFiveAstroidsProcess } from './mission';
 import { Engine, makeShipEntity, makePlanet } from './engine';
 import { loadData } from './dataload';
+import { spriteWidth } from './sprite';
 
 /** Building blocks of the universe. Read-only, and certainly
  *  won't change while an engine is running.
@@ -302,8 +303,9 @@ export class Spob extends DataNode{
             throw Error('no sprite found for planet '+this.id);
         } else {
             if (data.sprite.length > 1){ throw Error('Too many sprites listed for spob'); }
-            this.sprite = data.sprite
+            this.sprite = data.sprite[0];
         }
+        this.r = spriteWidth(this.sprite);
         this.spobs = (data.object || []).map(function(x: any){
             if (typeof x === 'string'){
                 checkExists(x, 'spobs', global);
@@ -319,6 +321,7 @@ export class Spob extends DataNode{
         Object.freeze(this);
     }
     distance: number;
+    r: number;
     period: number;
     sprite: string;
     offset: number;

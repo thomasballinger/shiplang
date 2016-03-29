@@ -1,6 +1,7 @@
 import { Entity, Ship as ShipEntity } from './entity';
 import { Engine } from './engine';
 import { System } from './universe';
+import { spriteId } from './sprite';
 
 //TODO invert y axis
 
@@ -181,9 +182,9 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
           shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
         if (e.thrust > 0 && e.drawStatus['thrustSprite']){
-            var imgid = e.drawStatus['thrustSprite'].replace(/ /g, '_');
+            var imgid = spriteId(e.drawStatus['thrustSprite']);
         } else {
-            var imgid = e.drawStatus['sprite'].replace(/ /g, '_');
+            var imgid = spriteId(e.drawStatus['sprite']);
         }
         var sprite = <HTMLImageElement>document.getElementById(imgid);
         if (sprite === null){
