@@ -177,7 +177,7 @@ export class System extends DataNode{
         for (var [spob, [x, y]] of this.spobSpots(profile.day)){
             var h = ((Math.atan2(x, -y) * 180 / Math.PI) + 3600) % 360;
             //TODO this is one of many spots with a bad y axis
-            world.addBackgroundEntity(makePlanet(x, y, spob.r, h, spob.sprite, !!spob.planet));
+            world.addBackgroundEntity(makePlanet(x, y, spob.r, h, spob.sprite, spob.planet ? spob.planet.id : undefined));
             //TODO this radius number should depend on the sprite
         }
     }
@@ -491,6 +491,7 @@ export class Planet extends DataNode{
         global.spobs[this.id].planet = this;
         this.description = data.description ? data.description.join('\n') : '';
         this.bar = data.bar ? data.bar.join('\n') : '';
+        this.landscape = data.landscape[0];
         Object.freeze(this);
     }
     description: string;

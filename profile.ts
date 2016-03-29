@@ -153,6 +153,7 @@ export class Profile{
             spaceLocation: [100, 100],
             location: 'Sol',
             name: 'Slippy',
+            planet: undefined,
             script: pilotScriptSource,
             //script: 'while (true){ thrustFor(.1); leftFor(.1); }'
             missions: [],
@@ -165,6 +166,7 @@ export class Profile{
     spaceLocation: [number, number];
     name: string;
     location: string;
+    planet: string;
     script: string;
     day: number;
     missions: [Mission, any][];

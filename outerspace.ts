@@ -7,6 +7,7 @@ import { Engine } from './engine';
 import * as errorbar from './errorbar';
 import { showMenu, hideMenu } from './pausemenu';
 import { Updateable, Selection, Scenario } from './interfaces';
+import { showPlanet } from './planetui';
 var DEBUGMODE = require('DEBUGMODE');
 
 
@@ -99,6 +100,10 @@ export function outerspace(originalWorld: Engine){
     if (updater.paused){
         setTimeout(tick, 33.5); // 30fps
         return;
+    }
+    if (updater.world && updater.world.profile.planet){
+        setTimeout(function(){showPlanet(updater.world.profile);}, .01);
+        return
     }
 
     if (mainDisplay.zoom < -13 && oldZoomTarget !== undefined){

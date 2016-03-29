@@ -61,9 +61,9 @@ function fireLaser(e:Entity, gameTime:GameTime){
     return laser;
 }
 
-export function makePlanet(x: number, y: number, r: number, h: number, sprite: string, landablePlanet?: boolean){
+export function makePlanet(x: number, y: number, r: number, h: number, sprite: string, landablePlanet?: string){
     var p = new SpobEntity('planet', x, y, 0, 0, r);
-    p.landablePlanet = !!landablePlanet;
+    p.landablePlanet = landablePlanet;
     p.h = h;
     p.drawStatus['sprite'] = sprite
     return p
@@ -304,7 +304,6 @@ export class Engine{
         }).length
     }
     habitablePlanets = function(): SpobEntity{
-        console.log(this.bgEntities.filter(function(e: SpobEntity){ return e.landablePlanet; }));
         return this.bgEntities.filter(function(e: SpobEntity){ return e.landablePlanet; });
     }
     findClosestShip = function(e1: Entity){

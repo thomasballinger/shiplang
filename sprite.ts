@@ -6,6 +6,11 @@ export function spriteId(name: string): string{
     return name.replace(/ /g, '_');
 }
 
+export function getLandscapeFilename(name: string): string{
+    var filename = '/esimages/' + name + '.jpg';
+    return filename;
+}
+
 export function spriteWidth(name: string): number{
 
     var dims = dimensions[name];

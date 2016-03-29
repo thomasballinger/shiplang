@@ -348,6 +348,7 @@ function makeCommands():MakeCommandsReturnType{
             return 'done';
         }),
 
+        /** Should only be used by the player */
         new AsyncCommand('land', function():any{
             if (e.attachedTo){
                 putMessage("You can't land while attached to another ship");
@@ -363,12 +364,13 @@ function makeCommands():MakeCommandsReturnType{
                 putMessage('Moving too quickly to land on this planet');
                 return function(){ return true; };
             }
-            if (!closest.habitable){
+            if (!closest.landablePlanet){
                 putMessage("It's not safe to land on this planet");
                 return function(){ return true; };
             }
-            Profile.fromStorage().set('spaceLocation', [e.x, e.y]).save();
-            closest.onLand();
+            // hopefully profile.location has already been set when they jumped in
+            p.set('spaceLocation', [e.x, e.y]).save();
+            p.set('planet', universe.planets[closest.landablePlanet].id);
             return 'done';
         }),
 
