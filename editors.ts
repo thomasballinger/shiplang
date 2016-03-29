@@ -32,6 +32,7 @@ export class AceJS {
 
         var self = this;
 
+        document.getElementById("editor").hidden = false;
         self.editor = brace.edit("editor");
         self.editor.getSession().setMode('ace/mode/javascript');
         self.editor.setTheme('ace/theme/github');

@@ -386,7 +386,7 @@ function makeCommands():MakeCommandsReturnType{
             }
             Profile.fromStorage().set('spaceLocation', [0, 0]).save();
             var current = Profile.fromStorage().location;
-            var next = current === 'Sol' ? 'robo' : 'Sol';
+            var next = current.id === 'Sol' ? 'robo' : 'Sol';
             Profile.fromStorage().set('location', next).go();
             return 'done';
         }),

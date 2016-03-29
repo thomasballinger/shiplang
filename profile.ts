@@ -151,7 +151,7 @@ export class Profile{
         }
         return new Profile({
             spaceLocation: [100, 100],
-            location: 'Sol',
+            location: universe.systems['Sol'],
             name: 'Slippy',
             planet: undefined,
             script: pilotScriptSource,
@@ -165,7 +165,7 @@ export class Profile{
     // schema for objects:
     spaceLocation: [number, number];
     name: string;
-    location: string;
+    location: System;
     planet: string;
     script: string;
     day: number;

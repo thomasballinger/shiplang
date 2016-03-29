@@ -115,6 +115,7 @@ export class Engine{
         this.playerAdded = true;
     }
     static fromStart(startName: string){
+        //TODO incorporate this everywhere!
         var seed = Math.random();
         var start = universe.starts[startName];
         if (start === undefined){ throw Error("can't find start "+startName+" in "+Object.keys(universe.starts)); }
@@ -122,7 +123,7 @@ export class Engine{
         return new Engine(start.system, start.buildProfile().save());
     }
     static fromProfile(profile: Profile){
-
+        return new Engine(profile.location, profile);
     }
     entitiesToDraw(): Entity[]{
         return [].concat(this.bgEntities, this.entities);

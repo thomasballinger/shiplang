@@ -198,7 +198,9 @@ export class System extends DataNode{
         }
     }
     createPlayerShipEntity(world: Engine, profile: Profile, script: any){
-        var ship = makeShipEntity(profile.ship, 0, 0, 270, script);
+        var x = profile.spaceLocation ? profile.spaceLocation[0] : 0;
+        var y = profile.spaceLocation ? profile.spaceLocation[1] : 0;
+        var ship = makeShipEntity(profile.ship, x, y, 270, script);
         ship.imtheplayer = true;
         ship.government = Gov.Player
         world.addEntity(ship);

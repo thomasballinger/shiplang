@@ -6,12 +6,12 @@
 </head>
 <body>
   <!-- Tags for images specified in game data get inserted here-->
-  <div id="images"></div>
+  <div id="images" hidden=true></div>
 
   <!-- Order important for z-index -->
   <canvas id="canvas" tabindex="1" width="1" height="1" ></canvas> <!-- Canvas width and height determined based on window.innerWidth and window.innerHeight -->
   <div id="messagelog"></div>
-  <div id="editor"> </div>
+  <div id="editor" hidden="true"> </div>
   <canvas id="minimap" width="200" height="200"></canvas>
   <canvas id="player-armor" width="200" height="20"></canvas>
   <canvas id="player-shields" width="200" height="20"></canvas>
@@ -23,6 +23,9 @@
   <div id="planetui" hidden="true">
     <img src='' id="landscape">
     <div id="planetstuff">
+      <div id="planetDescription">
+      </div>
+      <div id="leaveButton"> Depart </div>
     </div>
   </div>
   <canvas id="map" width="1000" height="1000" hidden=true></canvas>

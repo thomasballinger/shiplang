@@ -51,6 +51,9 @@ body {
   width: 720px;
   background-color: lightgray;
 }
+#leavebutton {
+  background-color: darkbrown;
+}
 #player-armor {
   position: absolute;
   top: 210;
