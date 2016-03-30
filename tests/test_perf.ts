@@ -41,14 +41,14 @@ describe('deepcopy', () => {
             world.tick(0.5, (msg: string)=>{ assert.fail(); });
             world.getPlayer().h = 15
             world.tick(0.5, (msg: string)=>{ assert.fail(); });
-            assert.equal(world.entities.length, 3);
+            assert.equal(world.ships.length, 3);
 
             var copies: Engine[] = [];
             for (var i=0; i<20; i++){
                 world.tick(0.1, (msg: string)=>{ assert.fail(); });
                 copies.push(world.copy())
             }
-            assert.equal(world.entities.length, 3);
+            assert.equal(world.ships.length, 3);
         });
     });
 });

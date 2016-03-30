@@ -75,7 +75,7 @@ export function simulator(originalWorld: Engine){
   });
   updater.registerObserver(<Updateable>{
     hud: new FPS('fps'),
-    update: function(player, world){ this.hud.tick('ships: '+world.entities.length); }
+    update: function(player, world){ this.hud.tick('ships: '+(world.ships.length + world.shipProjectiles.length)); }
   });
 
   setup.stealSimulatorKeys(updater);

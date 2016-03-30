@@ -34,10 +34,10 @@ describe('Engine', () => {
         it("shouldn't create copies that share entities", () => {
             var s1 = new Engine(undefined, undefined);
             var l1 = [1,2,3];
-            s1.addEntity(<Entity><any>l1)
+            s1.ships.push(<any>l1);
             var s2 = s1.copy()
             l1.push(4);
-            assert.equal((<any>s2.entities[0]).length, 3)
+            assert.equal((<any>s2.ships[0]).length, 3)
         });
         it("should create interpreters without shared state", () => {
             var world = new PeekEngine(engineFixtures.systems['Sys'],
@@ -79,7 +79,7 @@ describe('Engine', () => {
             var s1 = new Engine(undefined, undefined)
             var ship = makeShipEntity(universe.ships['Gunship'], 0, 0, 170);
             ship.shieldsMax = 0;
-            s1.addEntity(ship);
+            s1.ships.push(ship);
             s1.fireMissile(ship, universe.ships['Drone Missile'], undefined, '#abcdef')
             s1.tick(.2, function(e){ throw e; });
             s1.fireLaser(ship, '#abcdef')

@@ -1,4 +1,4 @@
-import { Entity, Ship as ShipEntity } from './entity';
+import { Entity, Ship as ShipEntity, Projectile, SpobEntity, EffectEntity } from './entity';
 import { Engine } from './engine';
 import { System } from './universe';
 import { spriteId, getSpritePath, spriteSize } from './sprite';
@@ -32,7 +32,7 @@ export class SpaceDisplay{
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
 
-    update(center: {x: number, y: number}, drawables: {x: number, y:number}[]){
+    update(center: {x: number, y: number}, drawables: {x: number, y: number}[]){
         if (!this.active){ return; }
         if (center === undefined){ throw Error("Centered entity cannot be undefined"); }
         if (this.zoomTarget !== this.zoom){
@@ -77,6 +77,14 @@ export class SpaceDisplay{
                 entityDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
             } else if (drawable instanceof System){
                 systemDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor);
+            } else if (drawable instanceof Projectile){
+                projectileDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
+            } else if (drawable instanceof SpobEntity){
+                spobDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
+            } else if (drawable instanceof EffectEntity){
+                effectDraw(drawable, this.ctx, left, top, position_scale_factor, entity_scale_factor, hud);
+            } else {
+                console.log("can't draw", drawable);
             }
             // Given the world-space
         }
@@ -173,24 +181,72 @@ function systemDraw(e: System, ctx: CanvasRenderingContext2D, dx: number, dy: nu
   }
 }
 
+function projectileDraw(p: Projectile, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false): void{
+    if (hud){ return; }
+
+    //TODO use sprites instead
+    var length = 10
+    var x1 = p.x - Math.cos(p.h * Math.PI / 180) * length / 2;
+    var y1 = p.y - Math.sin(p.h * Math.PI / 180) * length / 2;
+    var x2 = p.x + Math.cos(p.h * Math.PI / 180) * length / 2;
+    var y2 = p.y + Math.sin(p.h * Math.PI / 180) * length / 2;
+
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 5 * esf;
+    ctx.beginPath();
+    ctx.moveTo((x1-dx)*psf, (y1-dy)*psf)
+    ctx.lineTo((x2-dx)*psf, (y2-dy)*psf)
+    ctx.stroke();
+}
+
+function spobDraw(e: SpobEntity, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false){
+    if (hud){
+        ctx.fillStyle = "#11ff55";
+        ctx.beginPath();
+        ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*psf, 0, 2*Math.PI);
+        ctx.fill();
+    } else {
+        var sprite = <HTMLImageElement>document.getElementById(e.sprite)
+        if (sprite === null){
+            throw Error("Can't find sprite with id "+e.sprite);
+        }
+        var w = sprite.naturalWidth * esf; //TODO could use precalculated value for this - is that better?
+
+        var theta = e.h;
+
+        var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
+        var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
+
+        ctx.save();
+        ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
+        ctx.rotate(theta*Math.PI/180);
+        ctx.drawImage(sprite, -w/2, -w/2, w, w);
+        (<any>ctx).restore();
+    }
+}
+
+function effectDraw(e: EffectEntity, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false): void{
+    //TODO effect animations
+    var imgid = spriteId(e.sprites[0]);
+    var sprite = <HTMLImageElement>document.getElementById(imgid);
+    if (sprite === null){ throw Error("Can't find sprite with id "+imgid); }
+    var w = sprite.naturalWidth * esf;
+    var h = sprite.naturalHeight * esf;
+
+    var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
+    var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
+
+    ctx.save();
+    ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
+    ctx.drawImage(sprite, -w/2, -h/2, w, h);
+    (<any>ctx).restore();
+}
+
 function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false): void{
   //dx and dy are offsets in world space for panning
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions
   if (e instanceof ShipEntity){
-      if (hud && e.type === 'explosion'){
-          ctx.fillStyle="#FFA500";
-          drawPoly(ctx,
-                 (e.x-dx)*psf,
-                 (e.y-dy)*psf,
-                 [[-1.3*e.r, -1*e.r],
-                  [-.9*e.r, 1*e.r],
-                  [.9*e.r, 1*e.r],
-                  [1.3*e.r, -1*e.r]],
-                 e.h,
-                 esf);
-          return;
-      }
 
       //TODO pass this in
       function hudColor(e: Entity){
@@ -198,7 +254,7 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
       }
 
       if (!e.drawStatus['sprite']){ throw Error('no sprite for '+e.type); }
-      if (hud && e.type !== 'explosion'){
+      if (hud){
           var path = getSpritePath(e.drawStatus['sprite']);
           var [w, h] = spriteSize(e.drawStatus['sprite']);
           var theta = e.h + 90;
@@ -236,9 +292,7 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
           //shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
 
-        if (e.type === 'explosion'){
-            var imgid = spriteId('effect/explosion/big~1');
-        } else if (e.thrust > 0 && e.drawStatus['thrustSprite']){
+        if (e.thrust > 0 && e.drawStatus['thrustSprite']){
             var imgid = spriteId(e.drawStatus['thrustSprite']);
         } else {
             var imgid = spriteId(e.drawStatus['sprite']);
@@ -254,8 +308,6 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
 
         var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
         var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
-        var rotatedX = onscreenX * Math.cos(theta * Math.PI / 180) - onscreenY * Math.sin(theta * Math.PI / 180);
-        var rotatedY = onscreenX * Math.sin(theta * Math.PI / 180) + onscreenY * Math.cos(theta * Math.PI / 180);
 
         ctx.save();
         ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
@@ -337,8 +389,6 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
 
         var onscreenX = (e.x - dx) * psf - ctx.canvas.width / 2
         var onscreenY = (e.y - dy) * psf - ctx.canvas.height / 2
-        var rotatedX = onscreenX * Math.cos(theta * Math.PI / 180) - onscreenY * Math.sin(theta * Math.PI / 180);
-        var rotatedY = onscreenX * Math.sin(theta * Math.PI / 180) + onscreenY * Math.cos(theta * Math.PI / 180);
 
         ctx.save();
         ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);

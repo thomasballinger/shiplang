@@ -49,7 +49,8 @@ class Command {
     constructor(public name: string,
                 public body: any, // function with any signature
                 public paramTypes?: string[],
-                public numRequiredParams?: number){
+                public numRequiredParams?: number,
+                public returnType?: string){
         if (paramTypes === undefined){
             this.paramTypes = paramTypes = [];
         }
@@ -241,7 +242,7 @@ function makeCommands():MakeCommandsReturnType{
         }),
         new Command('distToNthPlanet', function(i: number):any{
             var habitable = w.habitablePlanets();
-            return e.distFrom(habitable[i % habitable.length]);
+            return e.distFromSpob(habitable[i % habitable.length]);
         }),
 
         new Command('distToClosestEnemy', function(){ return e.distFrom(w.findClosestEnemy(e)); }),

@@ -91,6 +91,9 @@ export class Entity{
         var theta = (this.vHeading() + 3600 - h + 180) % 360 - 180;
         return Math.cos(theta) * this.speed();
     }
+    distFromSpob(e: SpobEntity){
+        return sm.dist(this.x, this.y, e.x, e.y);
+    }
     distFrom(e: Entity): number;
     distFrom(x: number, y: number): number;
     distFrom(eOrX: Entity|number, y?: number){
@@ -129,10 +132,6 @@ export class Entity{
         this.shields -= absorbed;
         this.armor -= pierced;
     }
-}
-
-export class SpobEntity extends Entity{ // Spob stands for "space object" as per the EV Bible
-    onLand: ()=>void;
 }
 
 function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
@@ -306,4 +305,66 @@ export class Component extends Ship{
     deepCopyCreate():Ship{
         return new Ship(<ShipPrototype>{}, undefined, undefined, undefined);
     } //TODO figure out the typescript way to use the correct constructor in the superclass
+}
+
+export class Projectile{
+    constructor(
+        public x: number,
+        public y: number,
+        public dx: number,
+        public dy: number,
+        public h: number,
+        public damage: number,
+        public firedBy: Entity,
+        public firedAt: GameTime,
+        public timeToDie: GameTime,
+        public color: string){
+    }
+
+    lineSegment(dt: number): [[number, number], [number, number]]{
+        return [[this.x, this.y], [this.x + dt*this.dx, this.y + dt*this.dy]];
+    }
+    /** Stretch line back and forwards by dt/2 */
+    visualLineSegment(dt: number): [[number, number], [number, number]]{
+        return [[this.x - dt*this.dx/2, this.y - dt*this.dy/2],
+                [this.x + dt*this.dx/2, this.y + dt*this.dy/2]];
+    }
+    move(dt: number){
+        this.x = this.x + dt*this.dx;
+        this.y = this.y + dt*this.dy;
+    }
+    deepCopyCreate():Projectile{
+        return new Projectile(undefined, undefined, undefined, undefined,
+                              undefined, undefined, undefined, undefined,
+                              undefined, undefined);
+    }
+}
+
+export class EffectEntity{
+    //TODO for the moment all effects are little explosions
+    constructor(
+        public x: number,
+        public y: number,
+        public sprites: string[],
+        public startedAt: GameTime,
+        public repeat=false,
+        public frameRate?: number){
+        this.frame = 0;
+    }
+    // starts at 0, incremented each render
+    frame: number;
+}
+
+//TODO add a link to the Spob object for metadata
+export class SpobEntity{
+    constructor(public x: number,
+                public y: number,
+                public r: number,
+                public h: number,
+                public sprite: string,
+                public landablePlanet?: string){
+    }
+    deepCopyCreate():SpobEntity{
+        return new SpobEntity(undefined, undefined, undefined, undefined, undefined, undefined);
+    }
 }

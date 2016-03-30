@@ -3,7 +3,7 @@ import { Domains } from './dataload';
 import { Profile } from './profile';
 import { chooseScript, getScriptByName, getJSByName } from './ai';
 import { Event, EventType, killFiveAstroidsProcess } from './mission';
-import { Engine, makeShipEntity, makePlanet } from './engine';
+import { Engine, makeShipEntity } from './engine';
 import { loadData } from './dataload';
 import { spriteWidth } from './sprite';
 
@@ -173,14 +173,6 @@ export class System extends DataNode{
         }
         return spots;
     }
-    createPlanets(world: Engine, profile: Profile){
-        for (var [spob, [x, y]] of this.spobSpots(profile.day)){
-            var h = ((Math.atan2(x, -y) * 180 / Math.PI) + 3600) % 360;
-            //TODO this is one of many spots with a bad y axis
-            world.addBackgroundEntity(makePlanet(x, y, spob.r, h, spob.sprite, spob.planet ? spob.planet.id : undefined));
-            //TODO this radius number should depend on the sprite
-        }
-    }
     createInitialFleets(world: Engine, profile: Profile){
         // System Fleets
         for (var fleet of this.getFleets(5)){
@@ -203,7 +195,7 @@ export class System extends DataNode{
         var ship = makeShipEntity(profile.ship, x, y, 270, script);
         ship.imtheplayer = true;
         ship.government = Gov.Player
-        world.addEntity(ship);
+        world.ships.push(ship);
     }
 }
 System.fieldName = 'systems';

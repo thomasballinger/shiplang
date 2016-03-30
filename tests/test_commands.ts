@@ -10,7 +10,7 @@ import {setCurrentEntity, setGameTime, setGameWorld,
 describe('Commands', () => {
     var world = new Engine(undefined, undefined);
     var ship = makeShipEntity(universe.ships['Boid'], 1, 2, 3);
-    world.addEntity(ship);
+    world.ships.push(ship);
     setGameWorld(world)
     setCurrentEntity(ship)
     describe("#headingToClosestShipIn", () => {

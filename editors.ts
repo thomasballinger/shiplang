@@ -87,11 +87,11 @@ export class AceJS {
     }
     // interface used by Contexts
     setHighlightedEntity(id: string){
-        console.log('set highlighted entity called')
+        //console.log('set highlighted entity called')
         this.highlighter.setActive(id);
     }
     setHighlight(id: string, selections: Selection[]){
-        console.log('set highlight called')
+        //console.log('set highlight called')
         if (selections.length === 0){
             this.highlighter.clear(id);
         }

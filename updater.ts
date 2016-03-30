@@ -82,7 +82,7 @@ export class Updater{
     unpause(){ this.paused = false; }
 
     toggleView(){
-        var viewable = this.world.entities.filter(function(x){ return x.viewable })
+        var viewable = this.world.getShipsAndShipProjectiles().filter(function(x){ return x.viewable })
         var currentIndex = viewable.indexOf(this.viewedEntity);
         if (currentIndex === -1){
             this.ensureView()
@@ -91,7 +91,7 @@ export class Updater{
     }
     // if currently viewed entity doesn't exist, use the player instead;
     ensureView(){
-        var viewable = this.world.entities.filter(function(x){ return x.viewable })
+        var viewable = this.world.getShipsAndShipProjectiles().filter(function(x){ return x.viewable })
         if (viewable.indexOf(this.viewedEntity) === -1){
             this.viewedEntity = this.player;
         }
