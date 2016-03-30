@@ -49,7 +49,7 @@ function findOutline(filename, cb){
     var grid = buildGrid(this);
     var path = traverse(grid);
     //displayGrid(grid, path);
-    cb(grid);
+    cb(path);
   });
 }
 
@@ -185,7 +185,9 @@ function traverse(grid){
 
 /** Hacky temp simplifying of line */
 function simplifyCycle(path, every){
-  var every = every || 50;
+  every = every || 50;
+  // Use at least four points to define outline
+  every = Math.min(every, Math.floor(path.length / 4));
   var newPath = [];
   for (var i=0; i<path.length; i+=every){
     newPath.push(path[i]);

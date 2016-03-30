@@ -1,7 +1,7 @@
 import { Entity, Ship as ShipEntity } from './entity';
 import { Engine } from './engine';
 import { System } from './universe';
-import { spriteId } from './sprite';
+import { spriteId, getSpritePath, spriteSize } from './sprite';
 
 //TODO invert y axis
 
@@ -178,10 +178,67 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
   // psf is position scale factor, used to place ships
   // esf is entity scale factor, used to scale ship dimensions
   if (e instanceof ShipEntity){
-      if (hud || !e.drawStatus['sprite'] || e.type === 'explosion'){
-          shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
+      if (hud && e.type === 'explosion'){
+          ctx.fillStyle="#FFA500";
+          drawPoly(ctx,
+                 (e.x-dx)*psf,
+                 (e.y-dy)*psf,
+                 [[-1.3*e.r, -1*e.r],
+                  [-.9*e.r, 1*e.r],
+                  [.9*e.r, 1*e.r],
+                  [1.3*e.r, -1*e.r]],
+                 e.h,
+                 esf);
+          return;
+      }
+
+      //TODO pass this in
+      function hudColor(e: Entity){
+          return '#eeeeee';
+      }
+
+      if (!e.drawStatus['sprite']){ throw Error('no sprite for '+e.type); }
+      if (hud && e.type !== 'explosion'){
+          var path = getSpritePath(e.drawStatus['sprite']);
+          var [w, h] = spriteSize(e.drawStatus['sprite']);
+          var theta = e.h + 90;
+
+          ctx.save();
+          ctx.translate((e.x - dx) * psf, (e.y - dy) * psf);
+          if (!e.drawStatus['notDirectional']){
+              ctx.rotate(theta*Math.PI/180);
+          }
+          ctx.scale(esf, esf);
+
+          if (e.thrust > 0 && !e.drawStatus['thrustSprite']){
+              ctx.fillStyle = e.drawStatus["engineColor"] || "#882200";
+              var eWidth = 6
+              var eHeight = 12
+              for (var engSpot of e.drawStatus['engines']){
+                  var [ex, ey] = <[number, number]><any>engSpot;
+                  ctx.fillRect(ex-eWidth/2, ey, eWidth, eHeight);
+              }
+          }
+
+          ctx.translate(-(w/2), -(h/2));
+
+          ctx.fillStyle = hudColor(e);
+          ctx.moveTo(path[path.length-1][0], path[path.length-1][1]);
+          ctx.beginPath();
+          for (var spot of path){
+              ctx.lineTo(spot[0], spot[1]);
+          }
+          ctx.closePath();
+          ctx.fill();
+
+          (<any>ctx).restore();
+
+          //shipDraws[e.type](e, ctx, dx, dy, psf, esf, hud);
       } else {
-        if (e.thrust > 0 && e.drawStatus['thrustSprite']){
+
+        if (e.type === 'explosion'){
+            var imgid = spriteId('effect/explosion/big~1');
+        } else if (e.thrust > 0 && e.drawStatus['thrustSprite']){
             var imgid = spriteId(e.drawStatus['thrustSprite']);
         } else {
             var imgid = spriteId(e.drawStatus['sprite']);
@@ -206,9 +263,9 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
             ctx.rotate(theta*Math.PI/180);
         }
         if (e.thrust > 0 && !e.drawStatus['thrustSprite']){
-            for (var spot of e.drawStatus['engines']){
+            for (var engSpot of e.drawStatus['engines']){
                 //TODO fix drawStatus type
-                var [ex, ey] = <[number, number]><any>spot;
+                var [ex, ey] = <[number, number]><any>engSpot;
                 ex *= esf
                 ey *= esf
                 ctx.fillStyle = e.drawStatus["engineColor"] || "#882200";
@@ -290,219 +347,4 @@ var entityDraws = <{[type:string]: EntityDrawFunc}>{
         (<any>ctx).restore();
     }
   }
-};
-var shipDraws = <{[type:string]: ShipDrawFunc}>{
-  'triangle': function(e, ctx, dx, dy, psf, esf, hud=false){
-    ctx.fillStyle="#eeaa22";
-    if (e.thrust > 0){
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-1.3*e.r, -1*e.r],
-              [-.9*e.r, -1],
-              [-.9*e.r, 1*e.r],
-              [-1.3*e.r, 1*e.r]],
-             e.h,
-             esf);
-    }
-    if (e.drawStatus['scanning']){
-      ctx.strokeStyle="#ffeeff";
-      ctx.beginPath();
-      ctx.arc((e.x-dx)*psf, (e.y-dy)*psf, e.r*10*psf, 0, 2*Math.PI);
-      ctx.stroke();
-    }
-    ctx.fillStyle="#aaeebb";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[1.5*e.r, 0],
-              [-1*e.r, -1.2*e.r],
-              [-1*e.r, 1.2*e.r]],
-             e.h,
-             esf);
-  },
-  'fattriangle': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#335599";
-    if (e.thrust > 0){
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-2*e.r, -2.5*e.r],
-              [-1.5*e.r, -2.2*e.r],
-              [-1.5*e.r, 2.2*e.r],
-              [-2.0*e.r, 2.5*e.r]],
-             e.h,
-             esf);
-    }
-    ctx.fillStyle=e.drawStatus['color'] || "#992200";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[2*e.r, 0],
-              [-1.5*e.r, -2.2*e.r],
-              [-1.5*e.r, 2.2*e.r]],
-             e.h,
-             esf);
-  },
-  'holder': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#eeaa22";
-    if (e.thrust > 0){
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-13, -10],
-              [-9, -10],
-              [-9, 10],
-              [-13, 10]],
-             e.h,
-             esf);
-    }
-    ctx.fillStyle="#153765";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[15, -10],
-              [15, 0],
-              [-5, 0],
-              [-5, 10],
-              [-10, 12],
-              [-10, -12]],
-             e.h,
-             esf);
-  },
-  'gunship': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#562539";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[10, 3],
-              [-10, 4],
-              [-10, -4],
-              [10, -3]],
-             e.h,
-             esf);
-  },
-  'boid': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#1569C7";
-    if (e.thrust > 0){
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-13, -10],
-              [-9, -10],
-              [-9, 10],
-              [-13, 10]],
-             e.h,
-             esf);
-    }
-    ctx.fillStyle="#ffeebb";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-e.r, -e.r],
-              [-e.r, e.r],
-              [e.r, e.r],
-              [e.r, -e.r]],
-             e.h,
-             esf);
-  },
-  'shuttle': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#1569C7";
-    ctx.fillStyle="#ffeebb";
-    if (e.thrust > 0){
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-(e.r+2), (-e.r/2)],
-              [-(e.r), -(e.r/2)],
-              [-(e.r), e.r/2],
-              [-(e.r+2), e.r/2]],
-             e.h,
-             esf);
-    }
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[e.r, -e.r/3],
-              [e.r,  e.r/3],
-              [-e.r, e.r/2],
-              [-e.r, -e.r/2]],
-             e.h,
-             esf);
-  },
-  'explosion': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#FFA500";
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[-1.3*e.r, -1*e.r],
-              [-.9*e.r, 1*e.r],
-              [.9*e.r, 1*e.r],
-              [1.3*e.r, -1*e.r]],
-             e.h,
-             esf);
-  },
-  'drone missile': function(e, ctx, dx, dy, psf, esf){
-    if (e.drawStatus['armed']){
-      ctx.fillStyle="#AA1144";
-    } else {
-      ctx.fillStyle=e.drawStatus['color'] || "#4411AA";
-    }
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[10, -1],
-              [-10, -3],
-              [-10, 3],
-              [10, 1]],
-             e.h,
-             esf);
-    if (e.thrust > 0){
-      ctx.fillStyle="#eeaa22";
-      drawPoly(ctx,
-               (e.x-dx)*psf,
-               (e.y-dy)*psf,
-               [[-13, -4],
-                [-9, -3],
-                [-9, 3],
-                [-13, 4]],
-               e.h,
-               esf);
-    }
-  },
-  'needlemissile': function(e, ctx, dx, dy, psf, esf){
-    if (e.drawStatus['armed']){
-      ctx.fillStyle="#AA1144";
-    } else {
-      ctx.fillStyle=e.drawStatus['color'] || "#4488AA";
-    }
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[7, -1],
-              [-7, -2],
-              [-7, 2],
-              [7, 1]],
-             e.h,
-             esf);
-  },
-  'astroid': function(e, ctx, dx, dy, psf, esf){
-    ctx.fillStyle="#889922";
-    if (e.thrust > 0){
-        ctx.fillStyle="#aabb22";
-    }
-    drawPoly(ctx,
-             (e.x-dx)*psf,
-             (e.y-dy)*psf,
-             [[30, 0],
-              [10, 10],
-              [0, 30],
-              [-10, 10],
-              [-30, 0],
-              [-10, -10],
-              [0, -30],
-              [10, -10]],
-             0,
-             esf);
-    }
 };

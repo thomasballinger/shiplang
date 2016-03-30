@@ -3,8 +3,6 @@ require("./style.css");
 //TODO find/write a loader that just does this
 document.getElementById('images').innerHTML = require('raw!./sprite-src-loader!./sprite-loader!./data-loader!./data');
 
-require('json!./sprite-outline-loader!./sprite-loader!./data-loader!./data');
-
 import { simulator } from './simulator';
 import { outerspace, level1 } from './outerspace';
 import { Profile } from './profile';
