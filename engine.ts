@@ -179,6 +179,14 @@ export class Engine{
         // set personality fields on entities
     }
 
+    // New collision system:
+    // * animations: just decoration, don't collide with anything. Planets too.
+    // * explosions: check for collisions with damageables one time only
+    // * damageables: all ships, asteroids, some munitions (drone missiles)
+    //                have outlines to check munition line segments against
+    // * munitions: lines segments checked against all damageables.
+    //              If a munition is itself damageable, then it has an outline too.
+
     getCollisionPairs(entities: Entity[]){
         var collisions = <[Entity, Entity][]>[];
         for (var i=0; i<entities.length; i++){

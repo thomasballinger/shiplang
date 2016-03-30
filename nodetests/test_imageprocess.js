@@ -8,9 +8,7 @@ describe('findOutline', () => {
     function cb(result){
       done();
     }
-    var outline = imageprocess.findOutline('./esimages/ship/aerie.png', cb);
-    console.log(outline);
-    assert.equal(1, 1);
+    imageprocess.findOutline('./esimages/ship/aerie.png', cb);
   });
 });
 /*

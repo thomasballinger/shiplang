@@ -1,1 +1,1 @@
-require('./test_imageprocess.ts');
+require('./test_imageprocess');
