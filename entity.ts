@@ -12,6 +12,8 @@ var SHIELDS_RECHARGE_RATE = 1;
 
 // Asteroids, missiles, ships, planets, projectiles.
 // If a projectile wouldn't need it, doesn't belong here
+// TODO is this still a thing? Can it be combined with ship?
+// composition over inheritance blah blah
 export class Entity{
     constructor(type: string, x:number, y:number, dx:number, dy:number, r:number){
         this.type = type;
@@ -27,7 +29,6 @@ export class Entity{
         this.shieldsMax = 0;
         this.armor = this.armorMax;
         this.shields = this.shieldsMax;
-        this.explosionSize = 0;
         this.randomSeed = Math.random();
         this.weaponCharge = 0;
         this.damage = 0;
@@ -50,7 +51,6 @@ export class Entity{
     shields: number;
     armorMax: number;
     shieldsMax: number;
-    explosionSize: number;
     isComponent: boolean;
     randomSeed: number;
     weaponCharge: number;
@@ -139,6 +139,7 @@ function probablyReturnsGenerators(g:any): g is (e: Entity)=>Generator {
 }
 
 // Things scripts can be run on, including missiles
+// TODO rename to ShipEntity
 export class Ship extends Entity{
     constructor(spec: ShipPrototype, x: number, y: number, script?: Script){
         super(spec.type, x, y, 0, 0, spec.r);
@@ -146,7 +147,6 @@ export class Ship extends Entity{
         this.maxDH = spec.maxDH;
         this.maxSpeed = spec.maxSpeed;
         this.isMunition = spec.isMunition;
-        this.explosionSize = spec.explosionSize;
         if (script === undefined){
             this.context = new codetypes.NOPContext();
         } else if (Array.isArray(script) && (<any[]>script).length === 3 &&
@@ -186,6 +186,12 @@ export class Ship extends Entity{
                 this.drawStatus[key] = spec.drawStatus[key];
             }
         }
+
+        //TODO some attributes like this don't change,
+        //so the shipentitiy
+
+        //Only allowing undefined for deepCopyCreate
+        this.explosionId = spec.explode ? spec.explode.id : undefined;
     }
     maxThrust: number;
     maxDH: number;
@@ -195,6 +201,7 @@ export class Ship extends Entity{
     hTarget: number;
     isInertialess: boolean;
     viewable: boolean;
+    explosionId: string;
 
     context: Context;
     scriptDone: boolean;
@@ -333,7 +340,7 @@ export class Projectile{
         this.x = this.x + dt*this.dx;
         this.y = this.y + dt*this.dy;
     }
-    deepCopyCreate():Projectile{
+    deepCopyCreate(): Projectile{
         return new Projectile(undefined, undefined, undefined, undefined,
                               undefined, undefined, undefined, undefined,
                               undefined, undefined);
@@ -345,14 +352,22 @@ export class EffectEntity{
     constructor(
         public x: number,
         public y: number,
-        public sprites: string[],
+        public sprite: string,
         public startedAt: GameTime,
         public repeat=false,
-        public frameRate?: number){
+        public frameRate=15){
         this.frame = 0;
     }
     // starts at 0, incremented each render
     frame: number;
+
+    update(t: GameTime){
+        this.frame = Math.floor((t - this.startedAt) * this.frameRate);
+    }
+
+    deepCopyCreate(): EffectEntity{
+        return new EffectEntity(undefined, undefined, undefined, undefined, undefined, undefined);
+    }
 }
 
 //TODO add a link to the Spob object for metadata

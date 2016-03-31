@@ -30,17 +30,12 @@ function findSprites(obj){
   return sprites;
 }
 
-// Not mentioned in data but needed
-var engineSprites = [
-  'effect/explosion/big~1'
-];
-
 module.exports = function(source) {
   var data = source;
   this.cacheable();
 
   var sprites = findSprites(data);
-  sprites.push.apply(sprites, engineSprites);
+  sprites.push.apply(sprites);
 
   spriteFiles = {};
   var path = './esimages/';

@@ -342,7 +342,8 @@ function makeCommands():MakeCommandsReturnType{
         }),
 
         new AsyncCommand('detonate', function():any{
-            e.r = e.explosionSize;
+            //TODO doesn't make sense until splash damage is implemented again
+            e.r = 10;
             e.type = 'explosion';
             e.dx = e.dx/Math.abs(e.dx)*Math.pow(Math.abs(e.dx), .2) || 0;
             e.dy = e.dy/Math.abs(e.dy)*Math.pow(Math.abs(e.dy), .2) || 0;

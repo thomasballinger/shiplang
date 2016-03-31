@@ -1,10 +1,15 @@
 /** Returns the DOM id for a sprite */
 
+var files = require('json!./sprite-loader!./data-loader!./data');
 var dimensions = require('json!./sprite-size-loader!./sprite-loader!./data-loader!./data');
 var outlines = require('json!./sprite-outline-loader!./sprite-loader!./data-loader!./data');
 
-export function spriteId(name: string): string{
-    return name.replace(/ /g, '_');
+export function spriteId(name: string, i?: number): string{
+    if (i === undefined){
+        return name.replace(/ /g, '_');
+    } else {
+        return name.replace(/ /g, '_')+'_'+i;
+    }
 }
 
 export function getLandscapeFilename(name: string): string{
@@ -14,6 +19,14 @@ export function getLandscapeFilename(name: string): string{
 
 export function spriteSize(name: string): [number, number]{
     return dimensions[name];
+}
+
+export function spriteFrames(name: string): number{
+    if (Array.isArray(files[name])){
+        return files[name].length;
+    } else {
+        return undefined;
+    }
 }
 
 export function spriteWidth(name: string): number{

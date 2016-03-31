@@ -4,8 +4,9 @@ import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
-import { Fleet, System, Ship, Planet, Spob, universe } from './universe';
+import { Fleet, System, Ship, Planet, Spob, Effect, universe } from './universe';
 import { chooseScript } from './ai';
+import { spriteFrames } from './sprite';
 //
 var deepcopy = require('deepcopy');
 
@@ -46,21 +47,6 @@ function fireMissile(e:Entity, ship: Ship, script: Script, t:GameTime){
     return missile;
 }
 
-function beingLaunchedByCollider(pair:[Entity, Entity], gameTime:GameTime):boolean{
-    var e1 = pair[0]; var e2 = pair[1];
-    if ((e1.firedBy === e2 || (e1.firedBy && e1.firedBy.attachedTo === e2)) &&
-        gameTime < e1.firedAt + IMMUNITY_TIME_S &&
-        e1.type !== 'explosion'){
-            return true;
-    }
-    if ((e2.firedBy === e1 || (e2.firedBy && e2.firedBy.attachedTo === e1)) &&
-         gameTime < e2.firedAt + IMMUNITY_TIME_S &&
-         e2.type !== 'explosion'){
-        return true;
-    }
-}
-
-
 interface hasXY {
     x: number;
     y: number;
@@ -69,7 +55,6 @@ interface hasXY {
 interface hasXYR extends hasXY {
     r: number;
 }
-
 
 export class Engine{
     constructor(public system: System, public profile: Profile){
@@ -302,16 +287,12 @@ export class Engine{
         this.projectiles = this.projectiles.filter(function(x){
             return (x.timeToDie === undefined || x.timeToDie > gameTime);
         });
-        // remove expired effects
-        // TODO for now just keep effects around for .3 seconds
-        this.effects = this.effects.filter(function(e: EffectEntity){
-            return e.startedAt > self.gameTime - .1;
-        });
 
         return events;
     }
     explosionFromShip(s: ShipEntity): EffectEntity{
-        return new EffectEntity(s.x, s.y, ['effect/explosion/big~1'], this.gameTime);
+        var effect = universe.effects[s.explosionId];
+        return new EffectEntity(s.x, s.y, effect.sprite, this.gameTime);
     }
     // doesn't include passed in entity
     enemyCount = function(e1: Entity){
@@ -374,6 +355,7 @@ export class Engine{
         return this.spobs[index];
     }
     tick(dt:GameTime, setError:(msg: string)=>void){
+        var self = this;
         this.inTick = true;
         this.gameTime += dt;
 
@@ -385,6 +367,13 @@ export class Engine{
         this.ships.map(function(x: ShipEntity){ x.move(dt); });
         this.shipProjectiles.map(function(x: ShipEntity){ x.move(dt); });
         this.projectiles.map(function(x: Projectile){ x.move(dt); });
+
+        // update effects and remove if expired
+        this.effects.map(function(x: EffectEntity){ x.update(self.gameTime); })
+        this.effects = this.effects.filter(function(e: EffectEntity){
+            return e.frame < spriteFrames(e.sprite);
+        });
+
         var events = this.checkCollisions();
         var profile = this.profile;
 

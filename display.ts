@@ -227,7 +227,7 @@ function spobDraw(e: SpobEntity, ctx: CanvasRenderingContext2D, dx: number, dy: 
 
 function effectDraw(e: EffectEntity, ctx: CanvasRenderingContext2D, dx: number, dy: number, psf: number, esf: number, hud=false): void{
     //TODO effect animations
-    var imgid = spriteId(e.sprites[0]);
+    var imgid = spriteId(e.sprite, e.frame);
     var sprite = <HTMLImageElement>document.getElementById(imgid);
     if (sprite === null){ throw Error("Can't find sprite with id "+imgid); }
     var w = sprite.naturalWidth * esf;

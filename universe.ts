@@ -27,6 +27,7 @@ interface AllObjects{
     starts: {[name: string]: Start};
     ships: {[name: string]: Ship};
     missions: {[name: string]: Mission};
+    effects: {[name: string]: Effect}
 
     [domain: string]: {[name: string]: any};
 }
@@ -42,6 +43,7 @@ export function createObjects(domains: Domains): AllObjects{
         'start': Start,
         'ship': Ship,
         'mission': Mission,
+        'effect': Effect,
     }
     var allObjects: AllObjects = {
         systems: {},
@@ -53,6 +55,7 @@ export function createObjects(domains: Domains): AllObjects{
         starts: {},
         ships: {},
         missions: {},
+        effects: {},
     };
     // create the objects
     for (var dataKey of Object.keys(dataKeys)){
@@ -430,7 +433,8 @@ export class Ship extends DataNode{
         this.isComponent = data.attributes[0].hasOwnProperty('isComponent') ? true : false
         this.isInertialess = data.attributes[0].hasOwnProperty('isIntertialess') ? true : false
         this.lifespan = data.attributes[0].lifespan ? parseFloat(data.attributes[0].lifespan[0]) : undefined
-        this.explosionSize = data.attributes[0].hasOwnProperty('explosionSize') ? parseFloat(data.attributes[0].explosionSize[0]) : 20
+        this.explode = data.explode ? global.effects[data.explode[0]] : global.effects['tiny explosion'];
+        if (this.explode === undefined){ throw Error('Bad explosion value: '+data.explode); }
 
         this.r = 20; //TODO use sprite infomation TODO eventually don't use radius-based collisions
         this.type = this.id.toLowerCase(); //TODO get rid of this?
@@ -442,6 +446,7 @@ export class Ship extends DataNode{
     maxThrust: number;
     maxDH: number;
     maxSpeed: number;
+    explode: Effect;
 
     r: number;
     isMunition: boolean;
@@ -494,6 +499,19 @@ export class Planet extends DataNode{
 }
 Planet.fieldName = 'planets';
 
+export class Effect extends DataNode{
+    populate(data: any, global: AllObjects){
+        console.log('populating effect '+this.id);
+        this.sprite = data.sprite[0];
+        this.frameRate = parseInt(data['frame rate'][0]);
+        if (!Number.isInteger(this.frameRate)){
+            throw Error('Frame rate for '+this.id+' is not a number: '+this.frameRate);
+        }
+    }
+    sprite: string;
+    frameRate: number;
+}
+Effect.fieldName = 'effects';
 
 
 // Go ahead and load all data here so everyone

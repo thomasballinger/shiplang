@@ -48,7 +48,6 @@ ship "Drone Missile"
 		"maxSpeed" 350
 		"maxDH" 300
 		"isMunition" true
-		"explosionSize" 50
 	engine 6 30
 	engine -6 30
 
