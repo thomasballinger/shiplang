@@ -10,6 +10,8 @@ import { GameTime, Generator, Interpreter, Selection, Script, Context, JSInterpF
 
 var SHIELDS_RECHARGE_RATE = 1;
 
+
+
 // Asteroids, missiles, ships, planets, projectiles.
 // If a projectile wouldn't need it, doesn't belong here
 // TODO is this still a thing? Can it be combined with ship?
@@ -68,14 +70,15 @@ export class Entity{
 
     [key: string]:any; // so some metaprogramming in scriptenv.ts checks
 
-    towards(e: Entity): number;
+    towards(e: { x: number, y: number }): number;
     towards(x: number, y: number): number;
-    towards(eOrX: Entity|number, y?: number){
-      if (eOrX === undefined){ return sm.towardsPoint(this.x, this.y, 0, 0); }
+    towards(eOrX: any, y?: number){
       if (typeof eOrX === 'number' && typeof y === 'number'){
           return sm.towardsPoint(this.x, this.y, eOrX, y);
-      } else if (eOrX instanceof Entity){
+      } else if (typeof eOrX === 'object') {
           return sm.towardsPoint(this.x, this.y, eOrX.x, eOrX.y);
+      } else if (eOrX === undefined){
+          return sm.towardsPoint(this.x, this.y, 0, 0);
       }
     }
     towardsIn(e: Entity, dt: number){
