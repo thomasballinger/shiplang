@@ -116,7 +116,7 @@ export class Engine{
         return new Engine(profile.location, profile);
     }
     entitiesToDraw(): Entity[]{
-        return [].concat(this.spobs, this.ships, this.projectiles, this.effects);
+        return [].concat(this.spobs, this.ships, this.shipProjectiles, this.projectiles, this.effects);
     }
     copy():Engine{
         //var t0 = window.performance.now();
