@@ -383,6 +383,7 @@ function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntit
     top:
     for (var p of projectiles){
         for (var s of ships){
+            // line stuff here?
             if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(20, 2)) &&
                 p.firedBy !== s){
                 pairs.push([p, s]);

@@ -1,4 +1,6 @@
-* mark planets as habitable or not
+* fancy collision detection based on sprites
+* data-based weapons so it's easy to add new sprites and effects
+
 * engine sprites
 * swizzles
 
@@ -6,7 +8,6 @@
 
 * intro level - give player a shuttlecraft initially
 
-* fancy collision detection based on sprites
 
 * planet interface: computer lab to modify scripts!
 
@@ -85,3 +86,4 @@ done:
 * use different planet sprites for different planets
 * planet sprites should be rotated to face the sun
 * add stars
+* mark planets as habitable or not
