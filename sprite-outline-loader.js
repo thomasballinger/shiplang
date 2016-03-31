@@ -6,31 +6,28 @@ var imageprocess = require('./imageprocess');
 module.exports = function(source) {
   var callback = this.async();
   this.cacheable();
-  var sprites = source;
-
-  var images = sprites.map(function(x){
-    filename = './esimages/' + x + '.png';
-    if (!fs.existsSync(filename)){
-      throw Error("referenced image does not exist: "+filename);
-    }
-    return filename;
-  });
+  var spriteFiles = source;
 
   var outlines = {};
-  for (var i=0; i < images.length; i++){
-    var sprite = sprites[i];
-    var filename = images[i];
 
-    var thisCB = function(spriteName){
+  // skip animations with multiple frames
+  var spritesThatNeedOutlines = Object.keys(spriteFiles).filter(function(sprite){
+    return !Array.isArray(spriteFiles[sprite]);
+  });
+
+  for (var sprite of spritesThatNeedOutlines){
+    var filename = spriteFiles[sprite];
+
+    var thisCB = function(spriteName, filename){
       return function(path){
         outlines[spriteName] = path;
-        if (Object.keys(outlines).length === sprites.length){
+        if (Object.keys(outlines).length === spritesThatNeedOutlines.length){
           callback(null, outlines);
         } else {
-          console.log(Object.keys(outlines).length+'/'+sprites.length+' outlines complete');
+          console.log(Object.keys(outlines).length+'/'+spritesThatNeedOutlines.length+' outlines complete');
         }
       };
-    }(sprite);
+    }(sprite, spriteFiles[sprite]);
 
     imageprocess.findOutline(filename, thisCB);
   }

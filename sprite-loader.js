@@ -42,11 +42,27 @@ module.exports = function(source) {
   var sprites = findSprites(data);
   sprites.push.apply(sprites, engineSprites);
 
-  // uniquify
-  var unique = {};
-  for (var sprite of sprites){ unique[sprite] = true; }
-  sprites = Object.keys(unique);
+  spriteFiles = {};
+  var path = './esimages/';
+  var images = sprites.map(function(x){
+    filename = path + x + '.png';
+    if (fs.existsSync(filename)){
+      spriteFiles[x] = filename;
+    } else if (fs.existsSync(path+x+'~0.png')){
+      var frames = [];
+      var i = 0;
+      while (fs.existsSync(path+x+'~'+i+'.png')){
+        frames.push(path+x+'~'+i+'.png');
+        i++;
+      }
+      spriteFiles[x] = frames;
+    } else {
+      throw Error("referenced image does not exist: "+filename);
+    }
+    return filename;
+  });
 
-  return sprites;
+  console.log(spriteFiles);
+  return spriteFiles;
 };
 

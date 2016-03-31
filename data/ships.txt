@@ -21,6 +21,11 @@ ship "Triangle"
 		"maxDH" 200
 	engine -16 82
 	engine 16 82
+	explode "tiny explosion"
+
+effect "tiny explosion"
+	sprite "effect/explosion/tiny"
+	"frame rate" 15
 
 ship "Shuttle"
 	sprite "ship/shuttle"

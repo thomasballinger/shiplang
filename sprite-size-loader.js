@@ -4,20 +4,15 @@ var fs = require('fs');
 /** source should be a list of sprites */
 module.exports = function(source) {
   this.cacheable();
-  var sprites = source;
-
-  var images = sprites.map(function(x){
-    filename = './esimages/' + x + '.png';
-    if (!fs.existsSync(filename)){
-      throw Error("referenced image does not exist: "+filename);
-    }
-    return filename;
-  });
+  var spriteFiles = source;
 
   var dimensions = {};
-  for (var i=0; i < images.length; i++){
-    var sprite = sprites[i];
-    var filename = images[i];
+  for (var sprite of Object.keys(spriteFiles)){
+    var filename = spriteFiles[sprite];
+    // skip multiple frame animations
+    if (Array.isArray(filename)){
+      continue;
+    }
     dimensions[sprite] = getDimsPNG(filename);
   }
 
