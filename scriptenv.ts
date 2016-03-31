@@ -244,7 +244,7 @@ function makeCommands():MakeCommandsReturnType{
         }),
         new Command('distToNthPlanet', function(i: number):any{
             var habitable = w.habitablePlanets();
-            return e.distFromSpob(habitable[i % habitable.length]);
+            return e.distFrom(habitable[i % habitable.length]);
         }),
 
         new Command('distToClosestEnemy', function(){ return e.distFrom(w.findClosestEnemy(e)); }),
@@ -359,6 +359,7 @@ function makeCommands():MakeCommandsReturnType{
                 return function(){ return true; };
             }
             var closest = w.findClosestBackgroundEntity(e);
+            console.log(closest)
             if (!closest) { return function(){ return true; }; }
             if (e.distFrom(closest) > closest.r * 2){
                 putMessage('Not close enough to a planet to land');
@@ -418,7 +419,7 @@ function makeCommands():MakeCommandsReturnType{
                 w.fireMissile(e, universe.ships['Drone Missile'], plsFork, color);
             }
             return function(){
-                if (t < startTime + .4){
+                if (t < startTime + .5){
                     return false;
                 } else {
                     return true;

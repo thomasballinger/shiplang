@@ -94,16 +94,13 @@ export class Entity{
         var theta = (this.vHeading() + 3600 - h + 180) % 360 - 180;
         return Math.cos(theta) * this.speed();
     }
-    distFromSpob(e: SpobEntity){
-        return sm.dist(this.x, this.y, e.x, e.y);
-    }
-    distFrom(e: Entity): number;
+    distFrom(e: { x: number, y: number}): number;
     distFrom(x: number, y: number): number;
-    distFrom(eOrX: Entity|number, y?: number){
+    distFrom(eOrX: any, y?: number){
       if (eOrX === undefined){ return 1000000; }
       if (typeof eOrX === 'number' && typeof y === 'number'){
           return sm.dist(this.x, this.y, eOrX, y);
-      } else if (eOrX instanceof Entity){
+      } else {
           return sm.dist(this.x, this.y, eOrX.x, eOrX.y);
       }
     }

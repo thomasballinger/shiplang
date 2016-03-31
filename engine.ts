@@ -96,8 +96,8 @@ export class Engine{
     }
     fireMissile(e: Entity, ship: Ship, script: Script, color:string){
         var missile = new ShipEntity(ship,
-                                     e.x + x_comp(e.h)*e.r,
-                                     e.y + y_comp(e.h)*e.r,
+                                     e.x + x_comp(e.h)*e.r*3,
+                                     e.y + y_comp(e.h)*e.r*3,
                                      script);
         missile.dx = e.dx + x_comp(e.h) * 10;
         missile.dy = e.dy + y_comp(e.h) * 10;
@@ -383,7 +383,7 @@ function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntit
     top:
     for (var p of projectiles){
         for (var s of ships){
-            if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(30, 2)) &&
+            if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(20, 2)) &&
                 p.firedBy !== s){
                 pairs.push([p, s]);
                 continue top;
