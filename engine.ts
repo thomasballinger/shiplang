@@ -26,27 +26,6 @@ export function makeShipEntity(kind: Ship, x: number, y: number, h: number, scri
     return ship;
 }
 
-function makeMissile(x: number, y: number, dx: number, dy: number, h: number, ship: Ship, script: Script){
-    var missile = new ShipEntity(ship, x, y, script);
-    missile.dx = dx;
-    missile.dy = dy;
-    missile.r = 3;
-    missile.h = h;
-    return missile;
-}
-
-function fireMissile(e:Entity, ship: Ship, script: Script, t:GameTime){
-    var missile = makeMissile(e.x + x_comp(e.h)*e.r,
-                              e.y + y_comp(e.h)*e.r,
-                              e.dx + x_comp(e.h) * 10,
-                              e.dy + y_comp(e.h) * 10,
-                              e.h, ship, script);
-    missile.firedBy = e;
-    missile.firedAt = t;
-    missile.government = e.government;
-    return missile;
-}
-
 interface hasXY {
     x: number;
     y: number;
@@ -124,11 +103,23 @@ export class Engine{
         //console.log(window.performance.now() - t0);
         return world;
     }
-    fireMissile(entity:Entity, ship: Ship, script: Script, color:string){
-        var missile = fireMissile(entity, ship, script, this.gameTime);
+    fireMissile(e: Entity, ship: Ship, script: Script, color:string){
+        var missile = new ShipEntity(ship,
+                                     e.x + x_comp(e.h)*e.r,
+                                     e.y + y_comp(e.h)*e.r,
+                                     script);
+        missile.dx = e.dx + x_comp(e.h) * 10;
+        missile.dy = e.dy + y_comp(e.h) * 10;
+        missile.r = 3;
+        missile.h = e.h;
+        missile.firedBy = e;
+        missile.firedAt = this.gameTime;
+        missile.government = e.government;
         missile.drawStatus['color'] = color;
         this.shipProjectiles.push(missile);
     }
+
+
     fireLaser = function(e: Entity, color: string, intensity?: number){
 
         var p = new Projectile(e.x + x_comp(e.h)*e.r,
