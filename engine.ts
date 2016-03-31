@@ -107,7 +107,10 @@ export class Engine{
         missile.firedAt = this.gameTime;
         missile.government = e.government;
         missile.drawStatus['color'] = color;
+
+        //TODO describe these in a Weapon class in universe
         missile.damage = 5;
+        missile.hitEffectId = "tiny explosion";
         this.shipProjectiles.push(missile);
     }
 
@@ -158,6 +161,7 @@ export class Engine{
     }
 
     checkCollisions(): Event[]{
+        var self = this;
         var gameTime = this.gameTime;
         var events: Event[] = [];
 
@@ -183,13 +187,13 @@ export class Engine{
             }
             console.log(s, 'taking', sp.damage, 'damage from', sp);
             s.takeDamage(sp.damage);
+            self.effects.push(self.effectFromHit(sp));
             //TODO add animation here for hit effect
         }
 
         // check ships and shipProjectiles for having been destroyed.
 
         // returns true if alive, creates explosion effect if dead
-        var self = this;
         function isAliveElseExplode(s: ShipEntity){
             if (s.armor < 0){
                 s.context.cleanup();
@@ -214,6 +218,10 @@ export class Engine{
     explosionFromShip(s: ShipEntity): EffectEntity{
         var effect = universe.effects[s.explosionId];
         return new EffectEntity(s.x, s.y, effect.sprite, this.gameTime);
+    }
+    effectFromHit(sp: ShipEntity){
+        var effect = universe.effects[sp.hitEffectId];
+        return new EffectEntity(sp.x, sp.y, effect.sprite, this.gameTime);
     }
     // doesn't include passed in entity
     enemyCount = function(e1: Entity){

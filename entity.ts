@@ -192,6 +192,10 @@ export class Ship extends Entity{
 
         //Only allowing undefined for deepCopyCreate
         this.explosionId = spec.explode ? spec.explode.id : undefined;
+
+        //Only needed for weapons - maybe there'll be a separate weapon
+        //munition entity? It could inherit from ShipEntity?
+        this.hitEffectId = undefined;
     }
     maxThrust: number;
     maxDH: number;
@@ -202,6 +206,7 @@ export class Ship extends Entity{
     isInertialess: boolean;
     viewable: boolean;
     explosionId: string;
+    hitEffectId: string;
 
     context: Context;
     scriptDone: boolean;
