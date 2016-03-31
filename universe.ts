@@ -501,7 +501,6 @@ Planet.fieldName = 'planets';
 
 export class Effect extends DataNode{
     populate(data: any, global: AllObjects){
-        console.log('populating effect '+this.id);
         this.sprite = data.sprite[0];
         this.frameRate = parseInt(data['frame rate'][0]);
         if (!Number.isInteger(this.frameRate)){

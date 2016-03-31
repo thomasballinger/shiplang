@@ -184,65 +184,12 @@ export class Engine{
     //              If a munition is itself damageable, then it has an outline too.
 
 
-    /** Find first collision item in group 1 has with group 2 */
-    getCollisionPairs<A extends hasXYR, B extends hasXYR>(l1: A[], l2: B[]): [A, B][]{
-        var collisions = <[A, B][]>[];
-        for (var i=0; i<l1.length; i++){
-            var e1 = l1[i];
-            for (var j=0; j<l2.length; j++){
-                var e2 = l2[j];
-                if (Math.pow(e1.x - e2.x, 2) + Math.pow(e1.y - e2.y, 2) < (Math.pow(e1.r + e2.r, 2))){
-                    collisions.push([e1, e2]);
-                }
-            }
-        }
-        return collisions;
-    }
-
-    /** each projectile can collide with 0-1 ship */
-    getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntity[]): [Projectile, ShipEntity][]{
-        //TODO use line segment collisions instead of distance < 30
-        var pairs: [Projectile, ShipEntity][] = [];
-        top:
-        for (var p of projectiles){
-            for (var s of ships){
-                if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(30, 2)) &&
-                    p.firedBy !== s){
-                    pairs.push([p, s]);
-                    continue top;
-                }
-            }
-            pairs.push([p, undefined]);
-        }
-        return pairs;
-    }
-
-    /** each projectile can collide with 0-1 ship */
-    getShipProjectileCollisions(shipProjectiles: ShipEntity[], ships: ShipEntity[]): [ShipEntity, ShipEntity][]{
-        //TODO use line segment collisions instead of distance < 30
-        var pairs: [ShipEntity, ShipEntity][] = [];
-        top:
-        for (var sp of shipProjectiles){
-            for (var s of ships){
-                if (sp === s){ continue; }
-                if (Math.pow(sp.x - s.x, 2) + Math.pow(sp.y - s.y, 2) < (Math.pow(30, 2)) &&
-                    sp.firedBy !== s){
-                    //TODO make own projectile safely time limited
-                    pairs.push([sp, s]);
-                    continue top;
-                }
-            }
-            pairs.push([sp, undefined]);
-        }
-        return pairs;
-    }
-
     checkCollisions(): Event[]{
         var gameTime = this.gameTime;
         var events: Event[] = [];
 
         // check projectiles collisions with ships + shipProjectiles
-        var projectileCollisions = this.getProjectileShipCollisions(this.projectiles, this.getShipsAndShipProjectiles());
+        var projectileCollisions = getProjectileShipCollisions(this.projectiles, this.getShipsAndShipProjectiles());
         this.projectiles = [];
         for (var [p, s] of projectileCollisions){
             if (s === undefined){
@@ -254,7 +201,7 @@ export class Engine{
         }
 
         // check shipProjectiles collisions with ships + shipProjectiles
-        var shipProjectileCollisions = this.getShipProjectileCollisions(this.shipProjectiles, [].concat(this.shipProjectiles, this.ships))
+        var shipProjectileCollisions = getShipProjectileCollisions(this.shipProjectiles, [].concat(this.shipProjectiles, this.ships))
         this.shipProjectiles = []
         for (var [sp, s] of shipProjectileCollisions){
             if (s === undefined){
@@ -421,3 +368,58 @@ export class Engine{
         copy.playerAdded = this.playerAdded;
     };
 }
+
+
+/** Find first collision item in group 1 has with group 2 */
+function getCollisionPairs<A extends hasXYR, B extends hasXYR>(l1: A[], l2: B[]): [A, B][]{
+    var collisions = <[A, B][]>[];
+    for (var i=0; i<l1.length; i++){
+        var e1 = l1[i];
+        for (var j=0; j<l2.length; j++){
+            var e2 = l2[j];
+            if (Math.pow(e1.x - e2.x, 2) + Math.pow(e1.y - e2.y, 2) < (Math.pow(e1.r + e2.r, 2))){
+                collisions.push([e1, e2]);
+            }
+        }
+    }
+    return collisions;
+}
+
+/** each projectile can collide with 0-1 ship */
+function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntity[]): [Projectile, ShipEntity][]{
+    //TODO use line segment collisions instead of distance < 30
+    var pairs: [Projectile, ShipEntity][] = [];
+    top:
+    for (var p of projectiles){
+        for (var s of ships){
+            if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(30, 2)) &&
+                p.firedBy !== s){
+                pairs.push([p, s]);
+                continue top;
+            }
+        }
+        pairs.push([p, undefined]);
+    }
+    return pairs;
+}
+
+/** each projectile can collide with 0-1 ship */
+function getShipProjectileCollisions(shipProjectiles: ShipEntity[], ships: ShipEntity[]): [ShipEntity, ShipEntity][]{
+    //TODO use line segment collisions instead of distance < 30
+    var pairs: [ShipEntity, ShipEntity][] = [];
+    top:
+    for (var sp of shipProjectiles){
+        for (var s of ships){
+            if (sp === s){ continue; }
+            if (Math.pow(sp.x - s.x, 2) + Math.pow(sp.y - s.y, 2) < (Math.pow(30, 2)) &&
+                sp.firedBy !== s){
+                //TODO make own projectile safely time limited
+                pairs.push([sp, s]);
+                continue top;
+            }
+        }
+        pairs.push([sp, undefined]);
+    }
+    return pairs;
+}
+
