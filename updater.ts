@@ -251,7 +251,7 @@ export class Updater{
             })
         }
 
-        if (this.player.dead){
+        if (this.player.armor < 0){
             this.reset();
         }
         /*

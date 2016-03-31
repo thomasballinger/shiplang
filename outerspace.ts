@@ -119,7 +119,8 @@ export function outerspace(originalWorld: Engine){
         var tickTime = updater.tick(0.016, !fastForward[0]); // 60fps game time
         setTimeout(tick, 1); // max fps
     } else {
-        var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
+        //var tickTime = updater.tick(0.032, !fastForward[0]); // 30fps game time
+        var tickTime = updater.tick(0.04, !fastForward[0]); // trying faster game speed
         setTimeout(tick, Math.max(5, 33.5-tickTime)); // 30fps
     }
     //    setTimeout(tick, Math.max(5, 1033.5-tickTime)); // 1fps, good for low cpu usage

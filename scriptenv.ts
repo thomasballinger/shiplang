@@ -235,15 +235,11 @@ function makeCommands():MakeCommandsReturnType{
         new Command('headingToClosestComponent', function():any{ return e.towards(w.findClosestComponent(e)); }),
         new Command('distToClosestComponent', function():any{ return e.distFrom(w.findClosestComponent(e)); }),
         new Command('headingToClosestPlanet', function():any{
-            var h = e.towards(w.findClosestBackgroundEntity(e));
-            console.log('heading:', h);
             return e.towards(w.findClosestBackgroundEntity(e));
         }),
         new Command('distToClosestPlanet', function():any{ return e.distFrom(w.findClosestBackgroundEntity(e)); }),
         new Command('headingToNthPlanet', function(i: number):any{
             var habitable = w.habitablePlanets();
-            console.log(habitable);
-            console.log('heading to nth:', e.towards(habitable[i % habitable.length]))
             return e.towards(habitable[i % habitable.length]);
         }),
         new Command('distToNthPlanet', function(i: number):any{
