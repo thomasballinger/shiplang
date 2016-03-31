@@ -7,7 +7,7 @@ import { Profile } from './profile';
 import { Fleet, System, Ship, Planet, Spob, Effect, universe } from './universe';
 import { chooseScript } from './ai';
 import { spriteFrames } from './sprite';
-//
+
 var deepcopy = require('deepcopy');
 
 import { GameTime, Script, ShipSpec } from './interfaces';
@@ -15,7 +15,7 @@ import { GameTime, Script, ShipSpec } from './interfaces';
 var IMMUNITY_TIME_S = 1;
 
 
-//TODO move these helpers to something to do with entities - engine is more top-level.
+//TODO move this helpers to something to do with entities - engine is more top-level.
 export function makeShipEntity(kind: Ship, x: number, y: number, h: number, script?: Script){
     if (kind.isComponent){
         var ship = <ShipEntity>(new Component(kind, x, y, script));
@@ -24,15 +24,6 @@ export function makeShipEntity(kind: Ship, x: number, y: number, h: number, scri
     }
     ship.h = h;
     return ship;
-}
-
-interface hasXY {
-    x: number;
-    y: number;
-}
-
-interface hasXYR extends hasXY {
-    r: number;
 }
 
 export class Engine{
@@ -116,6 +107,7 @@ export class Engine{
         missile.firedAt = this.gameTime;
         missile.government = e.government;
         missile.drawStatus['color'] = color;
+        missile.damage = 5;
         this.shipProjectiles.push(missile);
     }
 
@@ -165,16 +157,6 @@ export class Engine{
         }
     }
 
-    // New collision system:
-    // * spobs: planets. No state, just use universe objects
-    // * animations: just decoration, don't collide with anything. Planets too.
-    // * explosions: check for collisions with damageables one time only
-    // * damageables: all ships, asteroids, some munitions (drone missiles)
-    //                have outlines to check munition line segments against
-    // * munitions: lines segments checked against all damageables.
-    //              If a munition is itself damageable, then it has an outline too.
-
-
     checkCollisions(): Event[]{
         var gameTime = this.gameTime;
         var events: Event[] = [];
@@ -199,6 +181,7 @@ export class Engine{
                 this.shipProjectiles.push(sp);
                 continue
             }
+            console.log(s, 'taking', sp.damage, 'damage from', sp);
             s.takeDamage(sp.damage);
             //TODO add animation here for hit effect
         }
@@ -360,6 +343,15 @@ export class Engine{
     };
 }
 
+
+interface hasXY {
+    x: number;
+    y: number;
+}
+
+interface hasXYR extends hasXY {
+    r: number;
+}
 
 /** Find first collision item in group 1 has with group 2 */
 function getCollisionPairs<A extends hasXYR, B extends hasXYR>(l1: A[], l2: B[]): [A, B][]{
