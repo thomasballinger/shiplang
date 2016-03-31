@@ -174,7 +174,8 @@ export class Engine{
                 continue;
             }
             s.takeDamage(p.damage);
-            //TODO add animation here for hit effect
+            //TODO unhardcode hit effect
+            self.effects.push(self.effectFromHit(p));
         }
 
         // check shipProjectiles collisions with ships + shipProjectiles
@@ -185,10 +186,9 @@ export class Engine{
                 this.shipProjectiles.push(sp);
                 continue
             }
-            console.log(s, 'taking', sp.damage, 'damage from', sp);
             s.takeDamage(sp.damage);
+            //TODO unhardcode hit effect
             self.effects.push(self.effectFromHit(sp));
-            //TODO add animation here for hit effect
         }
 
         // check ships and shipProjectiles for having been destroyed.
@@ -219,7 +219,7 @@ export class Engine{
         var effect = universe.effects[s.explosionId];
         return new EffectEntity(s.x, s.y, effect.sprite, this.gameTime);
     }
-    effectFromHit(sp: ShipEntity){
+    effectFromHit(sp: { hitEffectId: string, x: number, y: number}){
         var effect = universe.effects[sp.hitEffectId];
         return new EffectEntity(sp.x, sp.y, effect.sprite, this.gameTime);
     }

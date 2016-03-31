@@ -27,6 +27,10 @@ effect "tiny explosion"
 	sprite "effect/explosion/tiny"
 	"frame rate" 15
 
+effect "small explosion"
+	sprite "effect/explosion/small"
+	"frame rate" 15
+
 ship "Shuttle"
 	sprite "ship/shuttle"
 	attributes

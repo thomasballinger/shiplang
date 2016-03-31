@@ -331,7 +331,9 @@ export class Projectile{
         public firedAt: GameTime,
         public timeToDie: GameTime,
         public color: string){
+        this.hitEffectId = 'tiny explosion';
     }
+    hitEffectId: string;
 
     lineSegment(dt: number): [[number, number], [number, number]]{
         return [[this.x, this.y], [this.x + dt*this.dx, this.y + dt*this.dy]];
