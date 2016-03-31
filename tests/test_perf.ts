@@ -37,18 +37,18 @@ describe('deepcopy', () => {
             world.addPlayer([code, ufb, undefined]);
             world.getPlayer().h = 90
             world.tick(0.1, (msg: string)=>{ assert.fail(); });
-            world.getPlayer().h = 45
+            world.getPlayer().h = 0
             world.tick(0.5, (msg: string)=>{ assert.fail(); });
-            world.getPlayer().h = 15
+            world.getPlayer().h = 180
             world.tick(0.5, (msg: string)=>{ assert.fail(); });
-            assert.equal(world.ships.length, 3);
+            assert.equal(world.shipProjectiles.length, 2);
 
             var copies: Engine[] = [];
             for (var i=0; i<20; i++){
                 world.tick(0.1, (msg: string)=>{ assert.fail(); });
                 copies.push(world.copy())
             }
-            assert.equal(world.ships.length, 3);
+            assert.equal(world.shipProjectiles.length, 2);
         });
     });
 });
