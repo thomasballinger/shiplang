@@ -1,9 +1,15 @@
-* fancy collision detection based on sprites
-* data-based weapons so it's easy to add new sprites and effects
 
+fun engine stuff:
+* missile collisions with points
+* optimize ship outline paths
+* data-based weapons so it's easy to add new sprites and effects
+* fire guns from gun locations
 * engine sprites
 * swizzles
 
+major tasks:
+* write an immutable interpreter for comparison
+* write a crap JS interpreter
 * optimize javascript interpreter copying - way too slow atm!
 
 * intro level - give player a shuttlecraft initially
@@ -87,3 +93,4 @@ done:
 * planet sprites should be rotated to face the sun
 * add stars
 * mark planets as habitable or not
+* fancy collision detection based on sprites

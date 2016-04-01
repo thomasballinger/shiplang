@@ -378,7 +378,6 @@ function getCollisionPairs<A extends hasXYR, B extends hasXYR>(l1: A[], l2: B[])
 
 /** each projectile can collide with 0-1 ship */
 function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntity[], dt: GameTime): [Projectile, ShipEntity][]{
-    //TODO use line segment collisions instead of distance < 30
     var pairs: [Projectile, ShipEntity][] = [];
     top:
     for (var p of projectiles){
@@ -388,8 +387,16 @@ function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntit
                 continue;
             }
 
-            // Translate projectile beam to ship lines space
             var size = spriteSize(s.drawStatus['sprite'])
+            // *.75 because that's sqrt(2)/2 plus a bit.
+            // +600*dt because 600 is the fastest projectile in the game
+            // +400*dt because 350 is the fastest ship in the game
+            if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2)
+                > Math.pow(Math.max(size[0], size[1]) * .75 + 1000*dt, 2)){
+                continue;
+            }
+
+            // Translate projectile beam to ship lines space
             var h = (3600 - s.h - 90) % 360;
             var trans1: [number, number] = [pLine[0][0] - s.x, pLine[0][1] - s.y];
             var trans2: [number, number] = [pLine[1][0] - s.x, pLine[1][1] - s.y];
@@ -406,13 +413,6 @@ function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntit
                 }
             }
 
-            /*
-            if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(20, 2)) &&
-                p.firedBy !== s){
-                pairs.push([p, s]);
-                continue top;
-            }
-            */
         }
         pairs.push([p, undefined]);
     }
