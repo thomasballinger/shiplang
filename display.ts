@@ -1,7 +1,7 @@
 import { Entity, Ship as ShipEntity, Projectile, SpobEntity, EffectEntity } from './entity';
 import { Engine } from './engine';
 import { System } from './universe';
-import { spriteId, getSpritePath, spriteSize } from './sprite';
+import { spriteId, spritePath, spriteSize } from './sprite';
 
 //TODO invert y axis
 
@@ -255,7 +255,7 @@ function entityDraw(e: Entity, ctx: CanvasRenderingContext2D, dx: number, dy: nu
 
       if (!e.drawStatus['sprite']){ throw Error('no sprite for '+e.type); }
       if (hud){
-          var path = getSpritePath(e.drawStatus['sprite']);
+          var path = spritePath(e.drawStatus['sprite']);
           var [w, h] = spriteSize(e.drawStatus['sprite']);
           var theta = e.h + 90;
 

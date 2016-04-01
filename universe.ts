@@ -178,7 +178,7 @@ export class System extends DataNode{
     }
     createInitialFleets(world: Engine, profile: Profile){
         // System Fleets
-        for (var fleet of this.getFleets(5)){
+        for (var fleet of this.getFleets(50)){
             world.addFleet(fleet);
         }
         // Mission fleets
@@ -502,8 +502,8 @@ Planet.fieldName = 'planets';
 export class Effect extends DataNode{
     populate(data: any, global: AllObjects){
         this.sprite = data.sprite[0];
-        this.frameRate = parseInt(data['frame rate'][0]);
-        if (!Number.isInteger(this.frameRate)){
+        this.frameRate = parseFloat(data['frame rate'][0]);
+        if (!Number.isFinite(this.frameRate)){
             throw Error('Frame rate for '+this.id+' is not a number: '+this.frameRate);
         }
     }

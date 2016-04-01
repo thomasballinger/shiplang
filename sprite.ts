@@ -2,7 +2,23 @@
 
 var files = require('json!./sprite-loader!./data-loader!./data');
 var dimensions = require('json!./sprite-size-loader!./sprite-loader!./data-loader!./data');
-var outlines = require('json!./sprite-outline-loader!./sprite-loader!./data-loader!./data');
+var vertices = require('json!./sprite-outline-loader!./sprite-loader!./data-loader!./data');
+var lines = connectSpriteVertices(vertices);
+
+function connectSpriteVertices(vertices: { [sprite: string]: [number, number][] }){
+    var lines: { [name: string]: [[number, number], [number, number]][] } = {};
+    for (var sprite of Object.keys(vertices)){
+        var points = vertices[sprite];
+        var l: [[number, number], [number, number]][] = [];
+        var lastPoint = points[points.length-1];
+        for (var point of points){
+            l.push([lastPoint, point])
+            lastPoint = point;
+        }
+        lines[sprite] = l;
+    }
+    return lines;
+}
 
 export function spriteId(name: string, i?: number): string{
     if (i === undefined){
@@ -40,12 +56,20 @@ export function spriteWidth(name: string): number{
     }
 }
 
-export function getSpritePath(name: string): [number, number][]{
-    var path = outlines[name];
+export function spritePath(name: string): [number, number][]{
+    var path = vertices[name];
     if (path === undefined){
         console.log('could not find sprite for', name);
         return [[0, -50], [50, 0], [0, 50], [-50, 0]];
     } else {
         return path;
     }
+}
+
+export function spriteLines(name: string): [[number, number], [number, number]][]{
+    var l = lines[name];
+    if (lines === undefined){
+        throw Error('no lines found for '+name);
+    }
+    return l;
 }

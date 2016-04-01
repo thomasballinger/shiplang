@@ -1,12 +1,12 @@
 import { Entity, Ship as ShipEntity, SpobEntity, Component, Projectile, EffectEntity } from './entity';
-import { x_comp, y_comp, dist } from './shipmath';
+import { x_comp, y_comp, dist, headingDiff } from './shipmath';
 import * as scriptEnv from './scriptenv';
 import { Event, EventType } from './mission';
 import { isEnemy, govModReputation } from './governments';
 import { Profile } from './profile';
 import { Fleet, System, Ship, Planet, Spob, Effect, universe } from './universe';
 import { chooseScript } from './ai';
-import { spriteFrames } from './sprite';
+import { spriteFrames, spriteLines, spriteSize } from './sprite';
 
 var deepcopy = require('deepcopy');
 
@@ -160,13 +160,13 @@ export class Engine{
         }
     }
 
-    checkCollisions(): Event[]{
+    checkCollisions(dt: GameTime): Event[]{
         var self = this;
         var gameTime = this.gameTime;
         var events: Event[] = [];
 
         // check projectiles collisions with ships + shipProjectiles
-        var projectileCollisions = getProjectileShipCollisions(this.projectiles, this.getShipsAndShipProjectiles());
+        var projectileCollisions = getProjectileShipCollisions(this.projectiles, this.getShipsAndShipProjectiles(), dt);
         this.projectiles = [];
         for (var [p, s] of projectileCollisions){
             if (s === undefined){
@@ -179,7 +179,7 @@ export class Engine{
         }
 
         // check shipProjectiles collisions with ships + shipProjectiles
-        var shipProjectileCollisions = getShipProjectileCollisions(this.shipProjectiles, [].concat(this.shipProjectiles, this.ships))
+        var shipProjectileCollisions = getShipProjectileShipCollisions(this.shipProjectiles, [].concat(this.shipProjectiles, this.ships))
         this.shipProjectiles = []
         for (var [sp, s] of shipProjectileCollisions){
             if (s === undefined){
@@ -217,11 +217,11 @@ export class Engine{
     }
     explosionFromShip(s: ShipEntity): EffectEntity{
         var effect = universe.effects[s.explosionId];
-        return new EffectEntity(s.x, s.y, effect.sprite, this.gameTime);
+        return new EffectEntity(s.x, s.y, effect.sprite, this.gameTime, false, effect.frameRate);
     }
     effectFromHit(sp: { hitEffectId: string, x: number, y: number}){
         var effect = universe.effects[sp.hitEffectId];
-        return new EffectEntity(sp.x, sp.y, effect.sprite, this.gameTime);
+        return new EffectEntity(sp.x, sp.y, effect.sprite, this.gameTime, false, effect.frameRate);
     }
     // doesn't include passed in entity
     enemyCount = function(e1: Entity){
@@ -303,7 +303,7 @@ export class Engine{
             return e.frame < spriteFrames(e.sprite);
         });
 
-        var events = this.checkCollisions();
+        var events = this.checkCollisions(dt);
         var profile = this.profile;
 
         //TODO test this code, currently events are empty
@@ -377,18 +377,42 @@ function getCollisionPairs<A extends hasXYR, B extends hasXYR>(l1: A[], l2: B[])
 }
 
 /** each projectile can collide with 0-1 ship */
-function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntity[]): [Projectile, ShipEntity][]{
+function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntity[], dt: GameTime): [Projectile, ShipEntity][]{
     //TODO use line segment collisions instead of distance < 30
     var pairs: [Projectile, ShipEntity][] = [];
     top:
     for (var p of projectiles){
+        var pLine = p.lineSegment(dt);
         for (var s of ships){
-            // line stuff here?
+            if (p.firedBy === s){
+                continue;
+            }
+
+            // Translate projectile beam to ship lines space
+            var size = spriteSize(s.drawStatus['sprite'])
+            var h = (3600 - s.h - 90) % 360;
+            var trans1: [number, number] = [pLine[0][0] - s.x, pLine[0][1] - s.y];
+            var trans2: [number, number] = [pLine[1][0] - s.x, pLine[1][1] - s.y];
+            var rot1: [number, number] = [x_comp(h)*trans1[0] - y_comp(h)*trans1[1], y_comp(h)*trans1[0] + x_comp(h)*trans1[1]];
+            var rot2: [number, number] = [x_comp(h)*trans2[0] - y_comp(h)*trans2[1], y_comp(h)*trans2[0] + x_comp(h)*trans2[1]];
+            var final1: [number, number] = [rot1[0] + size[0]/2, rot1[1] + size[1]/2];
+            var final2: [number, number] = [rot2[0] + size[0]/2, rot2[1] + size[1]/2];
+
+            var lines = spriteLines(s.drawStatus['sprite']);
+            for (var line of lines){
+                if (linesIntersect(line[0], line[1], final1, final2)){
+                    pairs.push([p, s]);
+                    continue top;
+                }
+            }
+
+            /*
             if (Math.pow(p.x - s.x, 2) + Math.pow(p.y - s.y, 2) < (Math.pow(20, 2)) &&
                 p.firedBy !== s){
                 pairs.push([p, s]);
                 continue top;
             }
+            */
         }
         pairs.push([p, undefined]);
     }
@@ -396,7 +420,7 @@ function getProjectileShipCollisions(projectiles: Projectile[], ships: ShipEntit
 }
 
 /** each projectile can collide with 0-1 ship */
-function getShipProjectileCollisions(shipProjectiles: ShipEntity[], ships: ShipEntity[]): [ShipEntity, ShipEntity][]{
+function getShipProjectileShipCollisions(shipProjectiles: ShipEntity[], ships: ShipEntity[]): [ShipEntity, ShipEntity][]{
     //TODO use line segment collisions instead of distance < 30
     var pairs: [ShipEntity, ShipEntity][] = [];
     top:
@@ -413,5 +437,12 @@ function getShipProjectileCollisions(shipProjectiles: ShipEntity[], ships: ShipE
         pairs.push([sp, undefined]);
     }
     return pairs;
+}
+
+function linesIntersect(p1: [number, number], p2: [number, number], p3: [number, number], p4: [number, number]) {
+    function CCW(p1: [number, number], p2: [number, number], p3: [number, number]) {
+        return (p3[1] - p1[1]) * (p2[0] - p1[0]) > (p2[1] - p1[1]) * (p3[0] - p1[0]);
+    }
+    return (CCW(p1, p3, p4) != CCW(p2, p3, p4)) && (CCW(p1, p2, p3) != CCW(p1, p2, p4));
 }
 

@@ -336,7 +336,7 @@ export class Projectile{
     hitEffectId: string;
 
     lineSegment(dt: number): [[number, number], [number, number]]{
-        return [[this.x, this.y], [this.x + dt*this.dx, this.y + dt*this.dy]];
+        return [[this.x-dt*this.dx, this.y-dt*this.dy], [this.x + dt*this.dx, this.y + dt*this.dy]];
     }
     /** Stretch line back and forwards by dt/2 */
     visualLineSegment(dt: number): [[number, number], [number, number]]{
