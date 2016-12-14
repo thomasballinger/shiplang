@@ -8,7 +8,7 @@ declare module "pegjs" {
 		nodes: any;
 	}
 
-	export function buildParser(grammar: string, options?: {
+	export function generate(grammar: string, options?: {
 		cache: boolean,
 		allowedStartRules: string[],
 		output: string /* "source" | "parser" */,

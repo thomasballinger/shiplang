@@ -6,6 +6,9 @@ global.DEBUGMODE = false;
 // acorn, and deepCopy on the global object
 require('./hotswapping-js-interp/interpreter.js');
 
+if (typeof acorn === 'undefined'){ throw Error('acorn should be defined'); }
+if (typeof deepCopy === 'undefined'){ throw Error('deepCopy should be defined'); }
+
 /* TODO a possible solution:
 // make window available
 global.window = window

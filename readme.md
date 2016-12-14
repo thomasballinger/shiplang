@@ -33,3 +33,10 @@ Saved requirements aren't complete yet.
     npm run dev
 
 to run
+
+
+##Game Data
+
+This project uses the assets from Endless Sky anda data format similar to
+the one used in Endless Sky.
+

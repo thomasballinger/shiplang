@@ -26,7 +26,7 @@ function getLocation(){
 }
 
 function main(){
-  cmd = getLocation();
+  var cmd = getLocation();
   if (cmd === 'simulator'){
     return simulator(Engine.fromStart('simulator'));
   }

@@ -19,7 +19,7 @@ interface Scope {
   [key: string]: any;
 }
 
-import { buildParser } from 'pegjs';
+import { generate } from 'pegjs';
 
 if (process.pid !== undefined){
     // when run from node (I hope?)
@@ -425,7 +425,13 @@ export class Environment {
 var emptyEnv = new Environment([]);
 
 
-export var parser = buildParser(grammar);
+export var parser = generate(grammar);
+
+(<any>global).parser = parser;
+// TODO hack to allow code in the parser to access these nodes.
+// Ought to read more about PEG.js to fine out the right way to
+// do this.
+
 parser.nodes = {}
 parser.nodes.NumberLiteralNode = NumberLiteralNode;
 parser.nodes.StringLiteralNode = StringLiteralNode;

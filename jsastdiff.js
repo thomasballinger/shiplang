@@ -57,7 +57,7 @@ function diffIgnoringFunctionDeclarations(n1, n2){
 
 function functionNameUsedMoreThanOnce(ast){
   var funcs = findNamedFunctions(ast);
-  names = {};
+  var names = {};
   funcs.map(function(x){ names[x.id.name] = true; });
   return Object.keys(names) > funcs.length;
 }
@@ -73,7 +73,7 @@ function functionBodiesDifferent(f1, f2){
 
 function namedFunctionsByName(ast){
   var funcs = findNamedFunctions(ast);
-  names = {};
+  var names = {};
   funcs.map(function(x){ names[x.id.name] = x; });
   return names;
 }

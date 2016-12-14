@@ -2,23 +2,22 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
-  entry: './entry.js',
+  entry: ['babel-polyfill', './entry.js'],
   output: {
     filename: 'bundle.js'
   },
   devtool: 'source-map',
   externals: {
-    // in browsers: provided by hotswapping-js-interp/acorn.js
-    'acorn': "acorn",
     // in browsers: provided by hotswapping-js-interp/deepcopy.js
     'deepcopy': "deepCopy",
-    // in browsers: provided by hotswapping-js-interp/acorn.js
+    // in browsers: provided by hotswapping-js-interp/interpreter.js
     'Interpreter': "Interpreter",
 
     // Boolean for debug mode
     'DEBUGMODE': "DEBUGMODE",
   },
   resolve: {
+    modules: [path.resolve(__dirname), 'node_modules/'],
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   node: {
@@ -26,10 +25,11 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.tsx?$/,
+      { test: /\.tsx?$|.js$/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015-webpack']
+          presets: [require.resolve('babel-preset-es2015')]
+          //TODO why is require.resolve necessary here?
         }
       },
       { test: /\.grammar$/, loader: 'raw-loader' },
