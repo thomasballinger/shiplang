@@ -1,6 +1,6 @@
 /** Given a data-style data structure, return a list of sprites with info */
 var fs = require('fs');
-var imageprocess = require('./imageprocess');
+var imageprocess = require('./nodesrc/imageprocess');
 
 /** source should be a list of sprites */
 module.exports = function(source) {

@@ -24,9 +24,9 @@ import { generate } from 'pegjs';
 if (process.pid !== undefined){
     // when run from node (I hope?)
     var fs = require('fs');
-    var grammar = fs.readFileSync('./shiplang.grammar', 'utf8');
+    var grammar = fs.readFileSync('shiplang.grammar', 'utf8');
 } else { // webpack will use a loader
-    var grammar = require('./shiplang.grammar');
+    var grammar = require('../shiplang.grammar');
 }
 
 function enumLookup(enumObj: any, value: number){

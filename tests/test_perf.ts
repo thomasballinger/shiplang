@@ -1,10 +1,10 @@
 var assert = require('chai').assert
 
-import { Updater } from '../updater';
-import { Engine } from '../engine';
-import { Selection } from '../interfaces';
-import { Profile } from '../profile';
-import { UserFunctionBodies } from '../userfunctionbodies';
+import { Updater } from '../src/updater';
+import { Engine } from '../src/engine';
+import { Selection } from '../src/interfaces';
+import { Profile } from '../src/profile';
+import { UserFunctionBodies } from '../src/userfunctionbodies';
 import { PeekEngine, engineFixtures } from './test_engine';
 
 describe('deepcopy', () => {

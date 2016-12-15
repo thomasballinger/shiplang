@@ -1,7 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { Mission, universe } from '../universe';
+import { Mission, universe } from '../src/universe';
 
 describe('Missions', () => {
     it("can be round-trip serialized", () => {

@@ -190,7 +190,7 @@ export class BlocklySL {
 }
 
 function createBlocklyToolbox(){
-    var toolboxXML = require("raw!./blocklySLtoolbox.xml");
+    var toolboxXML = require("raw!../blocklySLtoolbox.xml");
     var node = document.createElement('div');
     node.innerHTML = toolboxXML;
     console.log(node);

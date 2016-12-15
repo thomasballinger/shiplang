@@ -34,8 +34,18 @@ Saved requirements aren't complete yet.
 
 to run
 
+## Tests
 
-##Game Data
+
+    npm test
+
+creates the build and runs all tests.
+
+It may be useful to tests loaders separately if the build is failing:
+
+    mocha nodetests
+
+## Game Data
 
 This project uses the assets from Endless Sky anda data format similar to
 the one used in Endless Sky.

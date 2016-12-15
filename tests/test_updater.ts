@@ -1,11 +1,11 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { Updater } from '../updater';
-import { Engine } from '../engine';
-import { Selection } from '../interfaces';
-import { Profile } from '../profile';
-import { UserFunctionBodies } from '../userfunctionbodies';
+import { Updater } from '../src/updater';
+import { Engine } from '../src/engine';
+import { Selection } from '../src/interfaces';
+import { Profile } from '../src/profile';
+import { UserFunctionBodies } from '../src/userfunctionbodies';
 import { PeekEngine, engineFixtures } from './test_engine';
 
 class FakeUserFunctionBodies extends UserFunctionBodies{

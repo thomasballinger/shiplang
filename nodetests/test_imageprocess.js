@@ -1,7 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 var assert = require('chai').assert;
 
-var imageprocess = require('../imageprocess');
+var imageprocess = require('../nodesrc/imageprocess');
 
 describe('findOutline', () => {
   it("works", (done) => {

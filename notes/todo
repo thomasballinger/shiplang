@@ -1,11 +1,13 @@
 new ideas
 
+✓ restructure into src directory
 * start using new typescript flags
 * start using pixi.js! faster rendering
 * figure out why rewinding isn't working right now
 * start using a linter
 * write a faster-to-copy JS interpreter
 * better timekeeping with performance.now() in deepcopy methods
+
 A lot of the stuff down below is great too!
 
 

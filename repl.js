@@ -4,7 +4,7 @@ require('ts-node').register();
 var readline = require('readline');
 var process = require('process');
 
-var evaluation = require('./eval');
+var evaluation = require('./src/eval');
 
 if (process.argv[2] === 'runner'){
   process.exit();

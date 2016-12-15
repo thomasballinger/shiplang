@@ -1,8 +1,8 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { loadData, parseLine, merge, loadMany } from '../dataload';
-import { createObjects } from '../universe';
+import { loadData, parseLine, merge, loadMany } from '../src/dataload';
+import { createObjects } from '../src/universe';
 
 var real = require('raw!../data/map.txt') + '\n' + require('raw!../data/ships.txt');
 

@@ -1,8 +1,8 @@
 /** Returns the DOM id for a sprite */
 
-var files = require('json!./sprite-loader!./data-loader!./data');
-var dimensions = require('json!./sprite-size-loader!./sprite-loader!./data-loader!./data');
-var vertices = require('json!./sprite-outline-loader!./sprite-loader!./data-loader!./data');
+var files = require('json!../sprite-loader!../data-loader!../data');
+var dimensions = require('json!../sprite-size-loader!../sprite-loader!../data-loader!../data');
+var vertices = require('json!../sprite-outline-loader!../sprite-loader!../data-loader!../data');
 var lines = connectSpriteVertices(vertices);
 
 function connectSpriteVertices(vertices: { [sprite: string]: [number, number][] }){

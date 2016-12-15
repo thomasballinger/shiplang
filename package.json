@@ -11,7 +11,7 @@
     "dev": "webpack-dev-server --config webpack.config.js --port 8080",
     "devtest": "webpack-dev-server --config webpack.tests.config.js --port 8081",
     "pretest": "webpack --config webpack.nodetests.config.js",
-    "test": "mocha --require source-map-support/register nodetest.build.js"
+    "test": "mocha --require source-map-support/register nodetest.build.js nocompiletests"
   },
   "babel": {
     "presets": [

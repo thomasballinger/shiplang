@@ -1,7 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-var astdiff = require('../jsastdiff');
+var astdiff = require('../src/jsastdiff');
 var acorn = require('acorn');
 acorn.walk = require('acorn/dist/walk');
 

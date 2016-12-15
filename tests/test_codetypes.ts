@@ -1,9 +1,9 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { SLgetScripts, debugReport } from '../scriptenv';
-import { SLContext } from '../codetypes';
-import { Ship } from '../entity';
+import { SLgetScripts, debugReport } from '../src/scriptenv';
+import { SLContext } from '../src/codetypes';
+import { Ship } from '../src/entity';
 
 
 var testCode = `

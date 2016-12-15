@@ -2,10 +2,11 @@ var fs = require('fs');
 var path = require('path');
 
 //turns on typescript requires
-require('typescript-require');
-var dataload = require('./dataload');
+require('ts-node/register')
+var dataload = require('./src/dataload');
 //turns typescript requires back off
 delete require.extensions['.ts'];
+delete require.extensions['.tsx'];
 
 /** Given a data-style data structure, return a list of sprites with info */
 module.exports = function(source) {

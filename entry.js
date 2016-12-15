@@ -3,13 +3,13 @@ require("./style.css");
 //TODO find/write a loader that just does this
 document.getElementById('images').innerHTML = require('raw!./sprite-src-loader!./sprite-loader!./data-loader!./data');
 
-import { simulator } from './simulator';
-import { outerspace, level1 } from './outerspace';
-import { Profile } from './profile';
-import { earth, tolok } from './story';
-import { missions } from './mission';
-import { Engine } from './engine';
-import { universe } from './universe';
+import { simulator } from './src/simulator';
+import { outerspace, level1 } from './src/outerspace';
+import { Profile } from './src/profile';
+import { earth, tolok } from './src/story';
+import { missions } from './src/mission';
+import { Engine } from './src/engine';
+import { universe } from './src/universe';
 
 // errors resulting from running user's script
 // are throw instead of displayed and ignored

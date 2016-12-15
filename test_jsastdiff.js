@@ -2,7 +2,7 @@
 var chai = require('chai');
 var assert = chai.assert;
 
-var jsastdiff = require('./jsastdiff');
+var jsastdiff = require('./src/jsastdiff');
 var acorn = require('acorn');
 
 var ast1 = acorn.parse(`

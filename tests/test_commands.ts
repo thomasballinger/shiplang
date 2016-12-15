@@ -1,10 +1,10 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { universe } from '../universe';
-import { Engine, makeShipEntity } from '../engine';
+import { universe } from '../src/universe';
+import { Engine, makeShipEntity } from '../src/engine';
 import {setCurrentEntity, setGameTime, setGameWorld,
-        setKeyControls, commands, controls} from '../scriptenv';
+        setKeyControls, commands, controls} from '../src/scriptenv';
 
 
 describe('Commands', () => {

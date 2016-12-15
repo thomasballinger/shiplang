@@ -1,12 +1,12 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 import { assert } from 'chai';
 
-import { Engine, makeShipEntity } from '../engine';
-import { Entity } from '../entity';
-import { System, universe, createObjects } from '../universe';
-import { Profile } from '../profile';
-import { loadData } from '../dataload';
-import { UserFunctionBodies } from '../userfunctionbodies';
+import { Engine, makeShipEntity } from '../src/engine';
+import { Entity } from '../src/entity';
+import { System, universe, createObjects } from '../src/universe';
+import { Profile } from '../src/profile';
+import { loadData } from '../src/dataload';
+import { UserFunctionBodies } from '../src/userfunctionbodies';
 
 export class PeekEngine extends Engine{
     tick(dt: number, onError: (err: string)=>void){
