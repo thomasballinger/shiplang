@@ -23,7 +23,7 @@ describe('deepcopy', () => {
         });
     });
     describe("copying a world with 2 missiles forked from the player's js interp", () => {
-        it('5 times', () => {
+        it('20 times', () => {
             var world = new PeekEngine(engineFixtures.systems['Sys'],
                                        Profile.newProfile());
             var code = `var a = 1;
