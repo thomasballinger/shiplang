@@ -1,6 +1,7 @@
-new ideas
-
+December 2016
 ✓ restructure into src directory
+✓ get travis tests passing again
+✓ link to a particular ES build
 * start using new typescript flags
 * start using pixi.js! faster rendering
 * figure out why rewinding isn't working right now

@@ -13,7 +13,7 @@ hotswapping-js-interp:
 	cd hotswapping-js-interp; git pull
 
 esimages:
-	svn export https://github.com/endless-sky/endless-sky/trunk/images esimages
+	svn export https://github.com/endless-sky/endless-sky/tags/v0.9.4/images esimages
 
 bundle.js: FORCE
 	node_modules/.bin/webpack
