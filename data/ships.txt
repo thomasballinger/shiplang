@@ -32,7 +32,7 @@ effect "small explosion"
 	"frame rate" 15
 
 ship "Shuttle"
-	sprite "ship/shuttle"
+	sprite "ship/shuttle=0"
 	attributes
 		"shields" 0
 		"hull" 3
@@ -88,7 +88,7 @@ ship "Boid"
 	engine -6 30
 
 ship "Astroid"
-	sprite "asteroid/big rock/spin-00"
+	sprite "asteroid/large rock/spin-00"
 	attributes
 		"shields" 0
 		"hull" 20
