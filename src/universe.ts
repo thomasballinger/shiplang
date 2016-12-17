@@ -66,6 +66,9 @@ export function createObjects(domains: Domains): AllObjects{
         var dataClass = dataKeys[dataKey]
         console.log('dataKey', dataKey);
         console.log('data class', dataClass);
+        for (var name in dataClass){
+            console.log("prop: ", name, (<any>dataClass)[name]);
+        }
         for (var name of Object.keys(domains[dataKey] || {})){
             allObjects[dataClass.fieldName][name] = new dataClass(name);
         }
