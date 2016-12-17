@@ -4,8 +4,8 @@ import { Gov } from './interfaces';
 // Don't initialize immediately to delay running evaluationg code
 var builtinScripts: any;
 
-var gunnerScript = require("raw!../scripts/gunner.js");
-var manualShipScript = require("raw!../scripts/pilot.js");
+var gunnerScript = require("raw-loader!../scripts/gunner.js");
+var manualShipScript = require("raw-loader!../scripts/pilot.js");
 
 export function chooseScript(governments: Gov, personality: string[]){
     initializeSL();
@@ -34,6 +34,6 @@ export function getJSByName(name: string): any{
 
 function initializeSL(){
     if (builtinScripts === undefined){
-        builtinScripts = SLgetScripts(require("raw!../scripts/pilot.sl"));
+        builtinScripts = SLgetScripts(require("raw-loader!../scripts/pilot.sl"));
     }
 }

@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { loadData, parseLine, merge, loadMany } from '../src/dataload';
 import { createObjects } from '../src/universe';
 
-var real = require('raw!../data/map.txt') + '\n' + require('raw!../data/ships.txt');
+var real = require('raw-loader!../data/map.txt') + '\n' + require('raw-loader!../data/ships.txt');
 
 var simple = `
 system Sol

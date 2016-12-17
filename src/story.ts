@@ -1,7 +1,7 @@
 import { Profile } from './profile';
 
-var earthtexts = require("raw!../text/earth.txt").split(/\n---\n?/g);
-var toloktexts = require("raw!../text/tolok.txt").split(/\n---\n?/g);
+var earthtexts = require("raw-loader!../text/earth.txt").split(/\n---\n?/g);
+var toloktexts = require("raw-loader!../text/tolok.txt").split(/\n---\n?/g);
 
 
 function style(text: string): string{

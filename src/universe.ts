@@ -523,5 +523,5 @@ Effect.fieldName = 'effects';
 
 // Go ahead and load all data here so everyone
 // can use the same copy
-var gamedata = require('json!../data-loader!../data');
+var gamedata = require('json-loader!../data-loader!../data');
 export var universe = createObjects(gamedata);

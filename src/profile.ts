@@ -1,4 +1,4 @@
-var pilotScriptSource = require("raw!../scripts/pilot.js");
+var pilotScriptSource = require("raw-loader!../scripts/pilot.js");
 import { Gov } from './interfaces';
 import { Event } from './mission';
 import { putMessage } from './messagelog';

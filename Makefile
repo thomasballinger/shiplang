@@ -16,7 +16,7 @@ esimages:
 	svn export https://github.com/endless-sky/endless-sky/trunk/images esimages
 
 bundle.js: FORCE
-	webpack
+	node_modules/.bin/webpack
 
 deploy: bundle.js
 	rsync -r index.html bundle.js esimages tom:/home/tomb/missilecmd
