@@ -18,25 +18,33 @@ module.exports = {
   },
   resolve: {
     modules: [path.resolve(__dirname), 'node_modules/'],
-    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
+    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
   },
   node: {
     fs: "empty"
   },
   module: {
-    loaders: [
-      { test: /\.tsx?$|.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: [require.resolve('babel-preset-es2015')]
-          //TODO why is require.resolve necessary here?
-        }
-      },
-      { test: /\.grammar$/, loader: 'raw-loader' },
-      { test: /\.css$/, loader: "style!css" }
+    rules: [
+      {
+        test: /\.tsx?$|.js$/,
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            presets: [require.resolve('babel-preset-es2015')]
+            //TODO why is require.resolve necessary here?
+          }
+        }]
+      }, {
+        test: /\.grammar$/,
+        loader: 'raw-loader'
+      }, {
+        test: /\.css$/,
+        loader: "style!css"
+      }, {
+        enforce: 'pre',
+        test: /\.tsx?$/,
+        loader: 'ts-loader'
+      }
     ],
-    preLoaders: [
-      { test: /\.tsx?$/, loader: 'ts-loader' },
-    ]
   }
 };
