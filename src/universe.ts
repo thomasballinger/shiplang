@@ -33,8 +33,10 @@ interface AllObjects{
 }
 
 export function createObjects(domains: Domains): AllObjects{
+    //TODO hsomehow System gets shadowed in this function?
+    //So HACK: using asdf instead.
     var dataKeys: {[name: string]: DataStatic} = {
-        'system': System,
+        'system': asdf, // reference same objects as global var system System
         'fleet': Fleet,
         'variant': Variant,
         'object': Spob,  // datafiles use "object"
@@ -58,17 +60,8 @@ export function createObjects(domains: Domains): AllObjects{
         effects: {},
     };
     // create the objects
-    console.log('dataKeys', dataKeys);
-    console.log('System', dataKeys['system']);
-    console.log('Planet', dataKeys['planet']);
-    console.log('Object.keys(dataKeys)', Object.keys(dataKeys));
     for (var dataKey of Object.keys(dataKeys)){
-        var dataClass = dataKeys[dataKey]
-        console.log('dataKey', dataKey);
-        console.log('data class', dataClass);
-        for (var name in dataClass){
-            console.log("prop: ", name, (<any>dataClass)[name]);
-        }
+        var dataClass = dataKeys[dataKey];
         for (var name of Object.keys(domains[dataKey] || {})){
             allObjects[dataClass.fieldName][name] = new dataClass(name);
         }
@@ -211,7 +204,6 @@ export class System extends DataNode{
     }
 }
 System.fieldName = 'systems';
-console.log('System: ', System);
 
 export class Fleet extends DataNode{
     populate(data: any, global: AllObjects){
@@ -508,7 +500,6 @@ export class Planet extends DataNode{
     bar: string;
 }
 Planet.fieldName = 'planets';
-console.log("Planet: ", Planet);
 
 export class Effect extends DataNode{
     populate(data: any, global: AllObjects){
@@ -527,4 +518,7 @@ Effect.fieldName = 'effects';
 // Go ahead and load all data here so everyone
 // can use the same copy
 var gamedata = require('json-loader!../data-loader!../data');
-export var universe = createObjects(gamedata);
+
+var asdf = System; //HACK for some reason System gets shadowed in createObjects
+var universe = createObjects(gamedata);
+export { universe } ;
