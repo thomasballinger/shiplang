@@ -39,7 +39,7 @@ module.exports = {
         loader: 'raw-loader'
       }, {
         test: /\.css$/,
-        loader: "style!css"
+        loader: "style-loader!css-loader"
       }, {
         enforce: 'pre',
         test: /\.tsx?$/,

@@ -2,8 +2,7 @@
 
 Currently using same assets as [Endless
 Sky](https://github.com/endless-sky/endless-sky), a great game by Michael
-Zahniser. Right now the assets from the most recent development version of the
-game are pulled in, so the build gets broken when a ship sprite gets renamed.
+Zahniser.
 
 A somewhat recent version is usually up at
 [missilecmd.ballingt.com/](http://missilecmd.ballingt.com/):
